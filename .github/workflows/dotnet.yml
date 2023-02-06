@@ -4,11 +4,15 @@
 name: .NET
 
 on:
-#  push:
-#    branches: [ "master" ]
-#  pull_request:
-#    branches: [ "master" ]
-  workflow_dispatch
+# 推送至master分支时触发  
+  push:
+    branches: [ "master" ]
+# 拉取master分支时触发    
+  pull_request:
+    branches: [ "master" ]
+
+# 手动运行
+#  workflow_dispatch
 
 jobs:
   build:
@@ -27,5 +31,7 @@ jobs:
       run: dotnet build --no-restore
     - name: 测试
       run: dotnet test --no-build --verbosity normal
+    - name: 查看当前目录
+      run: echo $(pwd)
     - name: 编译docker镜像
       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
