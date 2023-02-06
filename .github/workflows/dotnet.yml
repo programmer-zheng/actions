@@ -17,13 +17,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Setup .NET
+    - name: 设置.NET环境
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 6.0.x
-    - name: Restore dependencies
+    - name: 还原Nuget包
       run: dotnet restore
-    - name: Build
+    - name: 编译
       run: dotnet build --no-restore
-    - name: Test
+    - name: 测试
       run: dotnet test --no-build --verbosity normal
+    - name: 编译docker镜像
+      run: docker build -t my-image-name:$(date +%s)
