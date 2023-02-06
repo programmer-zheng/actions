@@ -28,4 +28,4 @@ jobs:
     - name: 测试
       run: dotnet test --no-build --verbosity normal
     - name: 编译docker镜像
-      run: docker build -t my-image-name:$(date +%s)
+      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
