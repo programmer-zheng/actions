@@ -4,10 +4,10 @@
 name: .NET
 
 on:
-# 推送至master分支时触发  
+  # 推送至master分支时触发  
   push:
     branches: [ "master" ]
-# 拉取master分支时触发    
+  # 拉取master分支时触发    
   pull_request:
     branches: [ "master" ]
 
@@ -20,20 +20,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: 设置.NET环境
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 6.0.x
-    - name: 还原Nuget包
-      run: dotnet restore
-    - name: 编译
-      run: dotnet build --no-restore
-    - name: 测试
-      run: dotnet test --no-build --verbosity normal
-    - name: 查看当前目录
-      run: echo $(pwd)
-    - name: 查看当前目录列表
-      run: echo $(ls -ll)
-    - name: 编译docker镜像
-      run: docker build . --file DotnetCoreMvcTestGithubActions/Dockerfile --tag my-image-name:$(date +%s)
+      - uses: actions/checkout@v3
+      - name: 设置.NET环境
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
+      - name: 还原Nuget包
+        run: dotnet restore
+      - name: 编译
+        run: dotnet build --no-restore
+      - name: 测试
+        run: dotnet test --no-build --verbosity normal
+      - name: 查看当前目录
+        run: echo $(pwd)
+      - name: 查看当前目录列表
+        run: echo $(ls -ll)
+      - name: 编译docker镜像
+        run: docker build . --file DotnetCoreMvcTestGithubActions/Dockerfile --tag my-image-name:$(date +%s)
