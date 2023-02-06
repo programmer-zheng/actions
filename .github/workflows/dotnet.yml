@@ -36,4 +36,4 @@ jobs:
     - name: 查看当前目录列表
       run: echo $(ls -ll)
     - name: 编译docker镜像
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      run: docker build . --file DotnetCoreMvcTestGithubActions/Dockerfile --tag my-image-name:$(date +%s)
