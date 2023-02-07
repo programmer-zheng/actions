@@ -48,5 +48,5 @@ jobs:
       - name: 上传制品
         uses: actions/upload-artifact@v3
         with: 
-          name: my-image-name-1.tar
-#          path: $(pwd)
+          name: docker-image-file
+          path: /home/runner/work/actions/actions/my-image-name-1.tar
