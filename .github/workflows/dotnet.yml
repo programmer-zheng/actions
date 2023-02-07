@@ -45,3 +45,8 @@ jobs:
         run: docker build . --file DotnetCoreMvcTestGithubActions/Dockerfile --tag my-image-name:1
       - name: 保存docker镜像
         run: docker save -o my-image-name-1.tar my-image-name:1
+      - name: 上传制品
+        uses: actions/upload-artifact@v3
+        with: 
+          name: my-image-name-1.tar
+          path: $(pwd)
