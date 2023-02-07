@@ -49,4 +49,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with: 
           name: my-image-name-1.tar
-          path: $(pwd)
+#          path: $(pwd)
