@@ -8,6 +8,8 @@
 
 [从 GitLab CI/CD 迁移到 GitHub Actions - GitHub Enterprise Server 3.2 Docs](https://docs.github.com/cn/enterprise-server@3.2/actions/migrating-to-github-actions/migrating-from-gitlab-cicd-to-github-actions#introduction)
 
+[上传制品](https://github.com/actions/upload-artifact)
+
 ### 触发
 
 ``` yaml
