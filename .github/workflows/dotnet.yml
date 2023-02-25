@@ -43,6 +43,8 @@ jobs:
         run: docker login -u ${{secrets.DOCKER_HUB_USERNAME}} -p ${{secrets.DOCKER_HUB_PASSWORD}}
       - name: 推送镜像
         run: docker push ${{secrets.DOCKER_HUB_USERNAME}}/my-image-name:1
+      - name: 退出登录
+        run: docker logout
       # - name: 保存docker镜像
       #   run: docker save -o my-image-name-1.tar my-image-name:1
       # - name: 上传制品
