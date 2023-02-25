@@ -43,6 +43,10 @@ jobs:
 #        run: docker save -o /my-image-name-$(date +%s).tar my-image-name:$(date +%s) 
       - name: 编译docker镜像
         run: docker build . --file DotnetCoreMvcTestGithubActions/Dockerfile --tag my-image-name:1
+      - name: 登录
+        run: docker login -u ${{secrets.DOCKER_HUB_USERNAME}} -p ${{secrets.DOCKER_HUB_PASSWORD}}
+      - name: 推送镜像
+        run: docker push my-image-name:1
       - name: 保存docker镜像
         run: docker save -o my-image-name-1.tar my-image-name:1
       - name: 上传制品
