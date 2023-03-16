@@ -20,15 +20,18 @@ for car in sortedCars:
     print(car.title())
 
 print("\n生成数字列表：")
-numbers = list(range(6))  # 默认从0开始
+# 默认从0开始
+numbers = list(range(6))
 print(numbers)
 
 print("\n生成数字列表2：")
-numbers = list(range(1, 6))  # 指定起始数字
+# 指定起始数字
+numbers = list(range(1, 6))
 print(numbers)
 
 print("\n步进式生成数字列表")
-even_numbers = list(range(2, 11, 3))  # 从2开始，到11结束（不包含11），每次步进3
+# 从2开始，到11结束（不包含11），每次步进3
+even_numbers = list(range(2, 11, 3))
 print(even_numbers)
 
 print("\n计算平方")
