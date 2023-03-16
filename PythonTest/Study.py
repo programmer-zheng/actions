@@ -34,19 +34,19 @@ print(even_numbers)
 print("\n计算平方")
 squares = []
 for value in even_numbers:
-    squares.append(value**2)
+    squares.append(value ** 2)
 
 print(squares)
 print("\n数字总和")
+print(sum(squares))
 print(sum(squares))
 
 print("\n最小数")
 print(min(squares))
 
-
 print("\n最大数")
 print(max(squares))
 
 print("\n简洁语法生成数字列表: [value**2 for value in range(2, 11, 3)]")
-squares = [value**2 for value in range(2, 11, 3)]
+squares = [value ** 2 for value in range(2, 11, 3)]
 print(squares)
