@@ -17,7 +17,12 @@ alien_0["color"] = "yellow"
 
 alien_0['x_position'] = 0
 alien_0['y_position'] = 25
-print(alien_0)
+print(f"添加键值后的字典：{alien_0}")
+
+# 测试多种方式删除字典键
+del alien_0["x_position"]
+alien_0.pop("y_position")
+print(f"删除键值后的字典：{alien_0}")
 
 favorite_languages = {
     'jen': 'python',
