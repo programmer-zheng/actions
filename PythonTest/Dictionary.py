@@ -50,3 +50,16 @@ print(f"You ordered a {pizza['crust']}-crust pizza "
 
 for topping in pizza['toppings']:
     print(f"\t{topping}")
+
+# 字典嵌套列表
+favorite_languages = {
+    'jen': ['python', 'ruby'],
+    'sarah': ['c'],
+    'edward': ['ruby', 'go'],
+    'phil': ['python', 'haskell'],
+}
+
+for name, languages in favorite_languages.items():
+    print(f"\n{name.title()}'s favorite languages are:")
+for language in languages:
+    print(f"\t{language.title()}")
