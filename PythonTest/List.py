@@ -7,6 +7,13 @@ sortedCars = sorted(cars)
 print("\n排序后的列表:")
 print(sortedCars)
 
+print("\n循环列表并对首字母大写：")
+for car in sortedCars:
+    if car == "bmw":
+        print(car.upper())
+    else:
+        print(car.title())
+
 sortedCars.reverse()
 print("\n列表反转:")
 print(sortedCars)
@@ -14,10 +21,6 @@ print(sortedCars)
 print("\n列表长度:", len(sortedCars))
 
 print("\n列表中最后一个元素:", sortedCars[-1])
-
-print("\n循环列表并对首字母大写：")
-for car in sortedCars:
-    print(car.title())
 
 print("\n生成数字列表：")
 # 默认从0开始

@@ -12,3 +12,4 @@ response_dict = r.json()
 
 # 处理结果。
 print(response_dict.keys())
+print(response_dict['total_count'])
