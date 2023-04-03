@@ -41,3 +41,13 @@ user_profile = build_profile('albert', 'einstein',
                              location='princeton',
                              field='physics')
 print(f"\n{user_profile}")
+
+
+def make_car(brand, placeOfOrigin, **car):
+    car["brand"] = brand
+    car["placeOfOrigin"] = placeOfOrigin
+    return car
+
+
+car = make_car("斯巴鲁", "中国", color="白色")
+print(f"\n{car}")
