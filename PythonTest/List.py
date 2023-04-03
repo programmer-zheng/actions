@@ -45,7 +45,6 @@ for value in even_numbers:
 print(squares)
 print("\n数字总和")
 print(sum(squares))
-print(sum(squares))
 
 print("\n最小数")
 print(min(squares))
