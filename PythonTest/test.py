@@ -1,4 +1,6 @@
-from Dog import *
+from dog import Dog, ChineseDog
+
+# import dog
 
 my_dog = Dog("球球")
 # 直接修改属性值
