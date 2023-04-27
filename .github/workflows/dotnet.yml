@@ -5,7 +5,13 @@ name: .NET
 
 on:
 # 手动运行
-  workflow_dispatch
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号'
+        required: true
+        
+
   # push:
   #   branches: [ "master" ]
   # pull_request:
@@ -37,17 +43,22 @@ jobs:
 #      - name: 保存docker镜像
 #        run: docker save -o /my-image-name-$(date +%s).tar my-image-name:$(date +%s) 
       - name: 编译docker镜像
-        run: docker build . --file DotnetCoreMvcTestGithubActions/Dockerfile --tag ${{secrets.DOCKER_HUB_USERNAME}}/my-image-name:1
+        run: docker build . --file DotnetCoreMvcTestGithubActions/Dockerfile --tag ${{secrets.DOCKER_HUB_USERNAME}}/my-image-name:${{github.event.inputs.version}}
       - name: 登录Docker Hub
         run: docker login -u ${{secrets.DOCKER_HUB_USERNAME}} -p ${{secrets.DOCKER_HUB_PASSWORD}}
       - name: 推送镜像
-        run: docker push ${{secrets.DOCKER_HUB_USERNAME}}/my-image-name:1
+        run: docker push ${{secrets.DOCKER_HUB_USERNAME}}/my-image-name:${{github.event.inputs.version}}
       - name: 退出登录
         run: docker logout
-      # - name: 保存docker镜像
-      #   run: docker save -o my-image-name-1.tar my-image-name:1
-      # - name: 上传制品
-      #   uses: actions/upload-artifact@v3
-      #   with: 
-      #     name: docker-image-file
-      #     path: /home/runner/work/actions/actions/my-image-name-1.tar
+      - name: 保存docker镜像
+        run: docker save -o my-image-name-${{ github.event.inputs.version }}.tar my-image-name:${{ github.event.inputs.version }}
+      - name: Release
+        uses: actions/create-release@latest
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.event.inputs.version}}
+          release_name: v${{ github.event.inputs.version}}
+          body_path: /home/runner/work/actions/actions/my-image-name-${{ github.event.inputs.version }}.tar
+          draft: false
+          prerelease: false
