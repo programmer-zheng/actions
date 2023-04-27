@@ -43,22 +43,24 @@ jobs:
 #      - name: 保存docker镜像
 #        run: docker save -o /my-image-name-$(date +%s).tar my-image-name:$(date +%s) 
       - name: 编译docker镜像
-        run: docker build . --file DotnetCoreMvcTestGithubActions/Dockerfile --tag ${{secrets.DOCKER_HUB_USERNAME}}/my-image-name:${{github.event.inputs.version}}
+        run: docker build . --file DotnetCoreMvcTestGithubActions/Dockerfile --tag ${{ secrets.DOCKER_HUB_USERNAME }}/my-image-name:${{ github.event.inputs.version }}
       - name: 登录Docker Hub
-        run: docker login -u ${{secrets.DOCKER_HUB_USERNAME}} -p ${{secrets.DOCKER_HUB_PASSWORD}}
+        run: docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PASSWORD }}
       - name: 推送镜像
-        run: docker push ${{secrets.DOCKER_HUB_USERNAME}}/my-image-name:${{github.event.inputs.version}}
+        run: docker push ${{secrets.DOCKER_HUB_USERNAME}}/my-image-name:${{ github.event.inputs.version }}
       - name: 退出登录
         run: docker logout
       - name: 保存docker镜像
         run: docker save -o my-image-name-${{ github.event.inputs.version }}.tar my-image-name:${{ github.event.inputs.version }}
+
+#https://github.com/actions/create-release#example-workflow---create-a-release
       - name: Release
         uses: actions/create-release@latest
         env: 
           GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }}
         with:
-          tag_name: v${{ github.event.inputs.version}}
-          release_name: v${{ github.event.inputs.version}}
+          tag_name: v${{ github.event.inputs.version }}
+          release_name: v${{ github.event.inputs.version }}
           body_path: /home/runner/work/actions/actions/my-image-name-${{ github.event.inputs.version }}.tar
           draft: false
           prerelease: false
