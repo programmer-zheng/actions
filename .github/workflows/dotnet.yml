@@ -55,7 +55,7 @@ jobs:
       - name: Release
         uses: actions/create-release@latest
         env: 
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }}
         with:
           tag_name: v${{ github.event.inputs.version}}
           release_name: v${{ github.event.inputs.version}}
