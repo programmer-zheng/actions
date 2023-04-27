@@ -51,7 +51,7 @@ jobs:
       - name: 退出登录
         run: docker logout
       - name: 保存docker镜像
-        run: docker save -o my-image-name-${{ github.event.inputs.version }}.tar my-image-name:${{ github.event.inputs.version }}
+        run: docker save -o my-image-name-${{ github.event.inputs.version }}.tar ${{ secrets.DOCKER_HUB_USERNAME }}/my-image-name:${{ github.event.inputs.version }}
 
 #https://github.com/actions/create-release#example-workflow---create-a-release
       - name: Release
