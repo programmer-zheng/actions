@@ -5,10 +5,10 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["DotnetCoreMvcTestGithubActions/DotnetCoreMvcTestGithubActions.csproj", "DotnetCoreMvcTestGithubActions/"]
-RUN dotnet restore "DotnetCoreMvcTestGithubActions/DotnetCoreMvcTestGithubActions.csproj"
+# COPY ["DotnetCoreMvcTestGithubActions/DotnetCoreMvcTestGithubActions.csproj", "DotnetCoreMvcTestGithubActions/"]
 COPY . .
-WORKDIR "/src/DotnetCoreMvcTestGithubActions"
+RUN dotnet restore "DotnetCoreMvcTestGithubActions/DotnetCoreMvcTestGithubActions.csproj"
+# WORKDIR "/src/DotnetCoreMvcTestGithubActions"
 RUN dotnet build "DotnetCoreMvcTestGithubActions.csproj" -c Release -o /app/build
 
 FROM build AS publish
