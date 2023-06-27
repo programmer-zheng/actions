@@ -7,7 +7,8 @@ FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 # COPY ["DotnetCoreMvcTestGithubActions/DotnetCoreMvcTestGithubActions.csproj", "DotnetCoreMvcTestGithubActions/"]
 COPY . .
-RUN dotnet restore "DotnetCoreMvcTestGithubActions/DotnetCoreMvcTestGithubActions.csproj"
+# RUN dotnet restore "DotnetCoreMvcTestGithubActions/DotnetCoreMvcTestGithubActions.csproj"
+RUN dotnet restore "DotnetCoreMvcTestGithubActions.csproj"
 # WORKDIR "/src/DotnetCoreMvcTestGithubActions"
 RUN dotnet build "DotnetCoreMvcTestGithubActions.csproj" -c Release -o /app/build
 
