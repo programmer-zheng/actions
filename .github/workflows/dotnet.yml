@@ -34,10 +34,10 @@ jobs:
 #        run: dotnet build --no-restore
 #      - name: 测试
 #        run: dotnet test --no-build --verbosity normal
-#      - name: 查看当前目录
-#        run: echo $(pwd)
-#      - name: 查看当前目录列表
-#        run: echo $(ls -ll)
+      - name: 查看当前目录
+        run: echo $(pwd)
+      - name: 查看当前目录列表
+        run: echo $(ls -ll)
 #      - name: 编译docker镜像
 #        run: docker build . --file DotnetCoreMvcTestGithubActions/Dockerfile --tag my-image-name:$(date +%s)
 #      - name: 保存docker镜像
