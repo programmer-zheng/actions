@@ -1,7 +1,10 @@
+using DotnetCoreMvcTestGithubActions;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<LoggingFilter>();
 
 var app = builder.Build();
 
@@ -13,6 +16,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseMiddleware<LoggingMiddleware>();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
