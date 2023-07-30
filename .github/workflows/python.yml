@@ -23,4 +23,4 @@ jobs:
         with:
          python-version: '3.9'
       - name: 运行python脚本
-        run: python PythonTest/Study.py
+        run: python Python/PythonTest/Study.py
