@@ -1,0 +1,17 @@
+<Project>
+  <ItemGroup>
+    <PackageVersion Include="Azure.Core" Version="1.34.0" />
+    <PackageVersion Include="Azure.Identity" Version="1.10.0" />
+    <PackageVersion Include="Microsoft.Graph" Version="5.22.0" />
+    <PackageVersion Include="Microsoft.Identity.Client" Version="4.55.0" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageVersion Include="Volo.Abp.Autofac" Version="7.3.2" />
+    <PackageVersion Include="Volo.Abp.Caching.StackExchangeRedis" Version="7.3.2" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
+    <PackageVersion Include="Serilog.Extensions.Hosting" Version="7.0.0" />
+    <PackageVersion Include="Serilog.Extensions.Logging" Version="7.0.0" />
+    <PackageVersion Include="Serilog.Sinks.Async" Version="1.5.0" />
+    <PackageVersion Include="Serilog.Sinks.Console" Version="4.1.0" />
+    <PackageVersion Include="Serilog.Sinks.File" Version="5.0.0" />
+  </ItemGroup>
+</Project>
