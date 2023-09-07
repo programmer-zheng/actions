@@ -1,18 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Senparc.CO2NET;
-using Senparc.CO2NET.Cache;
-using Senparc.CO2NET.Extensions;
+﻿using Senparc.CO2NET;
 using Senparc.CO2NET.RegisterServices;
 using Senparc.Weixin;
-using Senparc.Weixin.Cache;
 using Senparc.Weixin.Entities;
 using Senparc.Weixin.RegisterServices;
 using Senparc.Weixin.Work;
-using Senparc.Weixin.Work.AdvancedAPIs;
-using Senparc.Weixin.Work.AdvancedAPIs.MailList;
-using Senparc.Weixin.Work.Containers;
-using Senparc.Weixin.Work.Entities;
 
 namespace WeWorkTest
 {
@@ -20,16 +11,18 @@ namespace WeWorkTest
     {
         static void Main(string[] args)
         {
-            var configBuilder = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", false, true)
-                .AddJsonFile("appsettings.secret.json", true, true);
+            var webAppBuilder = WebApplication.CreateBuilder(args);
+            webAppBuilder.Configuration.AddJsonFile("appsettings.secret.json", true);
 
-            var config = configBuilder.Build();
-            var serviceProvider = new ServiceCollection()
-                .AddMemoryCache()
+            var config = webAppBuilder.Configuration;
+
+            webAppBuilder.Services
+                .AddControllersWithViews();
+
+            webAppBuilder.Services.AddMemoryCache()
                 .AddSenparcGlobalServices(config)
-                .AddSenparcWeixinServices(config)
-                .BuildServiceProvider();
+                .AddSenparcWeixinServices(config);
+
             var corpId = config.GetValue<string>("CorpId");
             var appSecret = config.GetValue<string>("AppSecret");
             var agentId = config.GetValue<string>("AgentId");
@@ -45,26 +38,11 @@ namespace WeWorkTest
                 //注册企业微信（可注册多个）
                 .RegisterWorkAccount(senparcWeixinSetting, "企业微信应用名"); // 注册企业微信应用信息，同时获取了 access token
 
+            var app = webAppBuilder.Build();
+            app.MapDefaultControllerRoute();
 
-            var appKey = AccessTokenContainer.BuildingKey(senparcWeixinSetting.WeixinCorpId, senparcWeixinSetting.WeixinCorpSecret);
+            app.Run();
 
-            var accessToken = AccessTokenContainer.GetToken(appKey);
-
-
-            var departmentList = MailListApi.GetDepartmentList(accessToken);
-
-            var rootUsers = MailListApi.GetDepartmentMemberInfo(accessToken, departmentList.department.First().id, 0);
-
-            Console.WriteLine(rootUsers.ToJson(true));
-            // var list = new List<GetMemberResult>();
-            // foreach (var department in departmentList?.department)
-            // {
-            //     var memberInfoResult = MailListApi.GetDepartmentMemberInfo(accessToken, department.id, 0);
-            //     var users = memberInfoResult.userlist;
-            //     list.AddRange(users);
-            // }
-            //
-            // Console.WriteLine(list.ToJson(true));
         }
     }
 }
