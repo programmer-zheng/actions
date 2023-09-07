@@ -10,7 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.32" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.32" />
-    <PackageReference Include="Senparc.Weixin.Work" Version="3.7.500" />
+    <PackageReference Include="Senparc.Weixin.Work" Version="3.7.510.1" />
   </ItemGroup>
 
   <ItemGroup>
