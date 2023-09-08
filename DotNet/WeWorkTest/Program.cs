@@ -12,7 +12,7 @@ namespace WeWorkTest
         static void Main(string[] args)
         {
             var webAppBuilder = WebApplication.CreateBuilder(args);
-            webAppBuilder.Configuration.AddJsonFile("appsettings.secret.json", true);
+            webAppBuilder.Configuration.AddJsonFile("appsettings.secrets.json", true, true);
 
             var config = webAppBuilder.Configuration;
 

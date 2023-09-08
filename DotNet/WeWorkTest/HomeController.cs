@@ -30,25 +30,12 @@ namespace WeWorkTest
 
         public IActionResult Index()
         {
-            return Content("Hello World");
-        }
-
-        private string GetAccessToken()
-        {
-            return AccessTokenContainer.GetToken(AppKey);
-        }
-
-        [Route("/test")]
-        public IActionResult Test(IConfiguration configuration)
-        {
-
-
             var accessToken = GetAccessToken();
 
 
             var departmentList = MailListApi.GetDepartmentList(accessToken);
 
-            var rootUsers = MailListApi.GetDepartmentMemberInfo(accessToken, departmentList.department.First().id, 0);
+            var rootUsers = SenparcSdkApiExtensions.GetWeWorkDepartmentMemberInfo(accessToken, departmentList.department.First().id, 0);
 
             var mapperRules = new Dictionary<string, string>();
             mapperRules["UserName"] = "userid";
@@ -63,14 +50,20 @@ namespace WeWorkTest
                 var user = item.ToMapperModel<GetMemberResult, User>(mapperRules);
                 json = user.ToJson();
             }
-            // var list = new List<GetMemberResult>();
-            // foreach (var department in departmentList?.department)
-            // {
-            //     var memberInfoResult = MailListApi.GetDepartmentMemberInfo(accessToken, department.id, 0);
-            //     var users = memberInfoResult.userlist;
-            //     list.AddRange(users);
-            // }
+            var list = new List<WeWorkGetMemberResult>();
+            foreach (var department in departmentList?.department)
+            {
+                var memberInfoResult = SenparcSdkApiExtensions.GetWeWorkDepartmentMemberInfo(accessToken, department.id, 0);
+                var users = memberInfoResult.userlist;
+                list.AddRange(users);
+            }
+            json = list.ToJson(true);
             return Content(json);
+        }
+
+        private string GetAccessToken()
+        {
+            return AccessTokenContainer.GetToken(AppKey);
         }
 
         [Route("/WeWork")]
@@ -89,20 +82,12 @@ namespace WeWorkTest
             var userId = getUserInfoResult.UserId;
             var ticket = getUserInfoResult.user_ticket;
             // Senparc.Weixin.Work 中未添加企业邮箱，使用扩展类接收企业微信API返回
-            //var userDetail = await OAuth2Api.GetUserDetailAsync(accessToken, ticket);
-            var userDetail = await GetWeWorkUserDetail(accessToken, ticket);
+            var userDetail = await OAuth2Api.GetUserDetailAsync(accessToken, ticket);
+            //var userDetail = await SenparcSdkApiExtensions.GetWeWorkUserDetail(accessToken, ticket);
             return Json(userDetail);
         }
 
-        public async Task<WeWorkUserDetailResult> GetWeWorkUserDetail(string accessToken, string user_ticket)
-        {
-            string urlFormat = Senparc.Weixin.Config.ApiWorkHost + "/cgi-bin/user/getuserdetail?access_token={0}";
-            var data = new
-            {
-                user_ticket = user_ticket
-            };
-            return await CommonJsonSend.SendAsync<WeWorkUserDetailResult>(accessToken, urlFormat, data).ConfigureAwait(continueOnCapturedContext: false);
-        }
+
     }
 
 
