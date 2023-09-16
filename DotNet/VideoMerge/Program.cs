@@ -1,37 +1,51 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using VideoMerge;
+using Volo.Abp;
 
 public class Program
 {
-    static void Main(string[] args)
+    public static async Task<int> Main(string[] args)
     {
-        var configurationBuilder = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", false, true);
-        var config = configurationBuilder.Build();
-        var videoBaseDirectory = config.GetValue<string>("BaseDirectory");
-        if (Directory.Exists(videoBaseDirectory))
+        try
         {
-            var dateDirectories = Directory.GetDirectories(videoBaseDirectory);
-            foreach (var dir in dateDirectories)
+            var builder = Host.CreateDefaultBuilder(args);
+            builder.ConfigureServices(services =>
             {
-                // 获取目录名称，后续用作合并视频文件名
-                var directoryName = new DirectoryInfo(dir).Name;
-                var videoFiles = Directory.GetFiles(dir, "*", SearchOption.TopDirectoryOnly);
-                var convertFile = Path.Combine(videoBaseDirectory, directoryName, $"{directoryName}.txt");
-                var outputFile = Path.Combine(videoBaseDirectory, $"{directoryName}.mp4");
-                using (StreamWriter writer = new StreamWriter(convertFile))
+                services.AddApplicationAsync<AppModule>(options =>
                 {
-                    foreach (var file in videoFiles)
-                    {
-                        var videoFileName = new FileInfo(file).Name;
-                        writer.WriteLine($"file {videoFileName}");
-                    }
-                }
+                    options.Services.ReplaceConfiguration(services.GetConfiguration());
+                    options.Services.AddLogging(loggingBuilder => loggingBuilder.AddConsole());
+                });
+            })
+                .UseAutofac().UseConsoleLifetime();
+            var host = builder.Build();
 
-                // 拼接转换命令
-                Console.WriteLine($"ffmpeg -safe 0 -f concat -i {convertFile} -c:v copy -c:a aac {outputFile}");
-            }
+            await host.Services.GetRequiredService<IAbpApplicationWithExternalServiceProvider>().InitializeAsync(host.Services);
+
+            await host.RunAsync();
+            return 0;
         }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            return 1;
+        }
+        //using (var application = AbpApplicationFactory.Create<AppModule>(options =>
+        //{
+        //    options.UseAutofac(); //Autofac integration
+        //}))
+        //{
+        //    application.Initialize();
+
+        //    Console.WriteLine("Press ENTER to stop application...");
+        //    Console.ReadLine();
+        //}
+
     }
 }

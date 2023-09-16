@@ -1,7 +1,11 @@
-﻿FROM mcr.microsoft.com/dotnet/runtime:6.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/runtime:7.0 AS base
+RUN apt-get update \
+    && apt-get clean \
+    && apt-get install -y --no-install-recommends libc6-dev libgdiplus wget software-properties-common
+RUN apt-get install -y ffmpeg
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["VideoMerge.csproj", "./"]
 RUN dotnet restore "VideoMerge.csproj"
