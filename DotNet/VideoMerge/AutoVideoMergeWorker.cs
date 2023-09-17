@@ -71,6 +71,12 @@ namespace VideoMerge
 
                     // 获取文件夹的视频文件
                     var videoFiles = Directory.GetFiles(dir);
+                    if (videoFiles.Length != 60)
+                    {
+                        Logger.LogInformation($"文件夹：{directoryName} 中只有 {videoFiles.Length} 个视频文件，不足一小时，跳过合并……");
+                        continue;
+                    }
+
                     try
                     {
                         // 将需要合并的文件，记录在以日期命名的文件中，后期ffmpeg合并命令使用
