@@ -3,6 +3,14 @@
 - 建立该项目，将同一小时的视频合并为一个文件，以日期命名（yyyy-MM-dd）新文件夹，存储当天24小时的视频
 - 合并完成后，删除源视频及目录
 - 每小时执行一次
+
+## 完成效果
+- 原小米摄像机同步到NAS效果
+<img src="screenshots/micamera-hour.png">
+
+- 视频合并后效果
+<img src="screenshots/merge-date.png">
+
 ## 下载ffmpeg
 [下载ffmpeg](https://ffmpeg.org/download.html)
            
