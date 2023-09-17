@@ -12,7 +12,22 @@ namespace VideoMerge
     {
         private readonly IConfiguration _configuration;
 
+        /// <summary>
+        /// 监控视频根目录
+        /// </summary>
         private readonly string VideoBaseDirectory;
+
+        /// <summary>
+        /// 合并周期
+        /// </summary>
+        private readonly int MergeCycle;
+
+        /// <summary>
+        /// 视频文件后缀
+        /// </summary>
+        private readonly string VideoSuffix;
+
+        private readonly string _searchPattern;
 
         public AutoVideoMergeWorker(AbpAsyncTimer timer, IServiceScopeFactory serviceScopeFactory, IConfiguration configuration) : base(timer, serviceScopeFactory)
         {
@@ -20,13 +35,17 @@ namespace VideoMerge
             timer.Start();
             _configuration = configuration;
             VideoBaseDirectory = _configuration.GetValue<string>("BaseDirectory");
+            MergeCycle = _configuration.GetValue<int>("MergeCycle");
+            VideoSuffix = $"*{_configuration.GetValue<string>("VideoSuffix")}";
+            VideoSuffix = string.IsNullOrWhiteSpace(VideoSuffix) ? "" : $".{VideoSuffix}";
+            _searchPattern = $"*{VideoSuffix}";
         }
 
 
         protected override async Task DoWorkAsync(PeriodicBackgroundWorkerContext workerContext)
         {
             // 时间间隔改为一小时
-            Timer.Period = 1000 * 60 * 60;
+            Timer.Period = 1000 * 60 * MergeCycle;
 
             if (Directory.Exists(VideoBaseDirectory))
             {
@@ -70,7 +89,7 @@ namespace VideoMerge
                     }
 
                     // 获取文件夹的视频文件
-                    var videoFiles = Directory.GetFiles(dir);
+                    var videoFiles = Directory.GetFiles(dir, _searchPattern);
                     if (videoFiles.Length != 60)
                     {
                         Logger.LogInformation($"文件夹：{directoryName} 中只有 {videoFiles.Length} 个视频文件，不足一小时，跳过合并……");
