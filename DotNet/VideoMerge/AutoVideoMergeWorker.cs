@@ -45,6 +45,7 @@ namespace VideoMerge
                     // 合并后的视频存放于以日期命名的文件夹中，按小时区分
                     if (directoryName == currentDateHour || !Regex.IsMatch(directoryName, @"^\d{10}$"))
                     {
+                        Logger.LogInformation($"跳过目录：{directoryName}");
                         continue;
                     }
 
