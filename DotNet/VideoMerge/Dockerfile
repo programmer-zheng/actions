@@ -22,4 +22,5 @@ RUN sed -i 's/"BaseDirectory"[^,\n]*/"BaseDirectory":"\/app\/videos"/g' /app/pub
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+ENV TZ=Asia/Shanghai
 ENTRYPOINT ["dotnet", "VideoMerge.dll"]
