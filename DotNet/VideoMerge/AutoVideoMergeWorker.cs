@@ -32,13 +32,15 @@ namespace VideoMerge
             {
                 // 获取当前日期和小时
                 var currentDateHour = DateTime.Now.ToString("yyyyMMddHH");
+                Logger.LogInformation($"当前时间:{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}，当前小时目录：{currentDateHour}");
                 // 获取根目录下的文件夹
                 var dateDirectories = Directory.GetDirectories(VideoBaseDirectory);
                 foreach (var dir in dateDirectories)
                 {
-                    Logger.LogInformation($"操作目录{dir}");
                     // 获取目录名称，后续用作合并视频文件名
                     var directoryName = new DirectoryInfo(dir).Name;
+                    Logger.LogInformation($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")} 操作目录:{directoryName}");
+
                     // 排除当前时间的目录（当前时间视频不完整，不足一小时）、文件夹名格式不正确的（日期+小时）
                     // 合并后的视频存放于以日期命名的文件夹中，按小时区分
                     if (directoryName == currentDateHour || !Regex.IsMatch(directoryName, @"^\d{10}$"))
@@ -61,7 +63,7 @@ namespace VideoMerge
                     // 若已转换过，删除原目录，避免重复执行合并操作，之所以不在转换后立即执行，是避免转换有错误
                     if (File.Exists(outputFile))
                     {
-                        Logger.LogInformation($"已存在{outputFile}，删除{dir}");
+                        Logger.LogInformation($"已存在合并后的视频：{outputFile}，删除源视频目录：{directoryName}");
                         Directory.Delete(dir, true);
                         continue;
                     }
@@ -80,28 +82,30 @@ namespace VideoMerge
                             }
                         }
 
-                        // 拼接转换命令
-                        var command = $"ffmpeg -safe 0 -f concat -i {convertFile} -c:v copy -c:a aac {outputFile}";
-                        var cmd = new Process();
-                        cmd.StartInfo.RedirectStandardInput = true;
-                        cmd.StartInfo.RedirectStandardOutput = true;
-                        cmd.StartInfo.CreateNoWindow = true; // 设置为true，执行过程中不在控制台显示，同时，结束当前程序时，无法立即结束ffmpeg转换程序
-                        // cmd.StartInfo.UseShellExecute = false;
+                        var command = string.Empty;
+                        var process = new Process();
+                        process.StartInfo.RedirectStandardInput = true;
+                        process.StartInfo.RedirectStandardOutput = true;
+                        process.StartInfo.CreateNoWindow = true; // 设置为true，执行过程中不在控制台显示，同时，结束当前程序时，无法立即结束ffmpeg转换程序
+                        // process.StartInfo.UseShellExecute = false;
                         if (OperatingSystem.IsLinux())
                         {
-                            cmd.StartInfo.FileName = "/bin/bash";
+                            command = $"ffmpeg -safe 0 -f concat -i {convertFile} -c:v copy -c:a aac {outputFile} > /dev/null 2>&1";
+                            process.StartInfo.FileName = "/bin/bash";
                         }
                         else if (OperatingSystem.IsWindows())
                         {
-                            cmd.StartInfo.FileName = "cmd.exe";
+                            command = $"ffmpeg -safe 0 -f concat -i {convertFile} -c:v copy -c:a aac {outputFile}";
+                            process.StartInfo.FileName = "cmd.exe";
                         }
 
-                        cmd.Start();
-                        cmd.StandardInput.WriteLine(command);
-                        cmd.StandardInput.Flush();
-                        cmd.StandardInput.Close();
-                        await cmd.WaitForExitAsync();
-                        var cmdOutput = await cmd.StandardOutput.ReadToEndAsync();
+                        Logger.LogDebug($"视频合并命令：{command}");
+                        process.Start();
+                        process.StandardInput.WriteLine(command);
+                        process.StandardInput.Flush();
+                        process.StandardInput.Close();
+                        await process.WaitForExitAsync();
+                        var cmdOutput = await process.StandardOutput.ReadToEndAsync();
                         Logger.LogDebug(cmdOutput);
                     }
                     catch (Exception e)

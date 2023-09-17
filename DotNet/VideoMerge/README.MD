@@ -21,7 +21,12 @@ ffmpeg -safe 0 -f concat -i C:\micamera\2023091417\2023091417.txt -c:v copy -c:a
 # 从官方源中安装ffmpeg
 apt-get install -y ffmpeg
 ```
-
+               
+## Docker 
+``` bash
+# 绑定本地 /micamera 目录到Docker容器的 /app/videos 目录
+docker run -itd --name video-merge --restart always -v /micamera:/app/videos programmerzheng/video-merge
+```
 
 ### 其他链接
 - https://gist.github.com/ratulbasak/b1297ac3f6c5ef429937006feff929e4
