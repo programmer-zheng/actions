@@ -16,10 +16,15 @@
 ffmpeg -safe 0 -f concat -i C:\micamera\2023091417\2023091417.txt -c:v copy -c:a aac C:\micamera\2023091417.mp4
 
 ```
+## Linux（Debian）
+``` bash
+# 从官方源中安装ffmpeg
+apt-get install -y ffmpeg
+```
 
 
 ### 其他链接
 - https://gist.github.com/ratulbasak/b1297ac3f6c5ef429937006feff929e4
 - https://stackoverflow.com/questions/72452823/package-is-installed-inside-docker-but-actual-command-provide-exception
 - https://medium.com/@ratulbasak93/ffmpeg-latest-in-docker-or-ubuntu-16-04-4bd7ea750ca1
-- 
+- https://stackoverflow.com/questions/44874439/run-bash-command-from-netcore-with-arguments
