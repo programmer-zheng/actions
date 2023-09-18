@@ -52,6 +52,7 @@ namespace VideoMerge
                 // 获取当前日期和小时
                 var currentDateHour = DateTime.Now.ToString("yyyyMMddHH");
                 Logger.LogInformation($"当前时间:{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}，当前小时目录：{currentDateHour}");
+                var lastModifyTime = new DirectoryInfo(VideoBaseDirectory).LastWriteTime;
                 // 获取根目录下的文件夹
                 var dateDirectories = Directory.GetDirectories(VideoBaseDirectory);
                 foreach (var dir in dateDirectories)
@@ -65,6 +66,18 @@ namespace VideoMerge
                     if (directoryName == currentDateHour || !Regex.IsMatch(directoryName, @"^\d{10}$"))
                     {
                         Logger.LogInformation($"跳过目录：{directoryName}");
+                        continue;
+                    }
+
+                    var year = Convert.ToInt32(directoryName.Substring(0, 4));
+                    var month = Convert.ToInt32(directoryName.Substring(4, 2));
+                    var day = Convert.ToInt32(directoryName.Substring(6, 2));
+                    var hour = Convert.ToInt32(directoryName.Substring(8, 2));
+                    var dirMaxTime = new DateTime(year, month, day, hour, 59, 59);
+                    // 摄像头往NAS里面同步需要时间，由于未知原因，导致同步过来的视频，有可能不足60个（网络原因、摄像头重启、存储卡意外损坏等）
+                    // 例：2023091813 文件夹中，只有50个视频文件，只有当最后修改时间（相当于最后同步时间）在 2023-9-18 13:59:59 之后，才同步 2023091813 文件夹
+                    if (!(dirMaxTime < lastModifyTime))
+                    {
                         continue;
                     }
 
@@ -90,11 +103,6 @@ namespace VideoMerge
 
                     // 获取文件夹的视频文件
                     var videoFiles = Directory.GetFiles(dir, _searchPattern);
-                    if (videoFiles.Length != 60)
-                    {
-                        Logger.LogInformation($"文件夹：{directoryName} 中只有 {videoFiles.Length} 个视频文件，不足一小时，跳过合并……");
-                        continue;
-                    }
 
                     try
                     {

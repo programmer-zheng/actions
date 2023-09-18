@@ -1,7 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using System.Text.RegularExpressions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -16,13 +14,13 @@ public class Program
         {
             var builder = Host.CreateDefaultBuilder(args);
             builder.ConfigureServices(services =>
-            {
-                services.AddApplicationAsync<AppModule>(options =>
                 {
-                    options.Services.ReplaceConfiguration(services.GetConfiguration());
-                    options.Services.AddLogging(loggingBuilder => loggingBuilder.AddConsole());
-                });
-            })
+                    services.AddApplicationAsync<AppModule>(options =>
+                    {
+                        options.Services.ReplaceConfiguration(services.GetConfiguration());
+                        options.Services.AddLogging(loggingBuilder => loggingBuilder.AddConsole());
+                    });
+                })
                 .UseAutofac().UseConsoleLifetime();
             var host = builder.Build();
 
@@ -36,16 +34,5 @@ public class Program
             Console.WriteLine(e.Message);
             return 1;
         }
-        //using (var application = AbpApplicationFactory.Create<AppModule>(options =>
-        //{
-        //    options.UseAutofac(); //Autofac integration
-        //}))
-        //{
-        //    application.Initialize();
-
-        //    Console.WriteLine("Press ENTER to stop application...");
-        //    Console.ReadLine();
-        //}
-
     }
 }
