@@ -1,41 +1,34 @@
-using System;
 using System.IO;
-using Medallion.Threading;
-using Medallion.Threading.Redis;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Volo.Abp.Study.EntityFrameworkCore;
 using Volo.Abp.Study.Localization;
 using Volo.Abp.Study.MultiTenancy;
 using Volo.Abp.Study.Web.Menus;
-using StackExchange.Redis;
 using Microsoft.OpenApi.Models;
+using OpenIddict.Validation.AspNetCore;
 using Volo.Abp;
-using Volo.Abp.AspNetCore.Authentication.OpenIdConnect;
-using Volo.Abp.AspNetCore.Mvc.Client;
+using Volo.Abp.Account.Web;
+using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc.Localization;
 using Volo.Abp.AspNetCore.Mvc.UI;
 using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap;
 using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
+using Volo.Abp.AspNetCore.Mvc.UI.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
-using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared.Toolbars;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
 using Volo.Abp.AutoMapper;
-using Volo.Abp.Caching;
-using Volo.Abp.Caching.StackExchangeRedis;
-using Volo.Abp.DistributedLocking;
-using Volo.Abp.Http.Client.IdentityModel.Web;
-using Volo.Abp.Http.Client.Web;
+using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity.Web;
+using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
-using Volo.Abp.MultiTenancy;
 using Volo.Abp.PermissionManagement.Web;
 using Volo.Abp.SettingManagement.Web;
 using Volo.Abp.Swashbuckle;
@@ -48,18 +41,14 @@ using Volo.Abp.VirtualFileSystem;
 namespace Volo.Abp.Study.Web;
 
 [DependsOn(
-    typeof(StudyHttpApiClientModule),
     typeof(StudyHttpApiModule),
-    typeof(AbpAspNetCoreAuthenticationOpenIdConnectModule),
-    typeof(AbpAspNetCoreMvcClientModule),
-    typeof(AbpHttpClientWebModule),
-    typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
+    typeof(StudyApplicationModule),
+    typeof(StudyEntityFrameworkCoreModule),
     typeof(AbpAutofacModule),
-    typeof(AbpCachingStackExchangeRedisModule),
-    typeof(AbpDistributedLockingModule),
-    typeof(AbpSettingManagementWebModule),
-    typeof(AbpHttpClientIdentityModelWebModule),
     typeof(AbpIdentityWebModule),
+    typeof(AbpSettingManagementWebModule),
+    typeof(AbpAccountWebOpenIddictModule),
+    typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
     typeof(AbpTenantManagementWebModule),
     typeof(AbpAspNetCoreSerilogModule),
     typeof(AbpSwashbuckleModule)
@@ -72,10 +61,22 @@ public class StudyWebModule : AbpModule
         {
             options.AddAssemblyResource(
                 typeof(StudyResource),
+                typeof(StudyDomainModule).Assembly,
                 typeof(StudyDomainSharedModule).Assembly,
+                typeof(StudyApplicationModule).Assembly,
                 typeof(StudyApplicationContractsModule).Assembly,
                 typeof(StudyWebModule).Assembly
             );
+        });
+
+        PreConfigure<OpenIddictBuilder>(builder =>
+        {
+            builder.AddValidation(options =>
+            {
+                options.AddAudiences("Study");
+                options.UseLocalServer();
+                options.UseAspNetCore();
+            });
         });
     }
 
@@ -84,17 +85,27 @@ public class StudyWebModule : AbpModule
         var hostingEnvironment = context.Services.GetHostingEnvironment();
         var configuration = context.Services.GetConfiguration();
 
-        ConfigureBundles();
-        ConfigureCache();
-        ConfigureDataProtection(context, configuration, hostingEnvironment);
-        ConfigureDistributedLocking(context, configuration);
+        ConfigureAuthentication(context);
         ConfigureUrls(configuration);
-        ConfigureAuthentication(context, configuration);
+        ConfigureBundles();
         ConfigureAutoMapper();
         ConfigureVirtualFileSystem(hostingEnvironment);
-        ConfigureNavigationServices(configuration);
-        ConfigureMultiTenancy();
+        ConfigureNavigationServices();
+        ConfigureAutoApiControllers();
         ConfigureSwaggerServices(context.Services);
+    }
+
+    private void ConfigureAuthentication(ServiceConfigurationContext context)
+    {
+        context.Services.ForwardIdentityAuthenticationForBearer(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+    }
+
+    private void ConfigureUrls(IConfiguration configuration)
+    {
+        Configure<AppUrlOptions>(options =>
+        {
+            options.Applications["MVC"].RootUrl = configuration["App:SelfUrl"];
+        });
     }
 
     private void ConfigureBundles()
@@ -109,62 +120,6 @@ public class StudyWebModule : AbpModule
                 }
             );
         });
-    }
-
-    private void ConfigureCache()
-    {
-        Configure<AbpDistributedCacheOptions>(options =>
-        {
-            options.KeyPrefix = "Study:";
-        });
-    }
-
-    private void ConfigureUrls(IConfiguration configuration)
-    {
-        Configure<AppUrlOptions>(options =>
-        {
-            options.Applications["MVC"].RootUrl = configuration["App:SelfUrl"];
-        });
-    }
-
-    private void ConfigureMultiTenancy()
-    {
-        Configure<AbpMultiTenancyOptions>(options =>
-        {
-            options.IsEnabled = MultiTenancyConsts.IsEnabled;
-        });
-    }
-
-    private void ConfigureAuthentication(ServiceConfigurationContext context, IConfiguration configuration)
-    {
-        context.Services.AddAuthentication(options =>
-            {
-                options.DefaultScheme = "Cookies";
-                options.DefaultChallengeScheme = "oidc";
-            })
-            .AddCookie("Cookies", options =>
-            {
-                options.ExpireTimeSpan = TimeSpan.FromDays(365);
-                options.CheckTokenExpiration();
-            })
-            .AddAbpOpenIdConnect("oidc", options =>
-            {
-                options.Authority = configuration["AuthServer:Authority"];
-                options.RequireHttpsMetadata = Convert.ToBoolean(configuration["AuthServer:RequireHttpsMetadata"]);
-                options.ResponseType = OpenIdConnectResponseType.CodeIdToken;
-
-                options.ClientId = configuration["AuthServer:ClientId"];
-                options.ClientSecret = configuration["AuthServer:ClientSecret"];
-
-                options.UsePkce = true;
-                options.SaveTokens = true;
-                options.GetClaimsFromUserInfoEndpoint = true;
-
-                options.Scope.Add("roles");
-                options.Scope.Add("email");
-                options.Scope.Add("phone");
-                options.Scope.Add("Study");
-            });
     }
 
     private void ConfigureAutoMapper()
@@ -182,22 +137,27 @@ public class StudyWebModule : AbpModule
             Configure<AbpVirtualFileSystemOptions>(options =>
             {
                 options.FileSets.ReplaceEmbeddedByPhysical<StudyDomainSharedModule>(Path.Combine(hostingEnvironment.ContentRootPath, $"..{Path.DirectorySeparatorChar}Volo.Abp.Study.Domain.Shared"));
+                options.FileSets.ReplaceEmbeddedByPhysical<StudyDomainModule>(Path.Combine(hostingEnvironment.ContentRootPath, $"..{Path.DirectorySeparatorChar}Volo.Abp.Study.Domain"));
                 options.FileSets.ReplaceEmbeddedByPhysical<StudyApplicationContractsModule>(Path.Combine(hostingEnvironment.ContentRootPath, $"..{Path.DirectorySeparatorChar}Volo.Abp.Study.Application.Contracts"));
+                options.FileSets.ReplaceEmbeddedByPhysical<StudyApplicationModule>(Path.Combine(hostingEnvironment.ContentRootPath, $"..{Path.DirectorySeparatorChar}Volo.Abp.Study.Application"));
                 options.FileSets.ReplaceEmbeddedByPhysical<StudyWebModule>(hostingEnvironment.ContentRootPath);
             });
         }
     }
 
-    private void ConfigureNavigationServices(IConfiguration configuration)
+    private void ConfigureNavigationServices()
     {
         Configure<AbpNavigationOptions>(options =>
         {
-            options.MenuContributors.Add(new StudyMenuContributor(configuration));
+            options.MenuContributors.Add(new StudyMenuContributor());
         });
+    }
 
-        Configure<AbpToolbarOptions>(options =>
+    private void ConfigureAutoApiControllers()
+    {
+        Configure<AbpAspNetCoreMvcOptions>(options =>
         {
-            options.Contributors.Add(new StudyToolbarContributor());
+            options.ConventionalControllers.Create(typeof(StudyApplicationModule).Assembly);
         });
     }
 
@@ -211,31 +171,6 @@ public class StudyWebModule : AbpModule
                 options.CustomSchemaIds(type => type.FullName);
             }
         );
-    }
-
-    private void ConfigureDataProtection(
-        ServiceConfigurationContext context,
-        IConfiguration configuration,
-        IWebHostEnvironment hostingEnvironment)
-    {
-        var dataProtectionBuilder = context.Services.AddDataProtection().SetApplicationName("Study");
-        if (!hostingEnvironment.IsDevelopment())
-        {
-            var redis = ConnectionMultiplexer.Connect(configuration["Redis:Configuration"]);
-            dataProtectionBuilder.PersistKeysToStackExchangeRedis(redis, "Study-Protection-Keys");
-        }
-    }
-
-    private void ConfigureDistributedLocking(
-        ServiceConfigurationContext context,
-        IConfiguration configuration)
-    {
-        context.Services.AddSingleton<IDistributedLockProvider>(sp =>
-        {
-            var connection = ConnectionMultiplexer
-                .Connect(configuration["Redis:Configuration"]);
-            return new RedisDistributedSynchronizationProvider(connection.GetDatabase());
-        });
     }
 
     public override void OnApplicationInitialization(ApplicationInitializationContext context)
@@ -259,18 +194,21 @@ public class StudyWebModule : AbpModule
         app.UseStaticFiles();
         app.UseRouting();
         app.UseAuthentication();
+        app.UseAbpOpenIddictValidation();
 
         if (MultiTenancyConsts.IsEnabled)
         {
             app.UseMultiTenancy();
         }
 
+        app.UseUnitOfWork();
         app.UseAuthorization();
         app.UseSwagger();
         app.UseAbpSwaggerUI(options =>
         {
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "Study API");
         });
+        app.UseAuditing();
         app.UseAbpSerilogEnrichers();
         app.UseConfiguredEndpoints();
     }

@@ -6,3 +6,4 @@ riderModule.iml
 .vs
 .idea
 appsettings.*.json
+yarn.lock

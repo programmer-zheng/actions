@@ -1,10 +1,10 @@
 {
   "iisSettings": {
-    "windowsAuthentication": false, 
+    "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "https://localhost:44366",
-      "sslPort": 44366
+      "applicationUrl": "https://localhost:44363/",
+      "sslPort": 44363
     }
   },
   "profiles": {
@@ -18,10 +18,10 @@
     "Volo.Abp.Study.Web": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:44366",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "applicationUrl": "https://localhost:44363/"
     }
   }
 }
