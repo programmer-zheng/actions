@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>.</DockerfileContext>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AlibabaCloud.SDK.Ecs20140526" Version="3.0.13" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.4" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
+    <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
+    <PackageReference Include="TencentCloudSDK.Dnspod" Version="3.0.895" />
+    <PackageReference Include="Volo.Abp.AspNetCore.Mvc" Version="7.4.2" />
+    <PackageReference Include="Volo.Abp.AspNetCore.Serilog" Version="7.4.2" />
+    <PackageReference Include="Volo.Abp.Autofac" Version="7.4.2" />
+  </ItemGroup>
+
+</Project>

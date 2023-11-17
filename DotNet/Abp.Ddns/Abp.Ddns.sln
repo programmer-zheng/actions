@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34221.43
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abp.Ddns", "Abp.Ddns.csproj", "{7A88FEC1-9568-4BA5-BCFF-CE76ABB15466}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7A88FEC1-9568-4BA5-BCFF-CE76ABB15466}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A88FEC1-9568-4BA5-BCFF-CE76ABB15466}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A88FEC1-9568-4BA5-BCFF-CE76ABB15466}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A88FEC1-9568-4BA5-BCFF-CE76ABB15466}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7DAA038C-2377-4053-B9D4-94D2B6639381}
+	EndGlobalSection
+EndGlobal
