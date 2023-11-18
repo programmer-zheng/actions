@@ -23,6 +23,7 @@ namespace Abp.Ddns.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
+        [Route("/wifi")]
         public IActionResult WifiOnline(string domain, string username, string password, int port)
         {
             using (var mikrotik = new Mikrotik(domain, port, username, password))
@@ -53,6 +54,7 @@ namespace Abp.Ddns.Controllers
         /// <param name="port">api端口号</param>
         /// <param name="mac">远程启动设备的mac地址</param>
         /// <returns></returns>
+        [Route("/wol")]
         public IActionResult Wol(string domain, string username, string password, int port, string mac, string intface = "")
         {
             var msg = "已通知远程主机启动";
@@ -132,6 +134,7 @@ namespace Abp.Ddns.Controllers
         /// <param name="password">dashboard密码</param>
         /// <param name="port">dashboard端口</param>
         /// <returns></returns>
+        [Route("/frps")]
         public async Task<IActionResult> Frps(string address, string username, string password, int port)
         {
             var url = $"http://{address}:{port}/api/proxy/tcp";
