@@ -94,13 +94,6 @@ namespace Abp.Ddns.Controllers
                 mac = HttpUtility.UrlDecode(mac).Replace("-", ":");
                 using (var mikrotik = new Mikrotik(domain, port, username, password))
                 {
-                    //var onlineHosts = mikrotik.GetOnlineHosts();
-                    //if (onlineHosts.Exists(t => t.MacAddress.Equals(mac)))
-                    //{
-                    //    msg = "远程设备已在线，无须重复开启!";
-                    //}
-                    //else
-                    //{
                     if (!string.IsNullOrWhiteSpace(intface))
                     {
                         mikrotik.Wol(mac, intface);
@@ -113,7 +106,6 @@ namespace Abp.Ddns.Controllers
                             mikrotik.Wol(mac, item);
                         }
                     }
-                    //}
                 }
             }
             catch (ArgumentException e)
