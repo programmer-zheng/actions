@@ -27,6 +27,7 @@ jobs:
             ${{ secrets.DOCKER_HUB_USERNAME }}/wol
           # generate Docker tags based on the following events/attributes
           tags: |
+            type=ref,patter=branch
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
