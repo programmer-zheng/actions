@@ -22,6 +22,10 @@ public class AbpDdnsModule : AbpModule
         {
             app.UseExceptionHandler("/Home/Error");
         }
+        else
+        {
+            app.UseHsts();
+        }
 
         app.UseStaticFiles();
 
