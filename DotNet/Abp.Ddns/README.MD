@@ -4,8 +4,7 @@
 
 ### Docker 镜像使用
 ``` bash
-docker run -itd --restart always \
--- name ddns \
+docker run -itd --name ddns --restart always \
 -p 8880:80 -p 8843:443 \
 -e Aliyun:AccessKeyId=keyid \
 -e Aliyun:AccessKeySecret=keysecret \
