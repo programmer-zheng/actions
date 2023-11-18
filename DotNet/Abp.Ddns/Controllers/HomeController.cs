@@ -12,7 +12,6 @@ namespace Abp.Ddns.Controllers
 {
     public class HomeController : AbpController
     {
-
         public IActionResult Index()
         {
             return View();
@@ -23,8 +22,8 @@ namespace Abp.Ddns.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-        
-                public IActionResult WifiOnline(string domain, string username, string password, int port)
+
+        public IActionResult WifiOnline(string domain, string username, string password, int port)
         {
             using (var mikrotik = new Mikrotik(domain, port, username, password))
             {
