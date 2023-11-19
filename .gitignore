@@ -7,3 +7,5 @@ riderModule.iml
 .idea
 appsettings.*.json
 yarn.lock
+**.log
+[lL]og[s].txt
