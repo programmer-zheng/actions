@@ -24,3 +24,37 @@ docker run -itd --name ddns --restart always \
 -v /https:/https \
 programmerzheng/ddns
 ```
+### Mikrotik中定时任务
+``` bash
+
+:local wxid "abcd"  
+
+:global currentIPv4;
+#获取当前拨号的外网IPv4地址
+
+:local nowIPv4 [/ip address get [find interface="pppoe-out1"] address];
+
+
+#:log error $currentIPv4
+#:log error $nowIPv4
+
+#判断当前IP与之前的IP是否一致
+:if ($nowIPv4 != $currentIPv4) do={
+    # 日志输出改变前后的IP
+    :log info "ipv4 address $currentIPv4 changed to $nowIPv4";
+    
+    #截取真实IP，去掉子网掩码
+    :local ip [:pick $nowIPv4 0 [:find $nowIPv4 "/"]]
+    
+    #设置nat转换，端口映射地址
+    /ip fir nat set [find chain=dstnat] dst-address=$ip
+
+    # 请求内部服务器中转
+    /tool fetch http-method=get keep-result=no url="https://192.168.88.111:8843/ddns?ip=$ip"
+    :set currentIPv4 $nowIPv4;
+    
+    # 微信通知，参考 https://ros6.com/?action=show&id=238
+    /tool fetch url="http://mail.ros6.com/wx/msg.php?act=sendmsg&wxid=$wxid&node=家里&msg=新的IP：$ip&lang=CN" output=none
+}
+
+```
