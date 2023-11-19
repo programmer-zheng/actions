@@ -26,31 +26,30 @@ programmerzheng/ddns
 ```
 ### Mikrotik中定时任务
 ``` bash
-
+# 个人微信号
 :local wxid "abcd"  
 
+# 存储当前IP地址
 :global currentIPv4;
-#获取当前拨号的外网IPv4地址
 
+#获取当前拨号的外网IPv4地址
 :local nowIPv4 [/ip address get [find interface="pppoe-out1"] address];
 
-
-#:log error $currentIPv4
-#:log error $nowIPv4
-
-#判断当前IP与之前的IP是否一致
+# 判断当前IP与之前的IP是否一致
 :if ($nowIPv4 != $currentIPv4) do={
     # 日志输出改变前后的IP
     :log info "ipv4 address $currentIPv4 changed to $nowIPv4";
     
-    #截取真实IP，去掉子网掩码
+    # 截取真实IP，去掉子网掩码
     :local ip [:pick $nowIPv4 0 [:find $nowIPv4 "/"]]
     
-    #设置nat转换，端口映射地址
+    # 设置nat转换，端口映射地址
     /ip fir nat set [find chain=dstnat] dst-address=$ip
 
     # 请求内部服务器中转
     /tool fetch http-method=get keep-result=no url="https://192.168.88.111:8843/ddns?ip=$ip"
+    
+    # 更新当前IP变量值
     :set currentIPv4 $nowIPv4;
     
     # 微信通知，参考 https://ros6.com/?action=show&id=238
