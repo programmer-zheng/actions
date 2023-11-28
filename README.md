@@ -1,5 +1,10 @@
-# actions
+# 工具集
 
-- Learn programming 
-- Write test sample code
-- Using github actions to build docker images for testing sample code
+### DDNS
+
+更新`DNSPod`下的动态域名解析，并更新阿里云安全组策略
+
+### 视频合并
+
+将小米监控生成的视频文件合并到以小时为单位的单个文件
+
