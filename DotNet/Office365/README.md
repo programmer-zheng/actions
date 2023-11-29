@@ -42,10 +42,14 @@ chmod +x Abp.MyConsoleApp
 ``` 
 
 ## 登录
-- [Microsoft Office 主页](https://portal.partner.microsoftonline.cn/Home)
+#### 中国区
+- [Microsoft](https://portal.partner.microsoftonline.cn/Home)
 - [Azure中国区主页](https://portal.azure.cn/#home)
 - 账号： test@test0109.partner.onmschina.cn
 - 密码： Jan49271
+
+#### 全球
+- [Microsoft Azure国际版主页](https://portal.azure.com/#home)
 
 ## 参考链接
 https://developer.microsoft.com/en-us/graph/graph-explorer

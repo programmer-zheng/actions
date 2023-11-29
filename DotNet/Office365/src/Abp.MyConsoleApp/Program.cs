@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
 using Volo.Abp;
@@ -20,8 +21,9 @@ public class Program
             .MinimumLevel.Information()
 #endif
             .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+            .MinimumLevel.Override("Volo", LogEventLevel.Error)//屏蔽abp框架启动时的模块加载信息
             .Enrich.FromLogContext()
-            .WriteTo.Async(c => c.File("Logs/logs.txt"))
+            // .WriteTo.Async(c => c.File("Logs/logs.txt"))
             .WriteTo.Async(c => c.Console())
             .CreateLogger();
 
@@ -45,7 +47,7 @@ public class Program
                 services.AddApplicationAsync<MyConsoleAppModule>(options =>
                 {
                     options.Services.ReplaceConfiguration(services.GetConfiguration());
-                    options.Services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog());
+                    options.Services.AddLogging(loggingBuilder => loggingBuilder.ClearProviders().AddSerilog());
                 });
             }).AddAppSettingsSecretsJson().UseAutofac().UseConsoleLifetime();
 

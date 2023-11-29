@@ -56,8 +56,8 @@ public class MyConsoleAppHostedService : IHostedService
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         // // 部门
-        //var groups = await _sharePointService.GetGroupsAsync();
-        //_logger.LogInformation($"共有以下部门：{string.Join("、", groups.Select(t => t.DisplayName))}");
+        var groups = await _sharePointService.GetGroupsAsync();
+        _logger.LogInformation($"共有以下{groups.Count}个部门：\n{string.Join("\n", groups.Select(t => t.DisplayName))}");
         //foreach (var group in groups)
         //{
         //    _logger.LogInformation($"============={group.DisplayName} 成员有：=====================");
@@ -84,7 +84,8 @@ public class MyConsoleAppHostedService : IHostedService
         // Task.WaitAll(list.ToArray());
         //  // 用户
         var users = await _sharePointService.GetUsersAsync();
-        _logger.LogDebug($"users count ：{users.Count}");
+        _logger.LogInformation($"用户数量 ：{users.Count}");
+        _logger.LogInformation(string.Join("\n", users.Select(t => $"{t.Mail}（{t.DisplayName}）")));
         foreach (var user in users)
         {
             if (_totalSize > targetSize)
@@ -104,8 +105,8 @@ public class MyConsoleAppHostedService : IHostedService
             }
         }
 
-        ////var sites = await _sharePointService.GetSitesAsync();
-        ////_logger.LogDebug($"sites count ：{sites.Count}");
+        var sites = await _sharePointService.GetSitesAsync();
+        _logger.LogInformation($"sites count ：{sites.Count}");
         ////foreach (var site in sites)
         ////{
         ////    if (_totalSize > targetSize)
@@ -130,32 +131,35 @@ public class MyConsoleAppHostedService : IHostedService
         ////}
 
         int threadCount = _configuration.GetValue<int>("ThreadCount");
-        var token = await _sharePointService.GetAccessTokenAsync();
-        CheckAndCreateDirectory("test");
-        _logger.LogInformation($"==================== beging download files，共{_dictionary.Count} ====================");
-        var start = Stopwatch.GetTimestamp();
-        var tasks = new List<Task>();
-        foreach (var key in _dictionary.Keys)
+        if (_dictionary?.Count > 0)
         {
-            var fileInfo = _dictionary[key];
-            // Task downloadTask =
-            //     _sharePointService.DownloadFileWithApiAsync(fileInfo);
-            Task downloadTask = _sharePointService.Download(fileInfo, fileInfo.FileInfo.Name, fileInfo.FileInfo.Size.Value, token);
-            tasks.Add(downloadTask);
-            // 当达到最大并行下载数量时，等待任一下载任务完成，然后再添加新的下载任务
-            if (tasks.Count >= threadCount)
+            var token = await _sharePointService.GetAccessTokenAsync();
+            CheckAndCreateDirectory("test");
+            _logger.LogInformation($"==================== beging download files，共{_dictionary.Count} ====================");
+            var start = Stopwatch.GetTimestamp();
+            var tasks = new List<Task>();
+            foreach (var key in _dictionary.Keys)
             {
-                Task.WaitAny(tasks.ToArray());
-                tasks.RemoveAll(t => t.IsCompleted);
+                var fileInfo = _dictionary[key];
+                // Task downloadTask =
+                //     _sharePointService.DownloadFileWithApiAsync(fileInfo);
+                Task downloadTask = _sharePointService.Download(fileInfo, fileInfo.FileInfo.Name, fileInfo.FileInfo.Size.Value, token);
+                tasks.Add(downloadTask);
+                // 当达到最大并行下载数量时，等待任一下载任务完成，然后再添加新的下载任务
+                if (tasks.Count >= threadCount)
+                {
+                    Task.WaitAny(tasks.ToArray());
+                    tasks.RemoveAll(t => t.IsCompleted);
+                }
             }
-        }
 
-        // 等待所有下载任务完成
-        Task.WaitAll(tasks.ToArray());
-        var stop = Stopwatch.GetTimestamp();
-        var seconds = Stopwatch.GetElapsedTime(start, stop).Seconds;
-        _logger.LogInformation(
-            $"==================== download is complete,total bytes:{_totalSize},Take Time：{seconds} seconds ====================");
+            // 等待所有下载任务完成
+            Task.WaitAll(tasks.ToArray());
+            var stop = Stopwatch.GetTimestamp();
+            var seconds = Stopwatch.GetElapsedTime(start, stop).Seconds;
+            _logger.LogInformation(
+                $"==================== download is complete,total bytes:{_totalSize},Take Time：{seconds} seconds ====================");
+        }
     }
 
     private async Task GetDriveRootAndOperateAsync(Drive drive, string directoryPerfix1, string directoryPerfix2)
