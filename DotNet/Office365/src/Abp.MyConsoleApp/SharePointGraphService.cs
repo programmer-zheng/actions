@@ -19,6 +19,8 @@ namespace Abp.MyConsoleApp;
 
 public class SharePointGraphService : SharePointBaseService, ITransientDependency, ISharePointService
 {
+    private const string TempFileFolderName = "temp";
+    
     private readonly GraphServiceClient _graphServiceClient;
     private readonly ClientSecretCredential _clientSecretCredential;
     private readonly string[] _scopes;
@@ -232,7 +234,7 @@ public class SharePointGraphService : SharePointBaseService, ITransientDependenc
                     }
 
                     Task.WaitAll(tasks);
-                    await MergeFilesAsync(chunkFilePaths, fileName);
+                    await MergeFilesAsync(chunkFilePaths, fileInfo.FileFullPath);
                 }
                 else
                 {
@@ -240,7 +242,7 @@ public class SharePointGraphService : SharePointBaseService, ITransientDependenc
                 }
             }
 
-            _logger.LogInformation(
+            _logger.LogDebug(
                 $"文件：{fileName} 已成功下载，使用线程 {Thread.CurrentThread.ManagedThreadId}");
         }
         catch (Exception e)
@@ -253,7 +255,7 @@ public class SharePointGraphService : SharePointBaseService, ITransientDependenc
     {
         try
         {
-            _logger.LogInformation(
+            _logger.LogDebug(
                 $"开始下载分片：{fileName}，使用线程 {Thread.CurrentThread.ManagedThreadId} startByte:{startByte},endByte:{endByte}");
             var range = $"bytes={startByte}-{endByte}";
             var request = new HttpRequestMessage(HttpMethod.Get, fileUrl);
@@ -261,7 +263,7 @@ public class SharePointGraphService : SharePointBaseService, ITransientDependenc
 
             using (var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead))
             using (var stream = await response.Content.ReadAsStreamAsync())
-            using (var fileStream = File.Create(Path.Combine(AppContext.BaseDirectory, "test", fileName)))
+            using (var fileStream = File.Create(Path.Combine(AppContext.BaseDirectory, TempFileFolderName, fileName)))
             {
                 await stream.CopyToAsync(fileStream);
             }
@@ -274,11 +276,11 @@ public class SharePointGraphService : SharePointBaseService, ITransientDependenc
 
     async Task MergeFilesAsync(ConcurrentQueue<string> sourceFilePaths, string outputPath)
     {
-        using (var output = File.Create(Path.Combine(AppContext.BaseDirectory, "test", outputPath)))
+        using (var output = File.Create(Path.Combine(AppContext.BaseDirectory, outputPath)))
         {
             foreach (var sourceFilePath in sourceFilePaths)
             {
-                using (var sourceStream = File.OpenRead(Path.Combine(AppContext.BaseDirectory, "test", sourceFilePath)))
+                using (var sourceStream = File.OpenRead(Path.Combine(AppContext.BaseDirectory, TempFileFolderName, sourceFilePath)))
                 {
                     await sourceStream.CopyToAsync(output);
                 }
@@ -288,7 +290,7 @@ public class SharePointGraphService : SharePointBaseService, ITransientDependenc
         // 删除分片文件
         foreach (var sourceFilePath in sourceFilePaths)
         {
-            File.Delete(Path.Combine(AppContext.BaseDirectory, "test", sourceFilePath));
+            File.Delete(Path.Combine(AppContext.BaseDirectory, TempFileFolderName, sourceFilePath));
         }
     }
 
@@ -297,8 +299,8 @@ public class SharePointGraphService : SharePointBaseService, ITransientDependenc
     {
         try
         {
-            var path = Path.Combine(AppContext.BaseDirectory, "test", fileInfo.FileInfo.Name);
-            _logger.LogInformation(
+            var path = Path.Combine(AppContext.BaseDirectory, fileInfo.FileFullPath);
+            _logger.LogDebug(
                 $"开始下载文件：{fileInfo.FileInfo.Name}到{path}，使用线程 {Thread.CurrentThread.ManagedThreadId}");
 
             var response = _graphServiceClient.Drives[fileInfo.DriveId].Items[fileInfo.DriveItemId].Content
@@ -314,7 +316,7 @@ public class SharePointGraphService : SharePointBaseService, ITransientDependenc
                 }
             }
 
-            _logger.LogInformation(
+            _logger.LogDebug(
                 $"文件：{fileInfo.FileInfo.Name} 已成功下载到{path}，使用线程 {Thread.CurrentThread.ManagedThreadId}");
         }
         catch (Exception e)

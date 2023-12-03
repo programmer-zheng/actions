@@ -58,30 +58,14 @@ public class MyConsoleAppHostedService : IHostedService
         // // 部门
         var groups = await _sharePointService.GetGroupsAsync();
         _logger.LogInformation($"共有以下{groups.Count}个部门：\n{string.Join("\n", groups.Select(t => t.DisplayName))}");
-        //foreach (var group in groups)
-        //{
-        //    _logger.LogInformation($"============={group.DisplayName} 成员有：=====================");
-        //    // 部门下属成员情况
-        //    var groupUsers = await _sharePointService.GetGroupMembers(group.Id);
-        //    _logger.LogInformation(string.Join("、", groupUsers.Select(t => t.DisplayName)));
-        //}
+        foreach (var group in groups)
+        {
+            _logger.LogInformation($"============={group.DisplayName} 成员有：=====================");
+            // 部门下属成员情况
+            var groupUsers = await _sharePointService.GetGroupMembers(group.Id);
+            _logger.LogInformation(string.Join("、", groupUsers.Select(t => t.DisplayName)));
+        }
 
-        // var dic = new Dictionary<string, string>();
-        // dic.Add("渤海银行.md", "https://graph.microsoft.com/v1.0/drives/b!NedHoWRQD0e1aCfQhOqpjN4jFPkAYmhJpN83VM_UHx684qUcASskTbCv6cVBeljk/items/01EBPWHBL4DNGCZVOGVNCYYCNOU2C4525J/content");
-        // dic.Add("OpenWrt.md", "https://graph.microsoft.com/v1.0/drives/b!NedHoWRQD0e1aCfQhOqpjN4jFPkAYmhJpN83VM_UHx684qUcASskTbCv6cVBeljk/items/01EBPWHBOSHV5MLA2ROVDZHBW5QSUX5XKK/content");
-        // dic.Add("项目运行.md", "https://graph.microsoft.com/v1.0/drives/b!NedHoWRQD0e1aCfQhOqpjN4jFPkAYmhJpN83VM_UHx684qUcASskTbCv6cVBeljk/items/01EBPWHBIWA463YKQ3AJAYB7NLBF22RABC/content");
-        // dic.Add("工作簿.xlsx", "https://graph.microsoft.com/v1.0/drives/b!8ktBWuiBu0ebEAjR-TEjx_KImFrxk9hFmshQ9Oka6cAConTgMEvUR7b_uURiBIDE/items/01N7B2R5H37W64U5IZ3BEJD2BINUCMLCXF/content");
-        // dic.Add("Implementing_Domain_Driven_Design.docx", "https://graph.microsoft.com/v1.0/drives/b!NedHoWRQD0e1aCfQhOqpjN4jFPkAYmhJpN83VM_UHx684qUcASskTbCv6cVBeljk/items/01EBPWHBMSHFQ4CPXYVNFIADINIYODRAJX/content");
-        // dic.Add("Implementing_Domain_Driven_Design.pdf", "https://graph.microsoft.com/v1.0/drives/b!NedHoWRQD0e1aCfQhOqpjN4jFPkAYmhJpN83VM_UHx684qUcASskTbCv6cVBeljk/items/01EBPWHBP2A25WOZYPJ5FJXIGABESKMNYV/content");
-        // dic.Add("navicat_Permute.dmg","https://graph.microsoft.com/v1.0/drives/b!NedHoWRQD0e1aCfQhOqpjN4jFPkAYmhJpN83VM_UHx684qUcASskTbCv6cVBeljk/items/01EBPWHBOEENBN7RFZFJFZ35CIG2M5FIZ7/content");
-        // var list = new List<Task>();
-        // foreach (var item in dic)
-        // {
-        //     Task x = _sharePointService.Download(item.Value, item.Key);
-        //     await x;
-        //     // list.Add(x);    
-        // }
-        // Task.WaitAll(list.ToArray());
         //  // 用户
         var users = await _sharePointService.GetUsersAsync();
         _logger.LogInformation($"用户数量 ：{users.Count}");
@@ -107,50 +91,41 @@ public class MyConsoleAppHostedService : IHostedService
 
         var sites = await _sharePointService.GetSitesAsync();
         _logger.LogInformation($"sites count ：{sites.Count}");
-        ////foreach (var site in sites)
-        ////{
-        ////    if (_totalSize > targetSize)
-        ////    {
-        ////        break;
-        ////    }
+        foreach (var site in sites)
+        {
+            if (_totalSize > targetSize)
+            {
+                break;
+            }
 
-        ////    var siteDrive = await _sharePointService.GetSiteDriveAsync(site.Id);
-        ////    if (site.Id.Equals(
-        ////            "test0109.sharepoint.cn,a8637ec3-08c1-429c-a64a-3ba3dab66205,c3bdb501-e9c1-403f-bc90-0559bcc38450",
-        ////            StringComparison.OrdinalIgnoreCase))
-        ////    {
-        ////        Console.WriteLine("========================");
-        ////        Console.WriteLine(JsonConvert.SerializeObject(siteDrive));
-        ////    }
+            var siteDrive = await _sharePointService.GetSiteDriveAsync(site.Id);
 
-        ////    if (siteDrive != null && !siteDrive.Id.IsNullOrWhiteSpace())
-        ////    {
-        ////        _logger.LogInformation($"开始处理站点 {site.DisplayName} {site.Id}数据");
-        ////        await GetDriveRootAndOperateAsync(siteDrive, "Sites", site.Id);
-        ////    }
-        ////}
+            if (siteDrive != null && !siteDrive.Id.IsNullOrWhiteSpace())
+            {
+                _logger.LogDebug($"开始处理站点 {site.DisplayName} {site.Id}数据");
+                await GetDriveRootAndOperateAsync(siteDrive, "Sites", site.Id);
+            }
+        }
 
         int threadCount = _configuration.GetValue<int>("ThreadCount");
         if (_dictionary?.Count > 0)
         {
             var token = await _sharePointService.GetAccessTokenAsync();
-            CheckAndCreateDirectory("test");
             _logger.LogInformation($"==================== beging download files，共{_dictionary.Count} ====================");
             var start = Stopwatch.GetTimestamp();
             var tasks = new List<Task>();
             foreach (var key in _dictionary.Keys)
             {
                 var fileInfo = _dictionary[key];
-                // Task downloadTask =
-                //     _sharePointService.DownloadFileWithApiAsync(fileInfo);
                 Task downloadTask = _sharePointService.Download(fileInfo, fileInfo.FileInfo.Name, fileInfo.FileInfo.Size.Value, token);
-                tasks.Add(downloadTask);
                 // 当达到最大并行下载数量时，等待任一下载任务完成，然后再添加新的下载任务
                 if (tasks.Count >= threadCount)
                 {
                     Task.WaitAny(tasks.ToArray());
                     tasks.RemoveAll(t => t.IsCompleted);
                 }
+
+                tasks.Add(downloadTask);
             }
 
             // 等待所有下载任务完成
