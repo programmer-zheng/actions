@@ -17,6 +17,11 @@ public class ContactsSyncSettingsController : AbpControllerBase, IContactsSyncSe
         _contactsSyncSettingAppService = contactsSyncSettingAppService;
     }
 
+    public Task<ContactsSyncSettingsDto> GetAsync()
+    {
+        return _contactsSyncSettingAppService.GetAsync();
+    }
+
     /// <summary>
     /// controller中
     /// </summary>

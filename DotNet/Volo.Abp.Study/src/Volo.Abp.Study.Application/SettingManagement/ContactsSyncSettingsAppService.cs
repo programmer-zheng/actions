@@ -14,6 +14,17 @@ public class ContactsSyncSettingsAppService : ApplicationService, IContactsSyncS
         _settingManager = settingManager;
     }
 
+    public async Task<ContactsSyncSettingsDto> GetAsync()
+    {
+        var settingsDto = new ContactsSyncSettingsDto
+        {
+            SyncEnabled = Convert.ToBoolean(await SettingProvider.GetOrNullAsync(StudySettings.SyncEnabled)),
+            ProviderName = await SettingProvider.GetOrNullAsync(StudySettings.ProviderName),
+        };
+
+        return settingsDto;
+    }
+
     /// <summary>
     /// 更新通讯录同步设置
     /// </summary>
@@ -21,7 +32,9 @@ public class ContactsSyncSettingsAppService : ApplicationService, IContactsSyncS
     // [RemoteService(false)]
     public async Task UpdateAsync(UpdateContactsSyncSettingsDto input)
     {
-        await _settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, StudySettings.SyncEnabled, input.SyncEnabled.ToString());
-        await _settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, StudySettings.ProviderName, input.ProviderName);
+        // 
+        // await _settingManager.SetForTenantOrGlobalAsync(CurrentTenant.Id, StudySettings.SyncEnabled, input.SyncEnabled.ToString());
+        await _settingManager.SetGlobalAsync(StudySettings.SyncEnabled, input.SyncEnabled.ToString());
+        await _settingManager.SetGlobalAsync(StudySettings.ProviderName, input.ProviderName);
     }
 }

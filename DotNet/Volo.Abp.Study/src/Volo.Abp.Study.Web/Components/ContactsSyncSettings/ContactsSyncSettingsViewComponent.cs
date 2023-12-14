@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc;
+using Volo.Abp.Study.SettingManagement;
 
 namespace Volo.Abp.Study.Web.Components.ContactsSyncSettings;
 
@@ -12,9 +13,18 @@ public class ContactsSyncSettingsViewComponent : AbpViewComponent
      * https://github.com/abpframework/abp/tree/7.4.3/modules/setting-management/src/Volo.Abp.SettingManagement.Web/Pages/SettingManagement/Components/EmailSettingGroup
      */
 
+    private readonly IContactsSyncSettingsAppService _contactsSyncSettingsAppService;
+
+    public ContactsSyncSettingsViewComponent(IContactsSyncSettingsAppService contactsSyncSettingsAppService)
+    {
+        _contactsSyncSettingsAppService = contactsSyncSettingsAppService;
+    }
+
     public virtual async Task<IViewComponentResult> InvokeAsync()
     {
-        return View("~/Components/ContactsSyncSettings/Default.cshtml", new UpdateContactsSettingsViewModel());
+        var settings = await _contactsSyncSettingsAppService.GetAsync();
+        var model = ObjectMapper.Map<ContactsSyncSettingsDto, UpdateContactsSettingsViewModel>(settings);
+        return View("~/Components/ContactsSyncSettings/Default.cshtml", model);
     }
 }
 
