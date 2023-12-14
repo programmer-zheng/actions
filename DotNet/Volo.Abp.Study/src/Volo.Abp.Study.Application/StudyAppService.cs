@@ -14,4 +14,9 @@ public abstract class StudyAppService : ApplicationService
     {
         LocalizationResource = typeof(StudyResource);
     }
+
+    public async Task<string> Get(int id)
+    {
+        return id.ToString();
+    }
 }

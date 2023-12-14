@@ -31,6 +31,8 @@ using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement.Web;
 using Volo.Abp.SettingManagement.Web;
+using Volo.Abp.SettingManagement.Web.Pages.SettingManagement;
+using Volo.Abp.Study.Web.Settings;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.TenantManagement.Web;
 using Volo.Abp.UI.Navigation.Urls;
@@ -52,7 +54,7 @@ namespace Volo.Abp.Study.Web;
     typeof(AbpTenantManagementWebModule),
     typeof(AbpAspNetCoreSerilogModule),
     typeof(AbpSwashbuckleModule)
-    )]
+)]
 public class StudyWebModule : AbpModule
 {
     public override void PreConfigureServices(ServiceConfigurationContext context)
@@ -93,6 +95,8 @@ public class StudyWebModule : AbpModule
         ConfigureNavigationServices();
         ConfigureAutoApiControllers();
         ConfigureSwaggerServices(context.Services);
+
+        Configure<SettingManagementPageOptions>(options => { options.Contributors.Add(new VoloAbpStudySettingPageContributor()); });
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)
@@ -102,10 +106,7 @@ public class StudyWebModule : AbpModule
 
     private void ConfigureUrls(IConfiguration configuration)
     {
-        Configure<AppUrlOptions>(options =>
-        {
-            options.Applications["MVC"].RootUrl = configuration["App:SelfUrl"];
-        });
+        Configure<AppUrlOptions>(options => { options.Applications["MVC"].RootUrl = configuration["App:SelfUrl"]; });
     }
 
     private void ConfigureBundles()
@@ -114,20 +115,14 @@ public class StudyWebModule : AbpModule
         {
             options.StyleBundles.Configure(
                 LeptonXLiteThemeBundles.Styles.Global,
-                bundle =>
-                {
-                    bundle.AddFiles("/global-styles.css");
-                }
+                bundle => { bundle.AddFiles("/global-styles.css"); }
             );
         });
     }
 
     private void ConfigureAutoMapper()
     {
-        Configure<AbpAutoMapperOptions>(options =>
-        {
-            options.AddMaps<StudyWebModule>();
-        });
+        Configure<AbpAutoMapperOptions>(options => { options.AddMaps<StudyWebModule>(); });
     }
 
     private void ConfigureVirtualFileSystem(IWebHostEnvironment hostingEnvironment)
@@ -136,10 +131,14 @@ public class StudyWebModule : AbpModule
         {
             Configure<AbpVirtualFileSystemOptions>(options =>
             {
-                options.FileSets.ReplaceEmbeddedByPhysical<StudyDomainSharedModule>(Path.Combine(hostingEnvironment.ContentRootPath, $"..{Path.DirectorySeparatorChar}Volo.Abp.Study.Domain.Shared"));
-                options.FileSets.ReplaceEmbeddedByPhysical<StudyDomainModule>(Path.Combine(hostingEnvironment.ContentRootPath, $"..{Path.DirectorySeparatorChar}Volo.Abp.Study.Domain"));
-                options.FileSets.ReplaceEmbeddedByPhysical<StudyApplicationContractsModule>(Path.Combine(hostingEnvironment.ContentRootPath, $"..{Path.DirectorySeparatorChar}Volo.Abp.Study.Application.Contracts"));
-                options.FileSets.ReplaceEmbeddedByPhysical<StudyApplicationModule>(Path.Combine(hostingEnvironment.ContentRootPath, $"..{Path.DirectorySeparatorChar}Volo.Abp.Study.Application"));
+                options.FileSets.ReplaceEmbeddedByPhysical<StudyDomainSharedModule>(Path.Combine(hostingEnvironment.ContentRootPath,
+                    $"..{Path.DirectorySeparatorChar}Volo.Abp.Study.Domain.Shared"));
+                options.FileSets.ReplaceEmbeddedByPhysical<StudyDomainModule>(Path.Combine(hostingEnvironment.ContentRootPath,
+                    $"..{Path.DirectorySeparatorChar}Volo.Abp.Study.Domain"));
+                options.FileSets.ReplaceEmbeddedByPhysical<StudyApplicationContractsModule>(Path.Combine(hostingEnvironment.ContentRootPath,
+                    $"..{Path.DirectorySeparatorChar}Volo.Abp.Study.Application.Contracts"));
+                options.FileSets.ReplaceEmbeddedByPhysical<StudyApplicationModule>(Path.Combine(hostingEnvironment.ContentRootPath,
+                    $"..{Path.DirectorySeparatorChar}Volo.Abp.Study.Application"));
                 options.FileSets.ReplaceEmbeddedByPhysical<StudyWebModule>(hostingEnvironment.ContentRootPath);
             });
         }
@@ -147,18 +146,12 @@ public class StudyWebModule : AbpModule
 
     private void ConfigureNavigationServices()
     {
-        Configure<AbpNavigationOptions>(options =>
-        {
-            options.MenuContributors.Add(new StudyMenuContributor());
-        });
+        Configure<AbpNavigationOptions>(options => { options.MenuContributors.Add(new StudyMenuContributor()); });
     }
 
     private void ConfigureAutoApiControllers()
     {
-        Configure<AbpAspNetCoreMvcOptions>(options =>
-        {
-            options.ConventionalControllers.Create(typeof(StudyApplicationModule).Assembly);
-        });
+        Configure<AbpAspNetCoreMvcOptions>(options => { options.ConventionalControllers.Create(typeof(StudyApplicationModule).Assembly); });
     }
 
     private void ConfigureSwaggerServices(IServiceCollection services)
@@ -204,10 +197,7 @@ public class StudyWebModule : AbpModule
         app.UseUnitOfWork();
         app.UseAuthorization();
         app.UseSwagger();
-        app.UseAbpSwaggerUI(options =>
-        {
-            options.SwaggerEndpoint("/swagger/v1/swagger.json", "Study API");
-        });
+        app.UseAbpSwaggerUI(options => { options.SwaggerEndpoint("/swagger/v1/swagger.json", "Study API"); });
         app.UseAuditing();
         app.UseAbpSerilogEnrichers();
         app.UseConfiguredEndpoints();

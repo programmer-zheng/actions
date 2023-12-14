@@ -3,6 +3,9 @@
     "texts": {
       "Menu:Home": "首页",
       "Welcome": "欢迎",
-      "LongWelcomeMessage": "欢迎来到该应用程序. 这是一个基于ABP框架的启动项目. 有关更多信息, 请访问 abp.io."
+      "LongWelcomeMessage": "欢迎来到该应用程序. 这是一个基于ABP框架的启动项目. 有关更多信息, 请访问 abp.io.",
+      "SyncEnabled": "启用同步功能",
+      "ContactsSyncSetting": "通讯录同步设置",
+      "SyncProviderName": "同步提供程序"
     }
   }
