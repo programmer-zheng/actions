@@ -39,6 +39,7 @@ using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.UI;
 using Volo.Abp.UI.Navigation;
 using Volo.Abp.VirtualFileSystem;
+using Volo.Abp.MultiTenancy;
 
 namespace Volo.Abp.Study.Web;
 
@@ -97,6 +98,12 @@ public class StudyWebModule : AbpModule
         ConfigureSwaggerServices(context.Services);
 
         Configure<SettingManagementPageOptions>(options => { options.Contributors.Add(new VoloAbpStudySettingPageContributor()); });
+
+        Configure<AbpTenantResolveOptions>(options =>
+        {
+            options.AddDomainTenantResolver("{0}.local.host");
+
+        });
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)
