@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Volo.Abp.Study.SettingManagement;
+using Volo.Abp.Study.CustomSetting;
 using Volo.Abp.Study.Web.Components.ContactsSyncSettings;
 
 namespace Volo.Abp.Study.Web;

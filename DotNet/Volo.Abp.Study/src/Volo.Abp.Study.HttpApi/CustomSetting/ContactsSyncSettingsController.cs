@@ -1,13 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc;
-using Volo.Abp.Study.ContactsSetting;
 
-namespace Volo.Abp.Study.SettingManagement;
+namespace Volo.Abp.Study.CustomSetting;
 
 // [RemoteService(Name = SettingManagementRemoteServiceConsts.RemoteServiceName)]
 // [Area(SettingManagementRemoteServiceConsts.ModuleName)]
-// [Route("/api/ContactsSetting/settings")]
 // [Route("/api/setting-management/contactssettings")]
+
+// [RemoteService(Name = "CustomSetting")]
+// [Area("customSetting")]
+//  [Route("/api/custom-setting/contacts")]
 public class ContactsSyncSettingsController : AbpControllerBase, IContactsSyncSettingsAppService
 {
     private readonly IContactsSyncSettingsAppService _contactsSyncSettingAppService;
@@ -16,7 +18,7 @@ public class ContactsSyncSettingsController : AbpControllerBase, IContactsSyncSe
     {
         _contactsSyncSettingAppService = contactsSyncSettingAppService;
     }
-
+     // [HttpGet]
     public Task<ContactsSyncSettingsDto> GetAsync()
     {
         return _contactsSyncSettingAppService.GetAsync();
@@ -27,7 +29,7 @@ public class ContactsSyncSettingsController : AbpControllerBase, IContactsSyncSe
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    [HttpPost]
+    // [HttpPost]
     public Task UpdateAsync(UpdateContactsSyncSettingsDto input)
     {
         return _contactsSyncSettingAppService.UpdateAsync(input);

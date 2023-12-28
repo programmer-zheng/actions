@@ -23,6 +23,8 @@ public class StudyHttpApiClientModule : AbpModule
 {
     public const string RemoteServiceName = "Default";
 
+    // public const string RemoteServiceName = "CustomSetting";
+
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         context.Services.AddHttpClientProxies(

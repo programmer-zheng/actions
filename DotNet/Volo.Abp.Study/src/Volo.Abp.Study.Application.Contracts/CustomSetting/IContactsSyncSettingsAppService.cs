@@ -1,7 +1,6 @@
 ﻿using Volo.Abp.Application.Services;
-using Volo.Abp.Study.ContactsSetting;
 
-namespace Volo.Abp.Study.SettingManagement;
+namespace Volo.Abp.Study.CustomSetting;
 
 public interface IContactsSyncSettingsAppService : IApplicationService
 {

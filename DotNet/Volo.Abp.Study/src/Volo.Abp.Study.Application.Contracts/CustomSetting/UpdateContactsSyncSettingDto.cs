@@ -1,4 +1,4 @@
-﻿namespace Volo.Abp.Study.ContactsSetting;
+﻿namespace Volo.Abp.Study.CustomSetting;
 
 public class UpdateContactsSyncSettingsDto
 {

@@ -7,10 +7,12 @@
                 return;
             }
             var form = $(this).serializeFormToObject();
-            
-            volo.abp.study.settingManagement.contactsSyncSettings.update(form).then(function (result) {
+
+            volo.abp.study.customSetting.contactsSyncSettings.update(form).then(function (result) {
                 $(document).trigger("AbpSettingSaved");
             })
         });
+        
+        
     })
 })(jQuery);
