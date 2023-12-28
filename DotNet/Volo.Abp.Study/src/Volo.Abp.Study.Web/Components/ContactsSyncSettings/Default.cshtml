@@ -9,26 +9,42 @@
 @model Volo.Abp.Study.Web.Components.ContactsSyncSettings.UpdateContactsSettingsViewModel        
 <abp-script src="/Components/ContactsSyncSettings/Default.js"></abp-script>
 
-<form id="SyncSettingForm" method="post">
-
+<abp-dynamic-form id="SyncSettingForm" abp-model="@Model">
     <abp-row>
-        <abp-column size-md="_12">
-            <div>
-                <abp-input asp-for="SyncEnabled"/>
-                <abp-input asp-for="ProviderName"></abp-input>
-            </div>
-
-            <hr class="my-4"/>
-            <div>
-                <abp-button button-type="Primary" type="submit">
-                    <i class="fa fa-save"></i> @L["Save"]
-                </abp-button>
-
-
-                <abp-button button-type="Primary" id="TestConnectButton">
-                    <i class="fa fa-send"></i> @L["TestConnect"]
-                </abp-button>
-            </div>
-        </abp-column>
+        <div>
+            <abp-form-content/>
+        </div>
+        <hr class="my-4">
+        <div>
+            <abp-button type="submit" button-type="Primary">
+                <i class="fa fa-save"> @L["Save"]</i>
+            </abp-button>
+            <abp-button button-type="Primary" id="TestConnectButton">
+                <i class="fa fa-send"></i> @L["TestConnect"]
+            </abp-button>
+        </div>
     </abp-row>
-</form>
+</abp-dynamic-form>
+@* <form id="SyncSettingForm" method="post"> *@
+@* *@
+@*     <abp-row> *@
+@*         <abp-column size-md="_12"> *@
+@*             <div> *@
+@*                 <abp-input asp-for="SyncEnabled"/> *@
+@*                 <abp-input asp-for="ProviderName"></abp-input> *@
+@*             </div> *@
+@* *@
+@*             <hr class="my-4"/> *@
+@*             <div> *@
+@*                 <abp-button button-type="Primary" type="submit"> *@
+@*                     <i class="fa fa-save"></i> @L["Save"] *@
+@*                 </abp-button> *@
+@* *@
+@* *@
+@*                 <abp-button button-type="Primary" id="TestConnectButton"> *@
+@*                     <i class="fa fa-send"></i> @L["TestConnect"] *@
+@*                 </abp-button> *@
+@*             </div> *@
+@*         </abp-column> *@
+@*     </abp-row> *@
+@* </form> *@
