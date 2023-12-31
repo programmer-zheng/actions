@@ -1,4 +1,4 @@
-﻿FROM mcr.microsoft.com/dotnet/runtime:7.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ffmpeg \
     && apt-get clean \
@@ -6,7 +6,7 @@ RUN apt-get update \
     && echo "Asia/Shanghai" > /etc/timezone
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ["VideoMerge.csproj", "./"]
 RUN dotnet restore "VideoMerge.csproj"
