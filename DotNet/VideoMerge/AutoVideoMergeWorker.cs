@@ -75,8 +75,9 @@ namespace VideoMerge
                         {
                             Directory.Delete(dir, true);
                             Logger.LogInformation($"超出保留时限，删除目录：{directoryName}");
-                            continue;
                         }
+
+                        continue;
                     }
 
                     var hour = Convert.ToInt32(directoryName.Substring(8, 2));
