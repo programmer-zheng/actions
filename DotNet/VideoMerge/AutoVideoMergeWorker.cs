@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Volo.Abp.BackgroundWorkers;
 using Volo.Abp.Threading;
 
@@ -12,49 +13,38 @@ namespace VideoMerge
     {
         private readonly IConfiguration _configuration;
 
-        /// <summary>
-        /// 监控视频根目录
-        /// </summary>
-        private readonly string VideoBaseDirectory;
-
-        /// <summary>
-        /// 合并周期
-        /// </summary>
-        private readonly int MergeCycle;
-
-        /// <summary>
-        /// 视频文件后缀
-        /// </summary>
-        private readonly string VideoSuffix;
 
         private readonly string _searchPattern;
 
-        public AutoVideoMergeWorker(AbpAsyncTimer timer, IServiceScopeFactory serviceScopeFactory, IConfiguration configuration) : base(timer, serviceScopeFactory)
+        private readonly VideoMergeConfigOption _configOption;
+
+        public AutoVideoMergeWorker(AbpAsyncTimer timer, IServiceScopeFactory serviceScopeFactory, IConfiguration configuration, IOptions<VideoMergeConfigOption> configureOptions)
+            : base(timer, serviceScopeFactory)
         {
             timer.Period = 1000 * 3;
             timer.Start();
             _configuration = configuration;
-            VideoBaseDirectory = _configuration.GetValue<string>("BaseDirectory");
-            MergeCycle = _configuration.GetValue<int>("MergeCycle");
-            VideoSuffix = $"*{_configuration.GetValue<string>("VideoSuffix")}";
-            VideoSuffix = string.IsNullOrWhiteSpace(VideoSuffix) ? "" : $".{VideoSuffix}";
-            _searchPattern = $"*{VideoSuffix}";
+            _configOption = configureOptions.Value;
+            _searchPattern = $"*{_configOption.VideoSuffix}";
         }
 
 
         protected override async Task DoWorkAsync(PeriodicBackgroundWorkerContext workerContext)
         {
-            // 时间间隔改为一小时
-            Timer.Period = 1000 * 60 * MergeCycle;
+            // 第一次启动后，修改同步周期
+            Timer.Period = 1000 * 60 * _configOption.MergeCycle;
 
-            if (Directory.Exists(VideoBaseDirectory))
+            if (Directory.Exists(_configOption.BaseDirectory))
             {
                 // 获取当前日期和小时
                 var currentDateHour = DateTime.Now.ToString("yyyyMMddHH");
-                Logger.LogInformation($"当前时间:{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}，当前小时目录：{currentDateHour}");
-                var lastModifyTime = new DirectoryInfo(VideoBaseDirectory).LastWriteTime;
+                Logger.LogInformation($"当前时间:{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}，对应目录：{currentDateHour}");
+
+                var dayRegex = new Regex(@"^\d{8,10}$");
+
+                var lastModifyTime = new DirectoryInfo(_configOption.BaseDirectory).LastWriteTime;
                 // 获取根目录下的文件夹
-                var dateDirectories = Directory.GetDirectories(VideoBaseDirectory);
+                var dateDirectories = Directory.GetDirectories(_configOption.BaseDirectory);
                 foreach (var dir in dateDirectories)
                 {
                     // 获取目录名称，后续用作合并视频文件名
@@ -63,7 +53,12 @@ namespace VideoMerge
 
                     // 排除当前时间的目录（当前时间视频不完整，不足一小时）、文件夹名格式不正确的（日期+小时）
                     // 合并后的视频存放于以日期命名的文件夹中，按小时区分
-                    if (directoryName == currentDateHour || !Regex.IsMatch(directoryName, @"^\d{10}$"))
+                    if (directoryName == currentDateHour)
+                    {
+                        continue;
+                    }
+
+                    if (!dayRegex.IsMatch(directoryName))
                     {
                         Logger.LogInformation($"跳过目录：{directoryName}");
                         continue;
@@ -72,6 +67,18 @@ namespace VideoMerge
                     var year = Convert.ToInt32(directoryName.Substring(0, 4));
                     var month = Convert.ToInt32(directoryName.Substring(4, 2));
                     var day = Convert.ToInt32(directoryName.Substring(6, 2));
+
+                    if (directoryName.Length == 8)
+                    {
+                        // 8位长度（yyyyMMdd)，判断是否超过保留时长，若超过时长，删除目录并跳过
+                        if (new DateTime(year, month, day) < DateTime.Today.AddDays(-_configOption.KeepDays))
+                        {
+                            Directory.Delete(dir, true);
+                            Logger.LogInformation($"超出保留时限，删除目录：{directoryName}");
+                            continue;
+                        }
+                    }
+
                     var hour = Convert.ToInt32(directoryName.Substring(8, 2));
                     var dirMaxTime = new DateTime(year, month, day, hour, 59, 59);
                     // 摄像头往NAS里面同步需要时间，由于未知原因，导致同步过来的视频，有可能不足60个（网络原因、摄像头重启、存储卡意外损坏等）
@@ -83,14 +90,14 @@ namespace VideoMerge
 
                     //截取日期部分
                     var videoDate = directoryName.Substring(0, 8);
-                    var videoDateDirectoryPath = Path.Combine(VideoBaseDirectory, videoDate);
+                    var videoDateDirectoryPath = Path.Combine(_configOption.BaseDirectory, videoDate);
                     if (!Directory.Exists(videoDateDirectoryPath))
                     {
                         Directory.CreateDirectory(videoDateDirectoryPath);
                     }
 
                     // ffmpeg合并视频文件
-                    var convertFile = Path.Combine(VideoBaseDirectory, directoryName, $"{directoryName}.txt");
+                    var convertFile = Path.Combine(_configOption.BaseDirectory, directoryName, $"{directoryName}.txt");
                     // 合并后的视频输出文件
                     var outputFile = Path.Combine(videoDateDirectoryPath, $"{directoryName}.mp4");
                     // 若已转换过，删除原目录，避免重复执行合并操作，之所以不在转换后立即执行，是避免转换有错误
@@ -150,7 +157,7 @@ namespace VideoMerge
             }
             else
             {
-                Logger.LogError($"视频存储目录：{VideoBaseDirectory} 不存在，无法进行视频转换操作");
+                Logger.LogError($"视频存储目录：{_configOption.BaseDirectory} 不存在，无法进行视频转换操作");
             }
         }
     }
