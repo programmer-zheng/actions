@@ -11,11 +11,11 @@ public class VoloAbpStudySettingPageContributor : ISettingPageContributor
 {
     public Task ConfigureAsync(SettingPageCreationContext context)
     {
-        var L = context.ServiceProvider.GetRequiredService<IStringLocalizer<StudyResource>>();
+        var l = context.ServiceProvider.GetRequiredService<IStringLocalizer<StudyResource>>();
         context.Groups.Add(
             new SettingPageGroup(
                 "Volo.Abp.Study.ContactsSyncSetting",
-                L["ContactsSyncSetting"],
+                l["ContactsSyncSetting"],
                 typeof(ContactsSyncSettingsViewComponent),
                 order: 1
             )
