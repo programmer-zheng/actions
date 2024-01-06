@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.Study.EntityFrameworkCore;
@@ -11,9 +12,11 @@ using Volo.Abp.Study.EntityFrameworkCore;
 namespace Volo.Abp.Study.Migrations
 {
     [DbContext(typeof(StudyDbContext))]
-    partial class StudyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240104071441_udate-volo-abp-to-8")]
+    partial class udatevoloabpto8
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

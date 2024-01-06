@@ -2,6 +2,10 @@
   "culture": "zh-Hans",
   "texts": {
     "Menu:Home": "首页",
+    "Menu:ProductManage": "商品管理",
+    "Menu:FirstLevel": "第一层",
+    "Menu:SecondLevel": "第二层",
+    "Menu:ThirdLevel": "第三层",
     "Welcome": "欢迎",
     "LongWelcomeMessage": "欢迎来到该应用程序. 这是一个基于ABP框架的启动项目. 有关更多信息, 请访问 abp.io.",
     "SyncEnabled": "启用同步功能",
@@ -10,6 +14,7 @@
     "TestConnect": "测试连接",
     "Feature:UserManageGroup": "用户管理",
     "Feature:LimitMaxUserCount": "启用最大用户数量限制",
-    "Feature:MaxUserCount": "最大用户数量"
+    "Feature:MaxUserCount": "最大用户数量",
+    "Permission:ContractSetting": "通讯录同步设置"
   }
 }

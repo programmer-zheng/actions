@@ -8,9 +8,15 @@ public class StudyPermissionDefinitionProvider : PermissionDefinitionProvider
 {
     public override void Define(IPermissionDefinitionContext context)
     {
+        
         var myGroup = context.AddGroup(StudyPermissions.GroupName);
         //Define your own permissions here. Example:
         //myGroup.AddPermission(StudyPermissions.MyPermission1, L("Permission:MyPermission1"));
+
+        myGroup.AddPermission(StudyPermissions.ContactSetting, L("Permission:ContractSetting"));
+        
+        
+        
     }
 
     private static LocalizableString L(string name)

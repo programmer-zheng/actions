@@ -16,15 +16,17 @@ namespace Volo.Abp.Study
                 defaultValue: "false",
                 displayName: L("Feature:LimitMaxUserCount"),
                 isVisibleToClients: true,
-                valueType: new ToggleStringValueType()
-                );
+                valueType: new ToggleStringValueType(),
+                isAvailableToHost: false
+            );
 
             group.AddFeature(
                 "MyApp.MaxUserCount",
                 defaultValue: "100",
                 displayName: L("Feature:MaxUserCount"),
-                valueType: new FreeTextStringValueType(new NumericValueValidator())
-                );
+                valueType: new FreeTextStringValueType(new NumericValueValidator()),
+                isAvailableToHost: false
+            );
         }
 
         private ILocalizableString L(string name)
