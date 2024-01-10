@@ -8,4 +8,4 @@
 
 ### 本地配置
 
-![AbpHelper_CRUD_Config](screenshots\AbpHelper_CRUD_Config.png)
+![AbpHelper_CRUD_Config](screenshots/AbpHelper_CRUD_Config.png)
