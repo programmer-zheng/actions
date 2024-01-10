@@ -4,7 +4,7 @@ using Volo.Abp.Domain.Entities;
 
 namespace Volo.Abp.Study.FlatManage;
 
-public class FlatInfoEntity : Entity<Guid>, ISoftDelete
+public class FlatInfo : Entity<Guid>, ISoftDelete
 {
     [Required]
     public required string FlatName { get; set; }
