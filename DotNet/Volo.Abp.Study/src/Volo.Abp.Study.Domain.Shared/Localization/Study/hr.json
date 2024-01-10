@@ -1,8 +1,24 @@
 {
-    "culture": "hr",
-    "texts": {
-        "Menu:Home": "Početna",
-        "Welcome": "Dobrodošli",
-        "LongWelcomeMessage": "Dobrodošli u aplikaciju. Ovo je startup projekt temeljen na ABP framework-u. Za više informacija posjetite abp.io."
-    }
+  "culture": "hr",
+  "texts": {
+    "Menu:Home": "Početna",
+    "Welcome": "Dobrodošli",
+    "LongWelcomeMessage": "Dobrodošli u aplikaciju. Ovo je startup projekt temeljen na ABP framework-u. Za više informacija posjetite abp.io.",
+    "Permission:FlatInfo": "FlatInfo",
+    "Permission:Create": "Create",
+    "Permission:Update": "Update",
+    "Permission:Delete": "Delete",
+    "Menu:FlatInfo": "MenuFlatInfo",
+    "FlatInfo": "FlatInfo",
+    "FlatInfoFlatName": "FlatInfoFlatName",
+    "FlatInfoEnName": "FlatInfoEnName",
+    "FlatInfoDeviceType": "FlatInfoDeviceType",
+    "FlatInfoConfigStr": "FlatInfoConfigStr",
+    "FlatInfoIsDeleted": "FlatInfoIsDeleted",
+    "CreateFlatInfo": "CreateFlatInfo",
+    "EditFlatInfo": "EditFlatInfo",
+    "FlatInfoDeletionConfirmationMessage": "Are you sure to delete the flatInfo {0}?",
+    "SuccessfullyDeleted": "Successfully deleted",
+    "TableFilter": "TableFilter"
+  }
 }

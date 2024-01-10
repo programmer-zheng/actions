@@ -3,6 +3,22 @@
   "texts": {
     "Menu:Home": "Koti",
     "Welcome": "Tervetuloa",
-    "LongWelcomeMessage": "Tervetuloa sovellukseen. Tämä on ABP-kehykseen perustuva käynnistysprojekti. Lisätietoja on osoitteessa abp.io."
+    "LongWelcomeMessage": "Tervetuloa sovellukseen. Tämä on ABP-kehykseen perustuva käynnistysprojekti. Lisätietoja on osoitteessa abp.io.",
+    "Permission:FlatInfo": "FlatInfo",
+    "Permission:Create": "Create",
+    "Permission:Update": "Update",
+    "Permission:Delete": "Delete",
+    "Menu:FlatInfo": "MenuFlatInfo",
+    "FlatInfo": "FlatInfo",
+    "FlatInfoFlatName": "FlatInfoFlatName",
+    "FlatInfoEnName": "FlatInfoEnName",
+    "FlatInfoDeviceType": "FlatInfoDeviceType",
+    "FlatInfoConfigStr": "FlatInfoConfigStr",
+    "FlatInfoIsDeleted": "FlatInfoIsDeleted",
+    "CreateFlatInfo": "CreateFlatInfo",
+    "EditFlatInfo": "EditFlatInfo",
+    "FlatInfoDeletionConfirmationMessage": "Are you sure to delete the flatInfo {0}?",
+    "SuccessfullyDeleted": "Successfully deleted",
+    "TableFilter": "TableFilter"
   }
 }

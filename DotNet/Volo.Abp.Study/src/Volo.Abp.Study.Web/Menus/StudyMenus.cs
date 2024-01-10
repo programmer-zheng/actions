@@ -1,4 +1,4 @@
-﻿namespace Volo.Abp.Study.Web.Menus;
+namespace Volo.Abp.Study.Web.Menus;
 
 public class StudyMenus
 {
@@ -16,4 +16,5 @@ public class StudyMenus
     public const string ThirdLevel = Prefix + ".Custom.ThirdLevel";
     //Add your menu items here...
 
+    public const string FlatInfo = Prefix + ".FlatInfo";
 }

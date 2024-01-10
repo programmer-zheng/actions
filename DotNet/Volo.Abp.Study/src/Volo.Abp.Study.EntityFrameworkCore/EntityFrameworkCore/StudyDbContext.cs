@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
@@ -12,6 +12,8 @@ using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
+using Volo.Abp.Study.FlatManage;
+using Volo.Abp.EntityFrameworkCore.Modeling;
 
 namespace Volo.Abp.Study.EntityFrameworkCore;
 
@@ -52,6 +54,7 @@ public class StudyDbContext :
     public DbSet<TenantConnectionString> TenantConnectionStrings { get; set; }
 
     #endregion
+    public DbSet<FlatInfo> FlatInfos { get; set; }
 
     public StudyDbContext(DbContextOptions<StudyDbContext> options)
         : base(options)
@@ -82,5 +85,15 @@ public class StudyDbContext :
         //    b.ConfigureByConvention(); //auto configure for the base class props
         //    //...
         //});
+
+
+        builder.Entity<FlatInfo>(b =>
+        {
+            b.ToTable(StudyConsts.DbTablePrefix + "FlatInfos", StudyConsts.DbSchema);
+            b.ConfigureByConvention(); 
+            
+
+            /* Configure more properties here */
+        });
     }
 }

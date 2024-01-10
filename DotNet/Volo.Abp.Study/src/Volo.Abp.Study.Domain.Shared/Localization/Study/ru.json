@@ -3,6 +3,22 @@
   "texts": {
     "Menu:Home": "Главная",
     "Welcome": "Добро пожаловать",
-    "LongWelcomeMessage": "Добро пожаловать в приложение. Этот запущенный проект основан на фреймворке ABP. Для получения дополнительной информации посетите сайт abp.io."
+    "LongWelcomeMessage": "Добро пожаловать в приложение. Этот запущенный проект основан на фреймворке ABP. Для получения дополнительной информации посетите сайт abp.io.",
+    "Permission:FlatInfo": "FlatInfo",
+    "Permission:Create": "Create",
+    "Permission:Update": "Update",
+    "Permission:Delete": "Delete",
+    "Menu:FlatInfo": "MenuFlatInfo",
+    "FlatInfo": "FlatInfo",
+    "FlatInfoFlatName": "FlatInfoFlatName",
+    "FlatInfoEnName": "FlatInfoEnName",
+    "FlatInfoDeviceType": "FlatInfoDeviceType",
+    "FlatInfoConfigStr": "FlatInfoConfigStr",
+    "FlatInfoIsDeleted": "FlatInfoIsDeleted",
+    "CreateFlatInfo": "CreateFlatInfo",
+    "EditFlatInfo": "EditFlatInfo",
+    "FlatInfoDeletionConfirmationMessage": "Are you sure to delete the flatInfo {0}?",
+    "SuccessfullyDeleted": "Successfully deleted",
+    "TableFilter": "TableFilter"
   }
 }

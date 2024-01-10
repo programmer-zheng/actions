@@ -1,4 +1,4 @@
-﻿using Volo.Abp.Study.Localization;
+using Volo.Abp.Study.Localization;
 using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.Localization;
 
@@ -17,6 +17,11 @@ public class StudyPermissionDefinitionProvider : PermissionDefinitionProvider
         
         
         
+
+        var flatInfoPermission = myGroup.AddPermission(StudyPermissions.FlatInfo.Default, L("Permission:FlatInfo"));
+        flatInfoPermission.AddChild(StudyPermissions.FlatInfo.Create, L("Permission:Create"));
+        flatInfoPermission.AddChild(StudyPermissions.FlatInfo.Update, L("Permission:Update"));
+        flatInfoPermission.AddChild(StudyPermissions.FlatInfo.Delete, L("Permission:Delete"));
     }
 
     private static LocalizableString L(string name)

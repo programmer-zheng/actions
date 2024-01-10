@@ -3,6 +3,22 @@
   "texts": {
     "Menu:Home": "Home",
     "Welcome": "Witaj",
-    "LongWelcomeMessage": "Witaj w aplikacji. To jest inicjalny projekt bazujący na ABP framework. Po więcej informacji odwiedź stronę abp.io."
+    "LongWelcomeMessage": "Witaj w aplikacji. To jest inicjalny projekt bazujący na ABP framework. Po więcej informacji odwiedź stronę abp.io.",
+    "Permission:FlatInfo": "FlatInfo",
+    "Permission:Create": "Create",
+    "Permission:Update": "Update",
+    "Permission:Delete": "Delete",
+    "Menu:FlatInfo": "MenuFlatInfo",
+    "FlatInfo": "FlatInfo",
+    "FlatInfoFlatName": "FlatInfoFlatName",
+    "FlatInfoEnName": "FlatInfoEnName",
+    "FlatInfoDeviceType": "FlatInfoDeviceType",
+    "FlatInfoConfigStr": "FlatInfoConfigStr",
+    "FlatInfoIsDeleted": "FlatInfoIsDeleted",
+    "CreateFlatInfo": "CreateFlatInfo",
+    "EditFlatInfo": "EditFlatInfo",
+    "FlatInfoDeletionConfirmationMessage": "Are you sure to delete the flatInfo {0}?",
+    "SuccessfullyDeleted": "Successfully deleted",
+    "TableFilter": "TableFilter"
   }
 }

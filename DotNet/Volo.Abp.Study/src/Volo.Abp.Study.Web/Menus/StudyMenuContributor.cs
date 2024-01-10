@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
+using Volo.Abp.Study.Permissions;
 using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.Study.Localization;
 using Volo.Abp.Study.MultiTenancy;
@@ -29,7 +30,7 @@ public class StudyMenuContributor : IMenuContributor
         }
     }
 
-    private Task ConfigureMainMenuAsync(MenuConfigurationContext context)
+    private async Task ConfigureMainMenuAsync(MenuConfigurationContext context)
     {
         var administration = context.Menu.GetAdministration();
         var l = context.GetLocalizer<StudyResource>();
@@ -46,16 +47,19 @@ public class StudyMenuContributor : IMenuContributor
             ).RequireAuthenticated()
         );
 
-
+        // if (await context.IsGrantedAsync(StudyPermissions.FlatInfo.Default))
+        // {
+        //     context.Menu.GetAdministration().AddItem(
+        //         new ApplicationMenuItem(StudyMenus.FlatInfo, l["Menu:FlatInfo"], "/FlatManage/FlatInfo")
+        //     );
+        // }
         context.Menu.Items.Insert(
             1,
             new ApplicationMenuItem(
-                StudyMenus.ProductManage,
-                l["Menu:ProductManage"],
-                "~/Product/Index",
+                StudyMenus.FlatInfo, l["Menu:FlatInfo"], "/FlatManage/FlatInfo",
                 icon: "fa-solid fa-shop",
                 order: 1
-            ).RequireAuthenticated()
+            ).RequirePermissions(StudyPermissions.FlatInfo.Default)
         );
         if (MultiTenancyConsts.IsEnabled)
         {
@@ -85,6 +89,6 @@ public class StudyMenuContributor : IMenuContributor
             secondLevel.AddItem(new ApplicationMenuItem(StudyMenus.ThirdLevel, l["Menu:ThirdLevel"], "~/ThirdLevel"));
         }
 
-        return Task.CompletedTask;
+
     }
 }

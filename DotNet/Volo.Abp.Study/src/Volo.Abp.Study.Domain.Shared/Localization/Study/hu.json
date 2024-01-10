@@ -3,6 +3,22 @@
   "texts": {
     "Menu:Home": "Kezdőlap",
     "Welcome": "Üdvözlöm",
-    "LongWelcomeMessage": "Üdvözöljük az alkalmazásban. Ez egy ABP keretrendszeren alapuló startup projekt. További információkért látogasson el az abp.io oldalra."
+    "LongWelcomeMessage": "Üdvözöljük az alkalmazásban. Ez egy ABP keretrendszeren alapuló startup projekt. További információkért látogasson el az abp.io oldalra.",
+    "Permission:FlatInfo": "FlatInfo",
+    "Permission:Create": "Create",
+    "Permission:Update": "Update",
+    "Permission:Delete": "Delete",
+    "Menu:FlatInfo": "MenuFlatInfo",
+    "FlatInfo": "FlatInfo",
+    "FlatInfoFlatName": "FlatInfoFlatName",
+    "FlatInfoEnName": "FlatInfoEnName",
+    "FlatInfoDeviceType": "FlatInfoDeviceType",
+    "FlatInfoConfigStr": "FlatInfoConfigStr",
+    "FlatInfoIsDeleted": "FlatInfoIsDeleted",
+    "CreateFlatInfo": "CreateFlatInfo",
+    "EditFlatInfo": "EditFlatInfo",
+    "FlatInfoDeletionConfirmationMessage": "Are you sure to delete the flatInfo {0}?",
+    "SuccessfullyDeleted": "Successfully deleted",
+    "TableFilter": "TableFilter"
   }
 }
