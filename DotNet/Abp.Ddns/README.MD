@@ -9,6 +9,7 @@
 mkdir /https
 
 # 创建docker容器，通过环境变量设置相关参数
+# 需要注意：ASPNETCORE_URLS和ASPNETCORE_Kestrel__Certificates__Default__Password的值需要双引号
 docker run -itd --name ddns --restart always \
 -p 8880:80 -p 8843:443 \
 -e Aliyun:AccessKeyId=keyid \
@@ -17,10 +18,10 @@ docker run -itd --name ddns --restart always \
 -e Tencent:SecretId=secretid \
 -e Tencent:SecretKey=secretkey \
 -e Tencent:Domain=domain \
--e Tencent:Record=record \          
+-e Tencent:Record=record \
 -e ASPNETCORE_URLS="https://+;http://+" \
+-e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/xxxx.pfx \
 -e ASPNETCORE_Kestrel__Certificates__Default__Password="password_text" \
--e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/xxxx.pfx \    
 -v /https:/https \
 programmerzheng/ddns
 ```
