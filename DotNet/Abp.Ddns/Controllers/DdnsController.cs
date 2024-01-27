@@ -55,4 +55,31 @@ public class DdnsController : AbpController
 
         return Content("success");
     }
+
+    [Route("/ddns_ipv6")]
+    [HttpGet]
+    public async Task<IActionResult> DdnsForIPv6([FromQuery] string ip)
+    {
+        Check.NotNullOrWhiteSpace(ip, nameof(ip));
+        try
+        {
+            var record = _configuration.GetValue<string>("Tencent:RecordV6");
+            var domain = _configuration.GetValue<string>("Tencent:Domain");
+            Check.NotNullOrWhiteSpace(record, nameof(record));
+            Check.NotNullOrWhiteSpace(domain, nameof(domain));
+            var dnspodSecretId = _configuration.GetValue<string>("Tencent:SecretId");
+            var dnspodSecretKey = _configuration.GetValue<string>("Tencent:SecretKey");
+            Check.NotNullOrWhiteSpace(dnspodSecretId, nameof(dnspodSecretId));
+            Check.NotNullOrWhiteSpace(dnspodSecretKey, nameof(dnspodSecretKey));
+            var dnsPodUtil = new TencentDnsPodUtil(dnspodSecretId!, dnspodSecretKey!);
+            // 更新dnspod中的域名解析
+            await dnsPodUtil.TencentModifyDynamicDns(domain!, record!, ip, true);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "IPv6 腾讯DnsPod动态Dns更新出错");
+        }
+
+        return Content("success");
+    }
 }

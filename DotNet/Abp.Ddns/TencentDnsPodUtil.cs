@@ -18,9 +18,9 @@ public class TencentDnsPodUtil
     }
 
 
-    public async Task TencentModifyDynamicDns(string domain, string subdomain, string ip)
+    public async Task TencentModifyDynamicDns(string domain, string subdomain, string ip, bool isIPv6 = false)
     {
-        var recordId = await GetTencentDnsPodRecordId(domain, subdomain);
+        var recordId = await GetTencentDnsPodRecordId(domain, subdomain, isIPv6);
         ModifyDynamicDNSRequest req = new ModifyDynamicDNSRequest();
         req.Domain = domain;
         req.RecordId = recordId;
@@ -32,11 +32,19 @@ public class TencentDnsPodUtil
     }
 
 
-    private async Task<ulong> GetTencentDnsPodRecordId(string domain, string subdomain)
+    private async Task<ulong> GetTencentDnsPodRecordId(string domain, string subdomain, bool isIPv6)
     {
         DescribeRecordListRequest req = new DescribeRecordListRequest();
         req.Domain = domain;
         req.Subdomain = subdomain;
+        if (isIPv6)
+        {
+            req.RecordType = "AAAA";
+        }
+        else
+        {
+            req.RecordType = "A";
+        }
         DescribeRecordListResponse resp = await _dnspodClient.DescribeRecordList(req);
 
         if (resp.RecordList != null && resp.RecordList.Length > 0)
