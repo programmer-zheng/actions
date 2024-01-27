@@ -18,7 +18,8 @@ docker run -itd --name ddns --restart always \
 -e Tencent:SecretId=secretid \
 -e Tencent:SecretKey=secretkey \
 -e Tencent:Domain=domain \
--e Tencent:Record=record \
+-e Tencent:Record=recordName \   
+-e Tencent:RecordV6=recordName \
 -e ASPNETCORE_URLS="https://+;http://+" \
 -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/xxxx.pfx \
 -e ASPNETCORE_Kestrel__Certificates__Default__Password="password_text" \
