@@ -34,6 +34,7 @@ namespace Abp.Ddns.Controllers
                 var onlineHosts = mikrotik.GetDhcpHosts();
                 onlineHosts = (from host in onlineHosts
                     join wifi in onlineWifiHosts on host.MacAddress equals wifi.MacAddress
+                    orderby wifi.Interface
                     select new HostInfo
                     {
                         HostName = host.HostName,
