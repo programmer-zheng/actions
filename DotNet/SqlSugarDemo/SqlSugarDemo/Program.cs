@@ -1,4 +1,5 @@
 using SqlSugar;
+using SqlSugarDemo.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,18 +12,18 @@ builder.Services.AddSingleton<ISqlSugarClient>(
         SqlSugarScope sqlSugar = new SqlSugarScope(new ConnectionConfig()
             {
                 DbType = SqlSugar.DbType.MySql,
-                ConnectionString = "server=db.local.host;database=SqlSugarDemo;uid=root;password=123qwe",
+                ConnectionString = "server=db.local.host;Database=SqlSugarDemo;Uid=root;Pwd=123qwe",
                 IsAutoCloseConnection = true,
             },
             db =>
             {
+                db.DbMaintenance.CreateDatabase();
+                db.CodeFirst.InitTables<Student>();
+                db.CodeFirst.InitTables<Book>();
                 //单例参数配置，所有上下文生效
                 db.Aop.OnLogExecuting = (sql, pars) =>
                 {
-                    //获取作IOC作用域对象
-                    var appServive = s.GetService<IHttpContextAccessor>();
-                    var obj = appServive?.HttpContext?.RequestServices.GetService<ILogger>();
-                    Console.WriteLine("AOP" + obj.GetHashCode());
+                    Console.WriteLine(sql);
                 };
             });
         return sqlSugar;

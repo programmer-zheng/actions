@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using SqlSugar;
 using SqlSugarDemo.Models;
 
 namespace SqlSugarDemo.Controllers;
@@ -8,14 +9,23 @@ public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
 
-    public HomeController(ILogger<HomeController> logger)
+    public readonly ISqlSugarClient db;
+
+    public HomeController(ILogger<HomeController> logger, ISqlSugarClient db)
     {
         _logger = logger;
+        this.db = db;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View();
+        await db.Insertable<Student>(new List<Student>()
+        {
+            new Student() { Name = "test111" },
+            new Student() { Name = "test222" },
+        }).ExecuteCommandAsync();
+        var students = db.Queryable<Student>().Includes(t => t.Books).ToList();
+        return Json(students);
     }
 
     public IActionResult Privacy()
