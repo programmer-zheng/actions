@@ -22,7 +22,7 @@ public class AbpDdnsModule : AbpModule
         {
             app.UseExceptionHandler("/Home/Error");
             app.UseHsts();
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
         }
         else
         {
