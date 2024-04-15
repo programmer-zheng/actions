@@ -26,4 +26,6 @@ public class Book
     public int SID { get; set; }
 
     public string BookName { get; set; }
+    
+    public DateTime PublishDate { get; set; }
 }

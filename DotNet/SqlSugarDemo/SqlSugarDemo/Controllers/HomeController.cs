@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SqlSugar;
 using SqlSugarDemo.Models;
 
@@ -29,9 +31,9 @@ public class HomeController : Controller
 
         var books = new List<Book>
         {
-            new() { Id = 1, SID = 1, BookName = "格林童话" },
-            new() { Id = 2, SID = 1, BookName = "寓言故事" },
-            new() { Id = 3, SID = 2, BookName = "C# 指南" },
+            new() { Id = 1, SID = 1, BookName = "格林童话", PublishDate = DateTime.Parse("1990-2-28") },
+            new() { Id = 2, SID = 1, BookName = "寓言故事", PublishDate = DateTime.Parse("1980-3-15") },
+            new() { Id = 3, SID = 2, BookName = "C# 指南", PublishDate = DateTime.Parse("2020-4-20") },
         };
 
         await db.Storageable(studentList).ExecuteCommandAsync();
@@ -39,6 +41,13 @@ public class HomeController : Controller
     }
 
     public async Task<IActionResult> Index()
+    {
+        var students = db.Queryable<Student>().Includes(t => t.Books).ToList();
+        return Content(JsonConvert.SerializeObject(students), "application/json", Encoding.UTF8);
+    }
+
+    [Route("/test")]
+    public async Task<IActionResult> Test()
     {
         var students = db.Queryable<Student>().Includes(t => t.Books).ToList();
         return Json(students);

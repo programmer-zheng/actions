@@ -4,7 +4,10 @@ using SqlSugarDemo.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
+{
+    options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
+});
 
 builder.Services.AddSingleton<ISqlSugarClient>(
     s =>
@@ -13,6 +16,8 @@ builder.Services.AddSingleton<ISqlSugarClient>(
             {
                 DbType = SqlSugar.DbType.MySql,
                 ConnectionString = "server=db.local.host;Database=SqlSugarDemo;Uid=root;Pwd=123qwe",
+                // DbType = SqlSugar.DbType.Sqlite,
+                // ConnectionString = "Data Source=:memory:",
                 IsAutoCloseConnection = true,
             },
             db =>
@@ -21,10 +26,7 @@ builder.Services.AddSingleton<ISqlSugarClient>(
                 db.CodeFirst.InitTables<Student>();
                 db.CodeFirst.InitTables<Book>();
                 //单例参数配置，所有上下文生效
-                db.Aop.OnLogExecuting = (sql, pars) =>
-                {
-                    Console.WriteLine(sql);
-                };
+                db.Aop.OnLogExecuting = (sql, pars) => { Console.WriteLine(sql); };
             });
         return sqlSugar;
     }
