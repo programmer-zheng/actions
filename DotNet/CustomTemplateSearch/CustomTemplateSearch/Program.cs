@@ -1,7 +1,20 @@
+using CustomTemplateSearch;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<CustomDbContext>(t =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("Default");
+    var mysqlVersion = MySqlServerVersion.AutoDetect(connectionString);
+    t.UseMySql(connectionString, mysqlVersion);
+});
+
+// builder.Services.AddScoped<CustonDataSeed>();
+
 
 var app = builder.Build();
 
