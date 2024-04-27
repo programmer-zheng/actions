@@ -9,3 +9,4 @@ appsettings.*.json
 yarn.lock
 **.log
 [lL]og[s].txt
+node_modules/
