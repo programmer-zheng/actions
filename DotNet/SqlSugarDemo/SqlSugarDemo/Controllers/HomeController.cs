@@ -31,7 +31,7 @@ public class HomeController : Controller
 
         var books = new List<Book>
         {
-            new() { Id = 1, SID = 1, BookName = "格林童话", PublishDate = DateTime.Parse("1990-2-28") },
+            new() { Id = 1, SID = 1, BookName = "格林童话",  },// 不设置日期，默认C#初始化时，日期最小值为 0001-01-01，SqlSugar会将日期自动设置为 1900-01-01
             new() { Id = 2, SID = 1, BookName = "寓言故事", PublishDate = DateTime.Parse("1980-3-15") },
             new() { Id = 3, SID = 2, BookName = "C# 指南", PublishDate = DateTime.Parse("2020-4-20") },
         };
