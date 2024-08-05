@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="NPOI" Version="2.7.1" />
+      <PackageReference Include="NPOI" Version="2.4.1" />
     </ItemGroup>
 
 </Project>
