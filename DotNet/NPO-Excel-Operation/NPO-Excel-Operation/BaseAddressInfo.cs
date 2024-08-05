@@ -12,36 +12,53 @@ public class BaseAddressInfo
         {
             new BaseAddressInfo
             {
-                Name = "北京市",
+                Name = "江苏省",
                 Children = new List<BaseAddressInfo>
                 {
                     new BaseAddressInfo
                     {
-                        Name = "北京市",
+                        Name = "南京市",
                         Children = new List<BaseAddressInfo>
                         {
-                            new BaseAddressInfo { Name = "东城区" },
-                            new BaseAddressInfo { Name = "西城区" },
-                            new BaseAddressInfo { Name = "朝阳区" },
-                            new BaseAddressInfo { Name = "海淀区" }
+                            new BaseAddressInfo { Name = "浦口区" },
+                            new BaseAddressInfo { Name = "建邺区" },
+                            new BaseAddressInfo { Name = "鼓楼区" },
                         }
+                    },
+                    new BaseAddressInfo
+                    {
+                    Name = "苏州市",
+                    Children = new List<BaseAddressInfo>
+                    {
+                        new BaseAddressInfo { Name = "姑苏区" },
+                        new BaseAddressInfo { Name = "吴中区" },
+                        new BaseAddressInfo { Name = "虎丘区" },
                     }
+                }
                 }
             },
             new BaseAddressInfo
             {
-                Name = "上海市",
+                Name = "安徽省",
                 Children = new List<BaseAddressInfo>
                 {
                     new BaseAddressInfo
                     {
-                        Name = "上海市",
+                        Name = "合肥市",
                         Children = new List<BaseAddressInfo>
                         {
-                            new BaseAddressInfo { Name = "黄浦区" },
-                            new BaseAddressInfo { Name = "徐汇区" },
-                            new BaseAddressInfo { Name = "长宁区" },
-                            new BaseAddressInfo { Name = "静安区" }
+                            new BaseAddressInfo { Name = "肥东县" },
+                            new BaseAddressInfo { Name = "肥西县" },
+                        }
+                    },
+                    new BaseAddressInfo
+                    {
+                        Name = "宿州市",
+                        Children = new List<BaseAddressInfo>
+                        {
+                            new BaseAddressInfo { Name = "埇桥区" },
+                            new BaseAddressInfo { Name = "砀山县" },
+                            new BaseAddressInfo { Name = "萧县" },
                         }
                     }
                 }
