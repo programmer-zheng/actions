@@ -10,7 +10,7 @@ class Program
     static void Main(string[] args)
     {
         //test.ExportExcelWithCascadingDropdown();
-        
+
         IWorkbook workBook = new XSSFWorkbook();
         // workBook = new HSSFWorkbook();
         // 不创建sheet，保存后无法打开excel文件
@@ -34,16 +34,32 @@ class Program
         sheet.SetColumnWidth(2, 9 * 256);
 
         var sampleData = BaseAddressInfo.GetSampleData();
-        var provinceList = sampleData.Select(t => t.Name).ToArray();
-        CustomExcelHelper.SetCellDropdownListDirect(sheet, 0, 0, provinceList);
+        var provinceList = sampleData.Select(t => t.Name).ToList();
+        CustomExcelHelper.SetCellDropdownListDirect(sheet, 0, 0, provinceList.ToArray());
         //SetCellDropdownList(workBook, sheet, "ProvinceList", 0, 0, provinceList);
 
-        
+
+        var columnIndex = 0;
+        workBook.WriteDropDownDataSource("BaseAddressInfoData", provinceList, columnIndex++);
+        var cityCount = sampleData.Select(t => t.Children).Count();
+        var areaColumnIndex = 0;
+        foreach (var province in sampleData)
+        {
+            var cityList = province.Children.Select(t => t.Name).ToList();
+            workBook.WriteDropDownDataSource("BaseAddressInfoData", cityList, columnIndex++);
+            foreach (var city in province.Children)
+            {
+                var areaList = city.Children.Select(t => t.Name).ToList();
+                areaColumnIndex++;
+                workBook.WriteDropDownDataSource("BaseAddressInfoData", areaList, cityCount + areaColumnIndex);
+            }
+        }
+        //sheet.CreateDropList(1, 0, 0);
+
         var fileFullPath = Path.Combine("C:", "ExcelSample.xlsx");
         workBook.Save(fileFullPath);
 
         Console.WriteLine("Excel generate success!");
-        
     }
 
 
@@ -112,6 +128,4 @@ class Program
         cellStyle.SetFont(font);
         return cellStyle;
     }
-    
-    
 }

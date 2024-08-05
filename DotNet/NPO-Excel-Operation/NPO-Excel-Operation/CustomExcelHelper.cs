@@ -10,6 +10,52 @@ namespace NPO_Excel_Operation;
 public static class CustomExcelHelper
 {
     /// <summary>
+    /// 输出下拉数据源
+    /// </summary>
+    /// <param name="workbook">工作簿</param>
+    /// <param name="sheetName">下拉数据源所处的Sheet名称</param>
+    /// <param name="dropdownDataSource">下拉数据源</param>
+    /// <param name="columnIndex">输出到数据源所处Sheet的第几列（从0开始）</param>
+    public static void WriteDropDownDataSource(this IWorkbook workbook, string sheetName, List<string> dropdownDataSource, int columnIndex)
+    {
+        ISheet sheet = workbook.GetSheet(sheetName);
+        //先创建一个Sheet专门用于存储下拉项的值
+        sheet ??= workbook.CreateSheet(sheetName);
+        //隐藏sheet
+        // workbook.SetSheetHidden(workbook.GetSheetIndex(sheet), SheetState.Hidden);
+        /*
+         ** 输出格式如下：第一列为省、第二开始为各省下级市
+        江苏省	南京市	合肥市	广州市
+        安徽省	苏州市	宿州市	深圳市
+        广东省
+        */
+        if (dropdownDataSource.Any())
+        {
+            int rowIndex = 0;
+            foreach (var context in dropdownDataSource)
+            {
+                IRow row = sheet.GetRow(rowIndex);
+                if (row == null)
+                {
+                    row = sheet.CreateRow(rowIndex);
+                }
+
+                rowIndex++;
+                ICell cell = row.CreateCell(columnIndex);
+                cell.SetCellValue(context);
+            }
+
+            IName range = workbook.CreateName();
+
+            string colName = GetExcelColumnName(columnIndex); //列数转为ABC等格式
+            range.RefersToFormula = sheet.SheetName + "!$" + colName + "$1:$" + colName + "$" + dropdownDataSource.Count() + "";
+            //添加下划线，防止有数字开头的名称
+            range.NameName = "_" + Guid.NewGuid().ToString("N");
+        }
+    }
+
+
+    /// <summary>
     /// 为单元格设置下拉（不额外创建Sheet）
     /// 如果firstcol为0，lastcol为1，则0、1两列都设置下拉 
     /// </summary>
@@ -64,7 +110,7 @@ public static class CustomExcelHelper
         }
 
         //创建的下拉项的区域：
-        var rangeName = sheetName + "Range"+Guid.NewGuid().ToString("N");
+        var rangeName = sheetName + "Range" + Guid.NewGuid().ToString("N");
         IName range = workbook.CreateName();
         range.RefersToFormula = sheetName + "!$A$1:$A$" + index;
         range.NameName = rangeName;
