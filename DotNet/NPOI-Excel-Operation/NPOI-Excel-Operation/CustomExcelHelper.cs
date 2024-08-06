@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Reflection;
+using System.Text;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
@@ -9,6 +10,9 @@ namespace NPO_Excel_Operation;
 
 public static class CustomExcelHelper
 {
+    private const int MaxRowCount2003 = 65536;
+    private const int MaxRowCount2007 = 1048576;
+
     /// <summary>
     /// 输出下拉数据源
     /// </summary>
@@ -16,7 +20,8 @@ public static class CustomExcelHelper
     /// <param name="sheetName">下拉数据源所处的Sheet名称</param>
     /// <param name="dropdownDataSource">下拉数据源</param>
     /// <param name="columnIndex">输出到数据源所处Sheet的第几列（从0开始）</param>
-    public static void WriteDropDownDataSource(this IWorkbook workbook, string sheetName, List<string> dropdownDataSource, int columnIndex)
+    /// <param name="nameName">Excel名称管理器中的名称（不允许有特殊字符，如中英文括号等，只允许中文、英文、数字、英文下划线，不能以数字开头）</param>
+    public static void WriteDropDownDataSource(this IWorkbook workbook, string sheetName, List<string> dropdownDataSource, int columnIndex, string nameName)
     {
         ISheet sheet = workbook.GetSheet(sheetName);
         //先创建一个Sheet专门用于存储下拉项的值
@@ -50,10 +55,29 @@ public static class CustomExcelHelper
             string colName = GetExcelColumnName(columnIndex); //列数转为ABC等格式
             range.RefersToFormula = sheet.SheetName + "!$" + colName + "$1:$" + colName + "$" + dropdownDataSource.Count() + "";
             //添加下划线，防止有数字开头的名称
-            range.NameName = "_" + Guid.NewGuid().ToString("N");
+            range.NameName = nameName; //"_" + Guid.NewGuid().ToString("N");
         }
     }
 
+    public static void SetDropdownListByName(this ISheet sheet, int firstRow, int lastRow, int firstColumn, int lastColumn, string nameName)
+    {
+        CellRangeAddressList regions = new CellRangeAddressList(firstRow, lastRow, firstColumn, lastColumn);
+        IDataValidation dataValidate;
+        if (sheet is XSSFSheet)
+        {
+            var dvHelper = sheet.GetDataValidationHelper();
+            var constraint = dvHelper.CreateFormulaListConstraint(nameName);
+            dataValidate = dvHelper.CreateValidation(constraint, regions);
+        }
+        else
+        {
+            DVConstraint constraint = DVConstraint.CreateFormulaListConstraint(nameName);
+            dataValidate = new HSSFDataValidation(regions, constraint);
+        }
+
+        dataValidate.CreateErrorBox("输入不合法", "请输入或选择下拉列表中的值。");
+        sheet.AddValidationData(dataValidate);
+    }
 
     /// <summary>
     /// 为单元格设置下拉（不额外创建Sheet）
@@ -66,8 +90,9 @@ public static class CustomExcelHelper
     public static void SetCellDropdownListDirect(ISheet sheet, int firstcol, int lastcol, string[] vals)
     {
         IDataValidation dataValidate;
+        var maxRowCount = sheet.GetSheetMaxRowCount();
         //设置生成下拉框的行和列
-        var cellRegions = new CellRangeAddressList(1, 65535, firstcol, lastcol);
+        var cellRegions = new CellRangeAddressList(1, maxRowCount, firstcol, lastcol);
         if (sheet is XSSFSheet)
         {
             var dvHelper = sheet.GetDataValidationHelper();
@@ -75,7 +100,7 @@ public static class CustomExcelHelper
 
             dataValidate = dvHelper.CreateValidation(constraint, cellRegions);
         }
-        else //if (sheet is HSSFSheet)
+        else
         {
             // 2003 设置 下拉框内容
             DVConstraint constraint = DVConstraint.CreateExplicitListConstraint(vals);
@@ -114,17 +139,17 @@ public static class CustomExcelHelper
         IName range = workbook.CreateName();
         range.RefersToFormula = sheetName + "!$A$1:$A$" + index;
         range.NameName = rangeName;
+
+        var maxRowCount = sheet.GetSheetMaxRowCount();
+        CellRangeAddressList regions = new CellRangeAddressList(0, maxRowCount, firstcol, lastcol);
         IDataValidation dataValidate;
         if (workbook is HSSFWorkbook)
         {
-            CellRangeAddressList regions = new CellRangeAddressList(0, 65535, firstcol, lastcol);
-
             DVConstraint constraint = DVConstraint.CreateFormulaListConstraint(rangeName);
             dataValidate = new HSSFDataValidation(regions, constraint);
         }
         else
         {
-            CellRangeAddressList regions = new CellRangeAddressList(0, 65535, firstcol, lastcol);
             var dvHelper = sheet.GetDataValidationHelper();
             var constraint = dvHelper.CreateFormulaListConstraint(rangeName);
 
@@ -177,14 +202,21 @@ public static class CustomExcelHelper
     /// <param name="fileFullPath"></param>
     public static void Save(this IWorkbook workBook, string fileFullPath)
     {
-        var suffix = Path.GetExtension(fileFullPath);
+        ArgumentNullException.ThrowIfNull(fileFullPath);
+
         if (workBook is HSSFWorkbook)
         {
-            fileFullPath = fileFullPath.Replace(suffix, ".xls");
+            fileFullPath = Path.ChangeExtension(fileFullPath, "xls");
         }
         else
         {
-            fileFullPath = fileFullPath.Replace(suffix, ".xlsx");
+            fileFullPath = Path.ChangeExtension(fileFullPath, "xlsx");
+        }
+
+        var directory = Path.GetDirectoryName(fileFullPath);
+        if (!Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
         }
 
         using (var fs = File.Create(fileFullPath))
@@ -249,21 +281,31 @@ public static class CustomExcelHelper
         return colorMap;
     }
 
-    private static string GetExcelColumnName(int columnIndex)
+    public static string GetExcelColumnName(int columnIndex)
     {
         if (columnIndex < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(columnIndex), "Excel列的索引必须大于等于零.");
         }
 
-        string columnName = string.Empty;
+        StringBuilder columnName = new StringBuilder();
         while (columnIndex >= 0)
         {
-            int remainder = columnIndex % 26;
-            columnName = (char)(remainder + 'A') + columnName;
-            columnIndex = (columnIndex / 26) - 1; // 移动到下一轮
+            int modulo = columnIndex % 26;
+            columnName.Insert(0, Convert.ToChar(65 + modulo));
+            columnIndex = (columnIndex / 26) - 1;
         }
 
-        return columnName;
+        return columnName.ToString();
+    }
+
+    public static int GetSheetMaxRowCount(this ISheet sheet)
+    {
+        if (sheet is XSSFSheet)
+        {
+            return MaxRowCount2007;
+        }
+
+        return MaxRowCount2003;
     }
 }

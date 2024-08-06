@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Runtime.InteropServices;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -42,7 +43,7 @@ class Program
         var columnIndex = 0; // 级联数据第一级，从0开始
 
         // 输出第一级数据 
-        workBook.WriteDropDownDataSource("BaseAddressInfoData", provinceList, columnIndex++);
+        workBook.WriteDropDownDataSource("BaseAddressInfoData", provinceList, columnIndex++, "Province");
 
         // 获取第二级总数量，预留第三级位置
         var cityCount = sampleData.Select(t => t.Children).Count();
@@ -53,7 +54,7 @@ class Program
         {
             // 输出第二级数据
             var cityList = province.Children.Select(t => t.Name).ToList();
-            workBook.WriteDropDownDataSource("BaseAddressInfoData", cityList, columnIndex++);
+            workBook.WriteDropDownDataSource("BaseAddressInfoData", cityList, columnIndex++, $"_{province.Name}");
 
             foreach (var city in province.Children)
             {
@@ -61,31 +62,32 @@ class Program
 
                 // 输出第三级数据
                 var areaList = city.Children.Select(t => t.Name).ToList();
-                workBook.WriteDropDownDataSource("BaseAddressInfoData", areaList, cityCount + areaColumnIndex);
+                workBook.WriteDropDownDataSource("BaseAddressInfoData", areaList, cityCount + areaColumnIndex, $"_{city.Name}");
             }
         }
 
+        var provinceColumnName = CustomExcelHelper.GetExcelColumnName(0);
+        var cityColumnName = CustomExcelHelper.GetExcelColumnName(1);
+
+        for (int i = 1; i < 5000; i++) // 如果使用excel最大行，生成性能有问题，生成的excel打开也会提示错误
+        {
+            var cityNameName = $"INDIRECT(\"_\"&${provinceColumnName}${i + 1})";
+            sheet.SetDropdownListByName(i, i, 1, 1, cityNameName);
+
+            var areaNameName = $"INDIRECT(\"_\"&${cityColumnName}${i + 1})";
+            sheet.SetDropdownListByName(i, i, 2, 2, areaNameName);
+        }
+
+
         var fileFullPath = Path.Combine("C:", "ExcelSample.xlsx");
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            fileFullPath = Path.Combine("/", "ExcelSample.xlsx");
+        }
+
         workBook.Save(fileFullPath);
 
         Console.WriteLine("Excel generate success!");
-    }
-
-
-    static string GetExcelColumnName(int columnNumber)
-    {
-        int dividend = columnNumber + 1;
-        string columnName = String.Empty;
-        int modulo;
-
-        while (dividend > 0)
-        {
-            modulo = (dividend - 1) % 26;
-            columnName = Convert.ToChar(65 + modulo).ToString() + columnName;
-            dividend = (int)((dividend - modulo) / 26);
-        }
-
-        return columnName;
     }
 
 
