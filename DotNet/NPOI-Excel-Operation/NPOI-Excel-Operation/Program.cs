@@ -1,6 +1,5 @@
 ﻿using System.Drawing;
 using System.Runtime.InteropServices;
-using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
@@ -37,7 +36,6 @@ class Program
         var sampleData = BaseAddressInfo.GetSampleData();
         var provinceList = sampleData.Select(t => t.Name).ToList();
         CustomExcelHelper.SetCellDropdownListDirect(sheet, 0, 0, provinceList.ToArray());
-        //SetCellDropdownList(workBook, sheet, "ProvinceList", 0, 0, provinceList);
 
 
         var columnIndex = 0; // 级联数据第一级，从0开始
@@ -68,7 +66,6 @@ class Program
 
         var provinceColumnName = CustomExcelHelper.GetExcelColumnName(0);
         var cityColumnName = CustomExcelHelper.GetExcelColumnName(1);
-
         for (int i = 1; i < 5000; i++) // 如果使用excel最大行，生成性能有问题，生成的excel打开也会提示错误
         {
             var cityNameName = $"INDIRECT(\"_\"&${provinceColumnName}${i + 1})";

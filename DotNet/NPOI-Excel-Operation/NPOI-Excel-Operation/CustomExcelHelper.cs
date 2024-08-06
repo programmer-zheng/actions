@@ -10,8 +10,15 @@ namespace NPO_Excel_Operation;
 
 public static class CustomExcelHelper
 {
-    private const int MaxRowCount2003 = 65536;
-    private const int MaxRowCount2007 = 1048576;
+    /// <summary>
+    /// Excel 2003 中最大行号
+    /// </summary>
+    public const int MaxRowIndex2003 = 65535;
+
+    /// <summary>
+    /// Excel 2007+ 中最大行号
+    /// </summary>
+    public const int MaxRowIndex2007 = 1048575;
 
     /// <summary>
     /// 输出下拉数据源
@@ -23,11 +30,12 @@ public static class CustomExcelHelper
     /// <param name="nameName">Excel名称管理器中的名称（不允许有特殊字符，如中英文括号等，只允许中文、英文、数字、英文下划线，不能以数字开头）</param>
     public static void WriteDropDownDataSource(this IWorkbook workbook, string sheetName, List<string> dropdownDataSource, int columnIndex, string nameName)
     {
-        ISheet sheet = workbook.GetSheet(sheetName);
         //先创建一个Sheet专门用于存储下拉项的值
+        ISheet sheet = workbook.GetSheet(sheetName);
         sheet ??= workbook.CreateSheet(sheetName);
+
         //隐藏sheet
-        // workbook.SetSheetHidden(workbook.GetSheetIndex(sheet), SheetState.Hidden);
+        workbook.SetSheetHidden(workbook.GetSheetIndex(sheet), SheetState.Hidden);
         /*
          ** 输出格式如下：第一列为省、第二开始为各省下级市
         江苏省	南京市	合肥市	广州市
@@ -40,10 +48,7 @@ public static class CustomExcelHelper
             foreach (var context in dropdownDataSource)
             {
                 IRow row = sheet.GetRow(rowIndex);
-                if (row == null)
-                {
-                    row = sheet.CreateRow(rowIndex);
-                }
+                row ??= sheet.CreateRow(rowIndex);
 
                 rowIndex++;
                 ICell cell = row.CreateCell(columnIndex);
@@ -51,11 +56,17 @@ public static class CustomExcelHelper
             }
 
             IName range = workbook.CreateName();
+            // 方式一：使用CellRangeAddress，创建范围 格式：Sheet1!A1:A4
+            var cellRange = new CellRangeAddress(0, dropdownDataSource.Count() - 1, columnIndex, columnIndex);
+            var referAsString = $"{sheet.SheetName}!{cellRange.FormatAsString()}";
+            range.RefersToFormula = referAsString;
 
-            string colName = GetExcelColumnName(columnIndex); //列数转为ABC等格式
-            range.RefersToFormula = sheet.SheetName + "!$" + colName + "$1:$" + colName + "$" + dropdownDataSource.Count() + "";
-            //添加下划线，防止有数字开头的名称
-            range.NameName = nameName; //"_" + Guid.NewGuid().ToString("N");
+            // 方式二：根据列，计算出在Excel中的列名 格式：Sheet1!$A$1:$A$3
+            // string colName = GetExcelColumnName(columnIndex); //列数转为ABC等格式
+            // var refers = sheet.SheetName + "!$" + colName + "$1:$" + colName + "$" + dropdownDataSource.Count() + "";
+            // range.RefersToFormula = refers;
+
+            range.NameName = nameName;
         }
     }
 
@@ -81,18 +92,18 @@ public static class CustomExcelHelper
 
     /// <summary>
     /// 为单元格设置下拉（不额外创建Sheet）
-    /// 如果firstcol为0，lastcol为1，则0、1两列都设置下拉 
+    /// 如果 firstCol 为0，lastCol 为1，则0、1两列都设置下拉 
     /// </summary>
     /// <param name="sheet"></param>
-    /// <param name="firstcol"></param>
-    /// <param name="lastcol"></param>
+    /// <param name="firstCol"></param>
+    /// <param name="lastCol"></param>
     /// <param name="vals">下拉的选项</param>
-    public static void SetCellDropdownListDirect(ISheet sheet, int firstcol, int lastcol, string[] vals)
+    public static void SetCellDropdownListDirect(ISheet sheet, int firstCol, int lastCol, string[] vals)
     {
         IDataValidation dataValidate;
         var maxRowCount = sheet.GetSheetMaxRowCount();
         //设置生成下拉框的行和列
-        var cellRegions = new CellRangeAddressList(1, maxRowCount, firstcol, lastcol);
+        var cellRegions = new CellRangeAddressList(1, maxRowCount, firstCol, lastCol);
         if (sheet is XSSFSheet)
         {
             var dvHelper = sheet.GetDataValidationHelper();
@@ -115,51 +126,6 @@ public static class CustomExcelHelper
         sheet.AddValidationData(dataValidate);
     }
 
-
-    public static void SetCellDropdownList(IWorkbook workbook, ISheet sheet, string sheetName, int firstcol, int lastcol, string[] vals, int sheetindex = 1)
-    {
-        ISheet hideSheet = workbook.GetSheet(sheetName);
-        //先创建一个Sheet专门用于存储下拉项的值
-        if (hideSheet == null)
-        {
-            hideSheet = workbook.CreateSheet(sheetName);
-        }
-
-        //隐藏
-        workbook.SetSheetHidden(sheetindex, SheetState.Hidden);
-        int index = 0;
-        foreach (var item in vals)
-        {
-            hideSheet.CreateRow(index).CreateCell(0).SetCellValue(item);
-            index++;
-        }
-
-        //创建的下拉项的区域：
-        var rangeName = sheetName + "Range" + Guid.NewGuid().ToString("N");
-        IName range = workbook.CreateName();
-        range.RefersToFormula = sheetName + "!$A$1:$A$" + index;
-        range.NameName = rangeName;
-
-        var maxRowCount = sheet.GetSheetMaxRowCount();
-        CellRangeAddressList regions = new CellRangeAddressList(0, maxRowCount, firstcol, lastcol);
-        IDataValidation dataValidate;
-        if (workbook is HSSFWorkbook)
-        {
-            DVConstraint constraint = DVConstraint.CreateFormulaListConstraint(rangeName);
-            dataValidate = new HSSFDataValidation(regions, constraint);
-        }
-        else
-        {
-            var dvHelper = sheet.GetDataValidationHelper();
-            var constraint = dvHelper.CreateFormulaListConstraint(rangeName);
-
-            dataValidate = dvHelper.CreateValidation(constraint, regions);
-        }
-
-        dataValidate.CreateErrorBox("输入不合法", "请输入或选择下拉列表中的值。");
-        dataValidate.ShowPromptBox = true;
-        sheet.AddValidationData(dataValidate);
-    }
 
     /// <summary>
     /// 设置背景颜色
@@ -216,7 +182,7 @@ public static class CustomExcelHelper
         var directory = Path.GetDirectoryName(fileFullPath);
         if (!Directory.Exists(directory))
         {
-            Directory.CreateDirectory(directory);
+            Directory.CreateDirectory(directory!);
         }
 
         using (var fs = File.Create(fileFullPath))
@@ -303,9 +269,9 @@ public static class CustomExcelHelper
     {
         if (sheet is XSSFSheet)
         {
-            return MaxRowCount2007;
+            return MaxRowIndex2007;
         }
 
-        return MaxRowCount2003;
+        return MaxRowIndex2003;
     }
 }
