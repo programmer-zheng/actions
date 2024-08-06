@@ -39,22 +39,31 @@ class Program
         //SetCellDropdownList(workBook, sheet, "ProvinceList", 0, 0, provinceList);
 
 
-        var columnIndex = 0;
+        var columnIndex = 0; // 级联数据第一级，从0开始
+
+        // 输出第一级数据 
         workBook.WriteDropDownDataSource("BaseAddressInfoData", provinceList, columnIndex++);
+
+        // 获取第二级总数量，预留第三级位置
         var cityCount = sampleData.Select(t => t.Children).Count();
+
+        // 第三级列索引
         var areaColumnIndex = 0;
         foreach (var province in sampleData)
         {
+            // 输出第二级数据
             var cityList = province.Children.Select(t => t.Name).ToList();
             workBook.WriteDropDownDataSource("BaseAddressInfoData", cityList, columnIndex++);
+
             foreach (var city in province.Children)
             {
-                var areaList = city.Children.Select(t => t.Name).ToList();
                 areaColumnIndex++;
+
+                // 输出第三级数据
+                var areaList = city.Children.Select(t => t.Name).ToList();
                 workBook.WriteDropDownDataSource("BaseAddressInfoData", areaList, cityCount + areaColumnIndex);
             }
         }
-        //sheet.CreateDropList(1, 0, 0);
 
         var fileFullPath = Path.Combine("C:", "ExcelSample.xlsx");
         workBook.Save(fileFullPath);

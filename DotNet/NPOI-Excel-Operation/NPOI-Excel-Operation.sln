@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NPO-Excel-Operation", "NPO-Excel-Operation\NPO-Excel-Operation.csproj", "{80421293-A3F9-46FA-A49B-C139F579D46C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NPOI-Excel-Operation", "NPOI-Excel-Operation\NPOI-Excel-Operation.csproj", "{80421293-A3F9-46FA-A49B-C139F579D46C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
