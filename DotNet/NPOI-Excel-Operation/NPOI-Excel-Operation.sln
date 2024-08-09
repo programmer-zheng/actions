@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NPOI-Excel-Operation", "NPOI-Excel-Operation\NPOI-Excel-Operation.csproj", "{80421293-A3F9-46FA-A49B-C139F579D46C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NPOI-Excel-Operation-Web", "NPOI-Excel-Operation-Web\NPOI-Excel-Operation-Web.csproj", "{6B3279ED-979B-47AF-85E4-E849714892CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{80421293-A3F9-46FA-A49B-C139F579D46C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80421293-A3F9-46FA-A49B-C139F579D46C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80421293-A3F9-46FA-A49B-C139F579D46C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B3279ED-979B-47AF-85E4-E849714892CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B3279ED-979B-47AF-85E4-E849714892CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B3279ED-979B-47AF-85E4-E849714892CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B3279ED-979B-47AF-85E4-E849714892CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
