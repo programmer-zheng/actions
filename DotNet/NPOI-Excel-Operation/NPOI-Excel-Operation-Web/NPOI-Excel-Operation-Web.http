@@ -1,0 +1,6 @@
+@NPOI_Excel_Operation_Web_HostAddress = http://localhost:5143
+
+GET {{NPOI_Excel_Operation_Web_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
