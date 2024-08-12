@@ -34,6 +34,11 @@ public class ExcelColumnConfig
     /// </summary>
     public short FontSize { get; set; }
 
+    /// <summary>
+    /// 排序
+    /// </summary>
+    public short SoftVal { get; set; }
+
 
     /// <summary>
     /// 单元格宽度

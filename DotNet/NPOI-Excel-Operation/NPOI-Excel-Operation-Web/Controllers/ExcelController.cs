@@ -60,7 +60,11 @@ public class ExcelController : ControllerBase
         cellStyle.SetFont(font);
         return cellStyle;
     }
- 
+
+    /// <summary>
+    /// 下载模板
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     public async Task<IActionResult> DownloadTemplate()
     {
@@ -136,37 +140,72 @@ public class ExcelController : ControllerBase
         // }
 
         // workBook.Save(fileFullPath);
-        // return null;
-        var fileName = workBook.GetFileName(Path.GetRandomFileName());
-        var ms = new MemoryStream();
-        workBook.Write(ms);
-        return File(ms, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        var fileName = workBook.GetFileName("MultiLevelDropdownDemo");
+        var bytes = workBook.SaveToBytes();
+        return File(bytes, "application/vnd.ms-excel", fileName);
     }
 
+    /// <summary>
+    /// 动态分组
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     public async Task<IActionResult> DynamicGroup()
     {
         var source = new List<TestData>
         {
-	        new() {OrderId="111",OrderNo="NO111",OrderAmount=111, Currency="CNY", OrderUserName="zhangsan",Number = 1,CreateTime = DateTime.Parse("2024-8-9 17:44:24"),Dic = new Dictionary<string, string> { { "Key1", "Value1" } }},
-	        new() {OrderId="222",OrderNo="NO111",OrderAmount=222, Currency="CNY", OrderUserName="zhangsan",Number = 1,CreateTime = DateTime.Parse("2024-8-9 18:44:24"),Dic = new Dictionary<string, string> { { "Key2", "Value2" } }},
-	        new() {OrderId="333",OrderNo="NO333",OrderAmount=333, Currency="USD", OrderUserName="lisi",Number = 1,CreateTime = DateTime.Parse("2024-8-9 17:44:24"),Dic = new Dictionary<string, string> { { "Key3", "Value3" } }},
-	        new() {OrderId="444",OrderNo="NO444",OrderAmount=444, Currency="CNY", OrderUserName="lisi",Number = 1,CreateTime = DateTime.Parse("2024-8-9 18:44:24"),Dic = new Dictionary<string, string> { { "Key4", "Value4" } }},
+            new()
+            {
+                OrderId = "111", OrderNo = "NO111", OrderAmount = 111, Currency = "CNY", OrderUserName = "zhangsan", Number = 1, CreateTime = DateTime.Parse("2024-8-9 17:44:24"),
+                Dic = new Dictionary<string, string> { { "Key1", "Value1" } }
+            },
+            new()
+            {
+                OrderId = "222", OrderNo = "NO111", OrderAmount = 123, Currency = "CNY", OrderUserName = "zhangsan", Number = 1, CreateTime = DateTime.Parse("2024-8-9 18:44:24"),
+                Dic = new Dictionary<string, string> { { "Key2", "Value2" } }
+            },
+            new()
+            {
+                OrderId = "333", OrderNo = "NO333", OrderAmount = 333, Currency = "USD", OrderUserName = "lisi", Number = 1, CreateTime = DateTime.Parse("2024-8-9 17:44:24"),
+                Dic = new Dictionary<string, string> { { "Key3", "Value3" } }
+            },
+            new()
+            {
+                OrderId = "444", OrderNo = "NO444", OrderAmount = 444, Currency = "CNY", OrderUserName = "lisi", Number = 1, CreateTime = DateTime.Parse("2024-8-9 18:44:24"),
+                Dic = new Dictionary<string, string> { { "Key4", "Value4" } }
+            },
         };
 
         var propertyOperateList = new List<DynamicGroupPropertyOperationDto>
         {
-	        new(DynamicGroupLinqOperatorEnum.Concat,nameof(TestData.OrderId)),
-            new(DynamicGroupLinqOperatorEnum.Concat,nameof(TestData.OrderNo)),
-	        new(DynamicGroupLinqOperatorEnum.Sum,nameof(TestData.OrderAmount)),
-	        new(DynamicGroupLinqOperatorEnum.First,nameof(TestData.Currency)),
-	        new(DynamicGroupLinqOperatorEnum.Concat,nameof(TestData.OrderUserName)),
-	        new(DynamicGroupLinqOperatorEnum.First,nameof(TestData.CreateTime)),
-	        new(DynamicGroupLinqOperatorEnum.DistinctSum,nameof(TestData.Number),nameof(TestData.OrderNo)),
+            new(DynamicGroupLinqOperatorEnum.Concat, nameof(TestData.OrderId)),
+            new(DynamicGroupLinqOperatorEnum.Concat, nameof(TestData.OrderNo)),
+            new(DynamicGroupLinqOperatorEnum.Sum, nameof(TestData.OrderAmount)),
+            new(DynamicGroupLinqOperatorEnum.First, nameof(TestData.Currency)),
+            new(DynamicGroupLinqOperatorEnum.Concat, nameof(TestData.OrderUserName)),
+            new(DynamicGroupLinqOperatorEnum.First, nameof(TestData.CreateTime)),
+            new(DynamicGroupLinqOperatorEnum.DistinctSum, nameof(TestData.Number), nameof(TestData.OrderNo)),
         };
 
         var groupedList = CustomExtension.DynamicGroup<TestData>(source, propertyOperateList, nameof(TestData.OrderUserName));
         var groupedList2 = CustomExtension.DynamicGroup<TestData>(source, propertyOperateList, nameof(TestData.Currency), nameof(TestData.OrderUserName));
-        return null;
+
+        var excelConfigList = new List<ExcelColumnConfig>
+        {
+            new ExcelColumnConfig { SoftVal = 2, PropertyName = nameof(TestData.OrderNo), ExcelCellHeader = "订单号", FontColor = Color.Black, FontSize = 12, FontFamily = "宋体" },
+            new ExcelColumnConfig { SoftVal = 3, PropertyName = nameof(TestData.OrderAmount), ExcelCellHeader = "订单金额", FontColor = Color.Red, FontSize = 12, FontFamily = "宋体" },
+            new ExcelColumnConfig { SoftVal = 4, PropertyName = nameof(TestData.Currency), ExcelCellHeader = "币种", FontColor = Color.Purple, FontSize = 12, },
+            new ExcelColumnConfig { SoftVal = 5, PropertyName = nameof(TestData.OrderUserName), ExcelCellHeader = "用户", FontColor = Color.Green, FontSize = 12, FontFamily = "宋体" },
+            new ExcelColumnConfig { SoftVal = 6, PropertyName = nameof(TestData.CreateTime), ExcelCellHeader = "下单时间", FontColor = Color.Red, FontSize = 12, FontFamily = "宋体" },
+            new ExcelColumnConfig { SoftVal = 7, PropertyName = nameof(TestData.Number), ExcelCellHeader = "数字", FontColor = Color.DarkOrange, FontSize = 13, FontFamily = "宋体" },
+        };
+        var workBook = CustomExcelHelper.CreateWorkbook();
+        CustomExcelHelper.Export(source, excelConfigList, workBook, "原始数据");
+        CustomExcelHelper.Export(groupedList, excelConfigList, workBook, "按照用户分组");
+        CustomExcelHelper.Export(groupedList2, excelConfigList, workBook, "按照币种和用户分组");
+
+        var fileName = workBook.GetFileName("DynamicGroupDemo");
+        var bytes = workBook.SaveToBytes();
+        return File(bytes, "application/vnd.ms-excel", fileName);
     }
 }
