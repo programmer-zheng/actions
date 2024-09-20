@@ -4,8 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:prism="http://prismlibrary.com/"
-    
- xmlns:be="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:be="http://schemas.microsoft.com/xaml/behaviors"
     Width="1200"
     Height="800"
     prism:ViewModelLocator.AutoWireViewModel="True"
@@ -70,23 +69,23 @@
                         <DockPanel>
 
                             <Button Margin="5" Width="150" DockPanel.Dock="Left" Content="添加记录" Command="{Binding CreateDomainRecordCommand}" />
-                            <ComboBox Width="180" Height="32" ItemsSource="{Binding DomainList}"  DisplayMemberPath="DomainName" 
+                            <ComboBox Width="180" Height="32" ItemsSource="{Binding DomainList}" DisplayMemberPath="DomainName"
                                       SelectedValuePath="DomainName" SelectedValue="{Binding DomainName}"
-                                    Style="{DynamicResource MaterialDesignOutlinedComboBox}"  >
+                                      Style="{DynamicResource MaterialDesignOutlinedComboBox}">
                                 <be:Interaction.Triggers>
                                     <be:EventTrigger EventName="SelectionChanged">
-                                        <prism:InvokeCommandAction Command="{Binding DomainChangedCommand}"/>
+                                        <prism:InvokeCommandAction Command="{Binding DomainChangedCommand}" />
                                     </be:EventTrigger>
                                 </be:Interaction.Triggers>
                             </ComboBox>
 
                         </DockPanel>
                     </DockPanel>
-                    <Grid Grid.Row="2" >
+                    <Grid Grid.Row="2">
                         <DataGrid BorderBrush="Gray" BorderThickness="1" Margin="15"
-                            AutoGenerateColumns="False" RowHeight="45"  
-                            CanUserAddRows="False" IsReadOnly="True"
-                            ItemsSource="{Binding DomainRecords}">
+                                  AutoGenerateColumns="False" RowHeight="45"
+                                  CanUserAddRows="False" IsReadOnly="True"
+                                  ItemsSource="{Binding DomainRecords}">
                             <!--<DataGrid.Resources>
                                 <Style TargetType="DataGridCell">
                                     <Setter Property="VerticalAlignment" Value="Center"/>
@@ -107,12 +106,12 @@
                                 <DataGridTextColumn
                                     Width="150"
                                     Binding="{Binding Value}"
-                                    Header="记录值" >
+                                    Header="记录值">
 
                                     <DataGridTextColumn.ElementStyle>
                                         <Style TargetType="TextBlock">
-                                            <Setter Property="Text" Value="{Binding Value}"/>
-                                            <Setter Property="ToolTip" Value="{Binding Value}"/>
+                                            <Setter Property="Text" Value="{Binding Value}" />
+                                            <Setter Property="ToolTip" Value="{Binding Value}" />
                                         </Style>
                                     </DataGridTextColumn.ElementStyle>
                                 </DataGridTextColumn>
@@ -123,11 +122,11 @@
                                 <DataGridTextColumn
                                     Width="120"
                                     Binding="{Binding Remark}"
-                                    Header="备注" >
+                                    Header="备注">
                                     <DataGridTextColumn.ElementStyle>
                                         <Style TargetType="TextBlock">
-                                            <Setter Property="Text" Value="{Binding Remark}"/>
-                                            <Setter Property="ToolTip" Value="{Binding Remark}"/>
+                                            <Setter Property="Text" Value="{Binding Remark}" />
+                                            <Setter Property="ToolTip" Value="{Binding Remark}" />
                                         </Style>
                                     </DataGridTextColumn.ElementStyle>
                                 </DataGridTextColumn>
@@ -135,7 +134,15 @@
                                     Width="170"
                                     Binding="{Binding UpdatedOn, StringFormat=\{0:yyyy-MM-dd HH:mm:ss\}}"
                                     Header="最后操作时间" />
-                                <DataGridTextColumn Width="120" Header="操作" />
+                                <DataGridTemplateColumn Width="120" Header="操作">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="删除"></Button>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
