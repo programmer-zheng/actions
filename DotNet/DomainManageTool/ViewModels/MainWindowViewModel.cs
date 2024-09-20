@@ -44,14 +44,14 @@ namespace DomainManageTool.ViewModels
 
         public DelegateCommand CreateDomainRecordCommand { get; private set; }
 
-        public DelegateCommand DomainChangedCommand { get; private set; }
+        public AsyncDelegateCommand DomainChangedCommand { get; private set; }
 
         private readonly PlatFormSecret _secret;
 
         public MainWindowViewModel(PlatFormSecret platFormSecret)
         {
             CreateDomainRecordCommand = new DelegateCommand(ShowCreateDomainRecordWindowDialog);
-            DomainChangedCommand = new DelegateCommand(LoadDomainRecordList);
+            DomainChangedCommand = new AsyncDelegateCommand(LoadDomainRecordList);
             _secret = platFormSecret;
             DomainList = LoadDomainList();
         }
@@ -80,10 +80,9 @@ namespace DomainManageTool.ViewModels
             TypeAdapterConfig<DomainListItem, DomainDto>.NewConfig().Map(dst => dst.DomainName, src => src.Name);
             var result = resp.DomainList.Adapt<List<DomainDto>>();
             return result;
-
         }
 
-        private void LoadDomainRecordList()
+        private async Task LoadDomainRecordList()
         {
             Credential cred = new Credential
             {
@@ -105,7 +104,7 @@ namespace DomainManageTool.ViewModels
             req.SortField = "updated_on";
             req.SortType = "desc";
             // 返回的resp是一个DescribeRecordLineCategoryListResponse的实例，与请求对象对应
-            DescribeRecordListResponse resp = client.DescribeRecordListSync(req);
+            DescribeRecordListResponse resp = await client.DescribeRecordList(req);
 
             TypeAdapterConfig<RecordListItem, RecordDto>.NewConfig().Map(dst => dst.Name, src => src.Name);
             DomainRecords = resp.RecordList.Adapt<List<RecordDto>>();
@@ -116,7 +115,5 @@ namespace DomainManageTool.ViewModels
             var window = new CreateDomainRecordWindow();
             window.ShowDialog();
         }
-
-
     }
 }
