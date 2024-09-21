@@ -34,12 +34,12 @@ namespace DomainManageTool.ViewModels
             set => SetProperty(ref _domainList, value);
         }
 
-        private string _domainName;
+        private DomainDto _selectedDomain;
 
-        public string DomainName
+        public DomainDto SelectedDomain
         {
-            get => _domainName;
-            set => SetProperty(ref _domainName, value);
+            get => _selectedDomain;
+            set => SetProperty(ref _selectedDomain, value);
         }
 
 
@@ -117,7 +117,7 @@ namespace DomainManageTool.ViewModels
             DnspodClient client = new DnspodClient(cred, "", clientProfile);
             // 实例化一个请求对象,每个接口都会对应一个request对象
             DescribeRecordListRequest req = new DescribeRecordListRequest();
-            req.Domain = DomainName;
+            req.Domain = SelectedDomain.DomainName;
             req.SortField = "updated_on";
             req.SortType = "desc";
             // 返回的resp是一个DescribeRecordLineCategoryListResponse的实例，与请求对象对应

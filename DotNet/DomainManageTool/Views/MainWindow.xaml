@@ -88,18 +88,16 @@
                             <ComboBox
                                 Width="180"
                                 Height="32"
+                                ItemsSource="{Binding DomainList}"
                                 DisplayMemberPath="DomainName"
-                                ItemsSource="{Binding DomainList, Mode=TwoWay}"
-                                SelectedValue="{Binding DomainName}"
-                                SelectedValuePath="DomainName"
-                                Style="{DynamicResource MaterialDesignOutlinedComboBox}">
+                                SelectedItem="{Binding SelectedDomain, Mode=TwoWay}"
+                                Style="{DynamicResource MaterialDesignComboBox}">
                                 <be:Interaction.Triggers>
                                     <be:EventTrigger EventName="SelectionChanged">
                                         <prism:InvokeCommandAction Command="{Binding DomainChangedCommand}" />
                                     </be:EventTrigger>
                                 </be:Interaction.Triggers>
                             </ComboBox>
-
                         </DockPanel>
                     </DockPanel>
                     <Grid Grid.Row="2">
