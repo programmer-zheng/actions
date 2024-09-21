@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using Microsoft.Extensions.Configuration;
 using Prism.Ioc;
 using System.IO;
 using System.Windows;
@@ -11,37 +12,39 @@ namespace DomainManageTool
     /// </summary>
     public partial class App
     {
+        public IConfiguration Configuration { get; private set; }
+
         protected override Window CreateShell()
         {
             return Container.Resolve<MainWindow>();
         }
 
+        protected override void Initialize()
+        {
+            var configurationBuilder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("appsettings.Production.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .AddCommandLine(Environment.GetCommandLineArgs());
+            Configuration = configurationBuilder.Build();
+            base.Initialize();
+        }
+
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             string secretId = string.Empty, secretKey = string.Empty;
-            try
+            secretId = Configuration.GetValue<string>(PlatFormSecret.SecretIdVariable);
+            secretKey = Configuration.GetValue<string>(PlatFormSecret.SecretKeyVariable);
+            if (string.IsNullOrWhiteSpace(secretId) || string.IsNullOrWhiteSpace(secretKey))
             {
-                var configBuilder = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                    .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
-                    .AddJsonFile("appsettings.Production.json", optional: true, reloadOnChange: true)
-                    .AddEnvironmentVariables();
-                var configuration = configBuilder.Build();
+                MessageBox.Show("未能从配置中获取Secret信息，请检查配置\n支持appsettgins.json、环境变量、命令行参数！", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Application.Current.Shutdown();
+            }
 
-                secretId = configuration.GetValue<string>("SecretId");
-                secretKey = configuration.GetValue<string>("SecretKey");
-            }
-            catch (System.IO.FileNotFoundException)
-            {
-                MessageBox.Show("缺少配置文件appsettings.json");
-                Application.Current.Shutdown();
-            }
-            catch (System.Exception e)
-            {
-                MessageBox.Show(e.Message);
-                Application.Current.Shutdown();
-            }
+            containerRegistry.RegisterInstance(Configuration);
+
             var secret = new PlatFormSecret(secretId, secretKey);
             containerRegistry.RegisterInstance<PlatFormSecret>(secret);
         }
