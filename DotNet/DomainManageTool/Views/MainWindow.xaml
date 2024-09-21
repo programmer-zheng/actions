@@ -2,9 +2,9 @@
     x:Class="DomainManageTool.Views.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:be="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:prism="http://prismlibrary.com/"
-    xmlns:be="http://schemas.microsoft.com/xaml/behaviors"
     Width="1200"
     Height="800"
     prism:ViewModelLocator.AutoWireViewModel="True"
@@ -16,7 +16,11 @@
     WindowStartupLocation="CenterScreen"
     WindowStyle="None">
     <Window.Resources>
-        <ImageBrush x:Key="watermark" ImageSource="/textboxbackground.gif" AlignmentX="Left" Stretch="None" />
+        <ImageBrush
+            x:Key="watermark"
+            AlignmentX="Left"
+            ImageSource="/textboxbackground.gif"
+            Stretch="None" />
     </Window.Resources>
     <materialDesign:DialogHost DialogTheme="Inherit" Identifier="RootDialog">
         <materialDesign:DrawerHost>
@@ -55,11 +59,18 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left">
-                    </StackPanel>
+                    <StackPanel
+                        Grid.Row="0"
+                        HorizontalAlignment="Left"
+                        Orientation="Horizontal" />
                     <DockPanel Grid.Row="1" Margin="15">
                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                            <TextBox x:Name="TextBoxSearch" Width="300" Height="32" Background="{StaticResource watermark}" TextChanged="OnTextBoxTextChanged" />
+                            <TextBox
+                                x:Name="TextBoxSearch"
+                                Width="300"
+                                Height="32"
+                                Background="{StaticResource watermark}"
+                                TextChanged="OnTextBoxTextChanged" />
                             <Button
                                 x:Name="BtnSearch"
                                 Margin="10,0"
@@ -68,10 +79,20 @@
                         </StackPanel>
                         <DockPanel>
 
-                            <Button Margin="5" Width="150" DockPanel.Dock="Left" Content="添加记录" Command="{Binding CreateDomainRecordCommand}" />
-                            <ComboBox Width="180" Height="32" ItemsSource="{Binding DomainList}" DisplayMemberPath="DomainName"
-                                      SelectedValuePath="DomainName" SelectedValue="{Binding DomainName}"
-                                      Style="{DynamicResource MaterialDesignOutlinedComboBox}">
+                            <Button
+                                Width="150"
+                                Margin="5"
+                                Command="{Binding CreateDomainRecordCommand}"
+                                Content="添加记录"
+                                DockPanel.Dock="Left" />
+                            <ComboBox
+                                Width="180"
+                                Height="32"
+                                DisplayMemberPath="DomainName"
+                                ItemsSource="{Binding DomainList, Mode=TwoWay}"
+                                SelectedValue="{Binding DomainName}"
+                                SelectedValuePath="DomainName"
+                                Style="{DynamicResource MaterialDesignOutlinedComboBox}">
                                 <be:Interaction.Triggers>
                                     <be:EventTrigger EventName="SelectionChanged">
                                         <prism:InvokeCommandAction Command="{Binding DomainChangedCommand}" />
@@ -82,15 +103,20 @@
                         </DockPanel>
                     </DockPanel>
                     <Grid Grid.Row="2">
-                        <DataGrid BorderBrush="Gray" BorderThickness="1" Margin="15"
-                                  AutoGenerateColumns="False" RowHeight="45"
-                                  CanUserAddRows="False" IsReadOnly="True"
-                                  ItemsSource="{Binding DomainRecords}">
+                        <DataGrid
+                            Margin="15"
+                            AutoGenerateColumns="False"
+                            BorderBrush="Gray"
+                            BorderThickness="1"
+                            CanUserAddRows="False"
+                            IsReadOnly="True"
+                            ItemsSource="{Binding DomainRecords}"
+                            RowHeight="45">
                             <!--<DataGrid.Resources>
                                 <Style TargetType="DataGridCell">
                                     <Setter Property="VerticalAlignment" Value="Center"/>
                                     <Setter Property="BorderThickness" Value="0"/>
-                                    -->
+                            -->
                             <!--<Setter Property="BorderBrush" Value="Black"/>-->
                             <!--<Setter Property="BorderThickness" Value="1"/>-->
                             <!--
@@ -138,7 +164,9 @@
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
-                                                <Button Content="删除"></Button>
+                                                <Button Content="删除"
+                                                        Command="{Binding Path=DataContext.DeleteRecordCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}}"
+                                                        CommandParameter="{Binding Name}" />
                                             </StackPanel>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>

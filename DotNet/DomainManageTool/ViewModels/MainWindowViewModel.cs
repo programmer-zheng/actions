@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using DomainManageTool.Models;
 using DomainManageTool.Views;
+using Prism.Dialogs;
 
 namespace DomainManageTool.ViewModels
 {
@@ -46,14 +47,30 @@ namespace DomainManageTool.ViewModels
 
         public AsyncDelegateCommand DomainChangedCommand { get; private set; }
 
+        public AsyncDelegateCommand<string> DeleteRecordCommand { get; private set; }
+
         private readonly PlatFormSecret _secret;
 
-        public MainWindowViewModel(PlatFormSecret platFormSecret)
+        private readonly IDialogService _dialogService;
+
+        public MainWindowViewModel(PlatFormSecret platFormSecret, IDialogService dialogService)
         {
             CreateDomainRecordCommand = new DelegateCommand(ShowCreateDomainRecordWindowDialog);
             DomainChangedCommand = new AsyncDelegateCommand(LoadDomainRecordList);
+            DeleteRecordCommand = new AsyncDelegateCommand<string>(DeleteRecord);
             _secret = platFormSecret;
+            _dialogService = dialogService;
             DomainList = LoadDomainList();
+        }
+
+        private async Task DeleteRecord(string recordName)
+        {
+            var result = MessageBox.Show($"确认删除:{recordName}吗？", "确认", MessageBoxButton.YesNo);
+            if (result == MessageBoxResult.OK)
+            {
+
+                await LoadDomainRecordList();
+            }
         }
 
         private List<DomainDto> LoadDomainList()
