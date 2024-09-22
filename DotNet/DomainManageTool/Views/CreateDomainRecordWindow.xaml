@@ -148,7 +148,7 @@
                                     Content="确定" />
                                 <Button
                                     Width="100"
-                                    Margin="10,0"
+                                    Margin="10,0" Command="{Binding CancelCommand}"
                                     Content="取消" />
                             </StackPanel>
                         </DockPanel>

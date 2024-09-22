@@ -2,6 +2,7 @@
 using Prism.Dialogs;
 using Prism.Mvvm;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows.Documents;
 
 namespace DomainManageTool.ViewModels;
@@ -21,16 +22,33 @@ public class CreateDomainRecordWindowViewModel : BindableBase, IDialogAware
 
     public DialogCloseListener RequestClose { get; }
 
-    public DelegateCommand SaveDomainRecordCommand { get; private set; }
+    public AsyncDelegateCommand SaveDomainRecordCommand { get; private set; }
+
+    public DelegateCommand CancelCommand { get; private set; }
 
     public CreateDomainRecordWindowViewModel()
     {
         RecordTypeList = new List<string>() { "A", "CNAME", "TXT" };
-
-        SaveDomainRecordCommand = new DelegateCommand(() =>
+        CancelCommand = new DelegateCommand(() =>
         {
-            RequestClose.Invoke(ButtonResult.OK);
+            RequestClose.Invoke(ButtonResult.Cancel);
         });
+        SaveDomainRecordCommand = new AsyncDelegateCommand(SaveRecord);
+    }
+
+    private bool Valid()
+    {
+        // TODO 验证输入
+        return true;
+    }
+
+    private async Task SaveRecord()
+    {
+        if (Valid())
+        {
+            // TODO 添加记录逻辑
+            RequestClose.Invoke(ButtonResult.OK);
+        }
     }
 
     public bool CanCloseDialog()

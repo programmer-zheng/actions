@@ -42,12 +42,23 @@ namespace DomainManageTool.ViewModels
             set => SetProperty(ref _selectedDomain, value);
         }
 
+        private string _keywords;
+
+        public string Keywords
+        {
+            get { return _keywords; }
+            set { SetProperty(ref _keywords, value); }
+        }
+
+
 
         public AsyncDelegateCommand CreateDomainRecordCommand { get; private set; }
 
         public AsyncDelegateCommand DomainChangedCommand { get; private set; }
 
         public AsyncDelegateCommand<string> DeleteRecordCommand { get; private set; }
+
+        public AsyncDelegateCommand SearchCommand { get; private set; }
 
         private readonly PlatFormSecret _secret;
 
@@ -58,6 +69,7 @@ namespace DomainManageTool.ViewModels
             CreateDomainRecordCommand = new AsyncDelegateCommand(ShowCreateDomainRecordWindowDialog);
             DomainChangedCommand = new AsyncDelegateCommand(LoadDomainRecordList);
             DeleteRecordCommand = new AsyncDelegateCommand<string>(DeleteRecord);
+            SearchCommand = new AsyncDelegateCommand(LoadDomainRecordList);
             _secret = platFormSecret;
             _dialogService = dialogService;
             DomainList = LoadDomainList();
@@ -101,6 +113,11 @@ namespace DomainManageTool.ViewModels
 
         private async Task LoadDomainRecordList()
         {
+            if (SelectedDomain == null)
+            {
+                MessageBox.Show("请先选择域名");
+                return;
+            }
             Credential cred = new Credential
             {
                 SecretId = _secret.SecretId,
@@ -118,13 +135,28 @@ namespace DomainManageTool.ViewModels
             // 实例化一个请求对象,每个接口都会对应一个request对象
             DescribeRecordListRequest req = new DescribeRecordListRequest();
             req.Domain = SelectedDomain.DomainName;
+            if (!string.IsNullOrWhiteSpace(Keywords))
+            {
+                req.Keyword = Keywords;
+            }
             req.SortField = "updated_on";
             req.SortType = "desc";
-            // 返回的resp是一个DescribeRecordLineCategoryListResponse的实例，与请求对象对应
-            DescribeRecordListResponse resp = await client.DescribeRecordList(req);
+            try
+            {
+                // 返回的resp是一个DescribeRecordLineCategoryListResponse的实例，与请求对象对应
+                DescribeRecordListResponse resp = await client.DescribeRecordList(req);
 
-            TypeAdapterConfig<RecordListItem, RecordDto>.NewConfig().Map(dst => dst.Name, src => src.Name);
-            DomainRecords = resp.RecordList.Adapt<List<RecordDto>>();
+                TypeAdapterConfig<RecordListItem, RecordDto>.NewConfig().Map(dst => dst.Name, src => src.Name);
+                DomainRecords = resp.RecordList.Adapt<List<RecordDto>>();
+            }
+            catch (TencentCloud.Common.TencentCloudSDKException)
+            {
+
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"加载记录列表出现异常：{e.Message}");
+            }
         }
 
         private async Task ShowCreateDomainRecordWindowDialog()

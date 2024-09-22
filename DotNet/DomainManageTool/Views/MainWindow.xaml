@@ -69,12 +69,14 @@
                                 x:Name="TextBoxSearch"
                                 Width="300"
                                 Height="32"
+                                Text="{Binding Keywords, Mode=TwoWay}"
                                 Background="{StaticResource watermark}"
                                 TextChanged="OnTextBoxTextChanged" />
                             <Button
                                 x:Name="BtnSearch"
                                 Margin="10,0"
                                 Content="{materialDesign:PackIcon Kind=Search}"
+                                Command="{Binding SearchCommand}"
                                 Style="{DynamicResource MaterialDesignFlatMidBgButton}" />
                         </StackPanel>
                         <DockPanel>
