@@ -4,6 +4,7 @@ using Prism.Ioc;
 using System.IO;
 using System.Windows;
 using DomainManageTool.Views;
+using DomainManageTool.ViewModels;
 
 namespace DomainManageTool
 {
@@ -47,6 +48,8 @@ namespace DomainManageTool
 
             var secret = new PlatFormSecret(secretId, secretKey);
             containerRegistry.RegisterInstance<PlatFormSecret>(secret);
+
+            containerRegistry.RegisterDialog<CreateDomainRecordWindow, CreateDomainRecordWindowViewModel>();
         }
     }
 }

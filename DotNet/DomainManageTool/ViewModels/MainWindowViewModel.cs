@@ -43,7 +43,7 @@ namespace DomainManageTool.ViewModels
         }
 
 
-        public DelegateCommand CreateDomainRecordCommand { get; private set; }
+        public AsyncDelegateCommand CreateDomainRecordCommand { get; private set; }
 
         public AsyncDelegateCommand DomainChangedCommand { get; private set; }
 
@@ -55,7 +55,7 @@ namespace DomainManageTool.ViewModels
 
         public MainWindowViewModel(PlatFormSecret platFormSecret, IDialogService dialogService)
         {
-            CreateDomainRecordCommand = new DelegateCommand(ShowCreateDomainRecordWindowDialog);
+            CreateDomainRecordCommand = new AsyncDelegateCommand(ShowCreateDomainRecordWindowDialog);
             DomainChangedCommand = new AsyncDelegateCommand(LoadDomainRecordList);
             DeleteRecordCommand = new AsyncDelegateCommand<string>(DeleteRecord);
             _secret = platFormSecret;
@@ -127,10 +127,22 @@ namespace DomainManageTool.ViewModels
             DomainRecords = resp.RecordList.Adapt<List<RecordDto>>();
         }
 
-        private void ShowCreateDomainRecordWindowDialog()
+        private async Task ShowCreateDomainRecordWindowDialog()
         {
-            var window = new CreateDomainRecordWindow();
-            window.ShowDialog();
+            if (SelectedDomain == null)
+            {
+                MessageBox.Show("请先选择域名");
+                return;
+            }
+            DialogParameters dialogParameters = new DialogParameters();
+            dialogParameters.Add("DomainId", SelectedDomain.DomainId);
+            dialogParameters.Add("DomainName", SelectedDomain.DomainName);
+
+            var dialogResult = await _dialogService.ShowDialogAsync("CreateDomainRecordWindow", dialogParameters);
+            if (dialogResult.Result == ButtonResult.OK)
+            {
+                await LoadDomainRecordList();
+            }
         }
     }
 }
