@@ -49,6 +49,8 @@ namespace DomainManageTool
             var secret = new PlatFormSecret(secretId, secretKey);
             containerRegistry.RegisterInstance<PlatFormSecret>(secret);
 
+            containerRegistry.RegisterDialogWindow<CustomDialogWindow>(); // 替换自带的对话框容器
+
             containerRegistry.RegisterDialog<CreateDomainRecordWindow, CreateDomainRecordWindowViewModel>();
         }
     }

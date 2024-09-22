@@ -29,7 +29,7 @@
 
                             <Button
                                 x:Name="BtnClose"
-                                Content="{materialDesign:PackIcon Kind=WindowClose}"
+                                Content="{materialDesign:PackIcon Kind=WindowClose}" Command="{Binding CancelCommand}"
                                 Style="{DynamicResource MaterialDesignFlatMidBgButton}" />
                         </StackPanel>
                         <TextBlock
