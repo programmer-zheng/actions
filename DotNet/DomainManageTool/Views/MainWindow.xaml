@@ -126,7 +126,15 @@
                                 <DataGridTextColumn
                                     Width="*"
                                     Binding="{Binding Name}"
-                                    Header="主机记录" />
+                                    Header="主机记录" >
+
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="{Binding Name}" />
+                                            <Setter Property="ToolTip" Value="{Binding Name}" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
                                 <DataGridTextColumn Binding="{Binding Type}" Header="记录类型" />
                                 <DataGridTextColumn Binding="{Binding Line}" Header="线路类型" />
                                 <DataGridTextColumn
@@ -157,16 +165,19 @@
                                     </DataGridTextColumn.ElementStyle>
                                 </DataGridTextColumn>
                                 <DataGridTextColumn
-                                    Width="170"
+                                    Width="200"
                                     Binding="{Binding UpdatedOn, StringFormat=\{0:yyyy-MM-dd HH:mm:ss\}}"
                                     Header="最后操作时间" />
-                                <DataGridTemplateColumn Width="120" Header="操作">
+                                <DataGridTemplateColumn Width="160" Header="操作">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
+                                                <Button Content="编辑" Margin="0 0 10 0"
+                                                        Command="{Binding Path=DataContext.EditRecordCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}}"
+                                                        CommandParameter="{Binding RecordId}" />
                                                 <Button Content="删除"
                                                         Command="{Binding Path=DataContext.DeleteRecordCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}}"
-                                                        CommandParameter="{Binding Name}" />
+                                                        CommandParameter="{Binding RecordId}" />
                                             </StackPanel>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>

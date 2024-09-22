@@ -7,7 +7,7 @@ namespace DomainManageTool.Models
 {
     public class DomainDto
     {
-        public long DomainId { get; set; }
+        public ulong DomainId { get; set; }
 
         public string DomainName { get; set; }
     }

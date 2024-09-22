@@ -51,7 +51,9 @@ namespace DomainManageTool
 
             containerRegistry.RegisterDialogWindow<CustomDialogWindow>(); // 替换自带的对话框容器
 
+
             containerRegistry.RegisterDialog<CreateDomainRecordWindow, CreateDomainRecordWindowViewModel>();
+            containerRegistry.RegisterDialog<EditDomainRecordWindow, EditDomainRecordWindowViewModel>();
         }
     }
 }

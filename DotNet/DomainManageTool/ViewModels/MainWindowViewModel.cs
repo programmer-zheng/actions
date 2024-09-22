@@ -57,6 +57,8 @@ namespace DomainManageTool.ViewModels
         public AsyncDelegateCommand DomainChangedCommand { get; private set; }
 
         public AsyncDelegateCommand<string> DeleteRecordCommand { get; private set; }
+        public AsyncDelegateCommand<string> EditRecordCommand { get; private set; }
+
 
         public AsyncDelegateCommand SearchCommand { get; private set; }
 
@@ -69,15 +71,30 @@ namespace DomainManageTool.ViewModels
             CreateDomainRecordCommand = new AsyncDelegateCommand(ShowCreateDomainRecordWindowDialog);
             DomainChangedCommand = new AsyncDelegateCommand(LoadDomainRecordList);
             DeleteRecordCommand = new AsyncDelegateCommand<string>(DeleteRecord);
+            EditRecordCommand = new AsyncDelegateCommand<string>(EditRecord);
             SearchCommand = new AsyncDelegateCommand(LoadDomainRecordList);
             _secret = platFormSecret;
             _dialogService = dialogService;
             DomainList = LoadDomainList();
         }
 
+        private async Task EditRecord(string recordId)
+        {
+            DialogParameters dialogParameters = new DialogParameters();
+            dialogParameters.Add("DomainName", SelectedDomain.DomainName);
+            dialogParameters.Add("DomainId", SelectedDomain.DomainId);
+            dialogParameters.Add("RecordId", recordId);
+
+            var dialogResult = await _dialogService.ShowDialogAsync("EditDomainRecordWindow", dialogParameters);
+            if (dialogResult.Result == ButtonResult.OK)
+            {
+                await LoadDomainRecordList();
+            }
+        }
+
         private async Task DeleteRecord(string recordName)
         {
-            var result = MessageBox.Show($"确认删除:{recordName}吗？", "确认", MessageBoxButton.YesNo);
+            var result = MessageBox.Show($"确认删除吗？", "确认", MessageBoxButton.YesNo);
             if (result == MessageBoxResult.OK)
             {
 

@@ -4,7 +4,7 @@ namespace DomainManageTool.Models
 {
     public class RecordDto
     {
-        public long RecordId { get; set; }
+        public string RecordId { get; set; }
 
         public string Value { get; set; }
 
