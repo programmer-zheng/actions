@@ -92,13 +92,40 @@ namespace DomainManageTool.ViewModels
             }
         }
 
-        private async Task DeleteRecord(string recordName)
+        private async Task DeleteRecord(string param)
         {
+            ulong recordId = ulong.Parse(param);
             var result = MessageBox.Show($"确认删除吗？", "确认", MessageBoxButton.YesNo);
-            if (result == MessageBoxResult.OK)
+            if (result == MessageBoxResult.Yes)
             {
+                Credential cred = new Credential
+                {
+                    SecretId = _secret.SecretId,
+                    SecretKey = _secret.SecretKey
+                };
+                // 实例化一个client选项，可选的，没有特殊需求可以跳过
+                ClientProfile clientProfile = new ClientProfile();
+                // 实例化一个http选项，可选的，没有特殊需求可以跳过
+                HttpProfile httpProfile = new HttpProfile();
+                httpProfile.Endpoint = ("dnspod.tencentcloudapi.com");
+                clientProfile.HttpProfile = httpProfile;
 
-                await LoadDomainRecordList();
+                // 实例化要请求产品的client对象,clientProfile是可选的
+                DnspodClient client = new DnspodClient(cred, "", clientProfile);
+                // 实例化一个请求对象,每个接口都会对应一个request对象
+                DeleteRecordRequest req = new DeleteRecordRequest();
+                req.Domain = SelectedDomain.DomainName;
+                req.RecordId = recordId;
+                // 返回的resp是一个DeleteRecordResponse的实例，与请求对象对应
+                try
+                {
+                    DeleteRecordResponse resp = await client.DeleteRecord(req);
+                    await LoadDomainRecordList();
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show($"删除记录失败：{e.Message}");
+                }
             }
         }
 
@@ -163,7 +190,10 @@ namespace DomainManageTool.ViewModels
                 // 返回的resp是一个DescribeRecordLineCategoryListResponse的实例，与请求对象对应
                 DescribeRecordListResponse resp = await client.DescribeRecordList(req);
 
-                TypeAdapterConfig<RecordListItem, RecordDto>.NewConfig().Map(dst => dst.Name, src => src.Name);
+                TypeAdapterConfig<RecordListItem, RecordDto>.NewConfig()
+                    .Map(dst => dst.RecordId, src => src.RecordId)
+                    .Map(dst => dst.Name, src => src.Name)
+                    ;
                 DomainRecords = resp.RecordList.Adapt<List<RecordDto>>();
             }
             catch (TencentCloud.Common.TencentCloudSDKException)

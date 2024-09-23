@@ -33,7 +33,7 @@ namespace DomainManageTool.Models
 
         public string Remark { get; set; }
 
-        public int TTL { get; set; }
+        public ulong TTL { get; set; }
 
         /// <summary>
         /// MX值，只有MX记录有
