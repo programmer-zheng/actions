@@ -45,5 +45,7 @@ namespace DomainManageTool.Models
         /// </summary>
         public bool DefaultNS { get; set; }
 
+        public bool CanExecuteAction { get => Type == "NS" ? false : true; }
+
     }
 }
