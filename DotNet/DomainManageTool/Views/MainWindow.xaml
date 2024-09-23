@@ -5,8 +5,8 @@
     xmlns:be="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:prism="http://prismlibrary.com/"
-    Width="1200"
-    Height="800"
+    Width="1600"
+    Height="900"
     prism:ViewModelLocator.AutoWireViewModel="True"
     AllowsTransparency="True"
     Background="{DynamicResource MaterialDesignPaper}"
@@ -154,7 +154,7 @@
                                     Binding="{Binding TTL}"
                                     Header="TTL" />
                                 <DataGridTextColumn
-                                    Width="120"
+                                    MinWidth="120"
                                     Binding="{Binding Remark}"
                                     Header="备注">
                                     <DataGridTextColumn.ElementStyle>
@@ -168,7 +168,7 @@
                                     Width="180"
                                     Binding="{Binding UpdatedOn, StringFormat=\{0:yyyy-MM-dd HH:mm:ss\}}"
                                     Header="最后操作时间" />
-                                <DataGridTemplateColumn Width="160" Header="操作">
+                                <DataGridTemplateColumn MinWidth="160" Header="操作">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">

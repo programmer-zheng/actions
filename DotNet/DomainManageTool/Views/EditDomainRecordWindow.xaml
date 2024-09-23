@@ -13,7 +13,7 @@ prism:ViewModelLocator.AutoWireViewModel="True"
 Background="{DynamicResource MaterialDesignPaper}"
 BorderBrush="Gainsboro"
 BorderThickness="1,0,1,1"
-         d:DesignHeight="380" d:DesignWidth="650">
+         d:DesignHeight="380" d:DesignWidth="800">
 
     <materialDesign:DialogHost DialogTheme="Inherit" Identifier="RootDialog">
         <materialDesign:DrawerHost>
