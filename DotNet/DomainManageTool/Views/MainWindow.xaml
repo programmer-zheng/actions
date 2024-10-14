@@ -69,14 +69,14 @@
                                 x:Name="TextBoxSearch"
                                 Width="300"
                                 Height="32"
-                                Text="{Binding Keywords, Mode=TwoWay}"
                                 Background="{StaticResource watermark}"
+                                Text="{Binding Keywords, Mode=TwoWay}"
                                 TextChanged="OnTextBoxTextChanged" />
                             <Button
                                 x:Name="BtnSearch"
                                 Margin="10,0"
-                                Content="{materialDesign:PackIcon Kind=Search}"
                                 Command="{Binding SearchCommand}"
+                                Content="{materialDesign:PackIcon Kind=Search}"
                                 Style="{DynamicResource MaterialDesignFlatMidBgButton}" />
                         </StackPanel>
                         <DockPanel>
@@ -90,8 +90,8 @@
                             <ComboBox
                                 Width="180"
                                 Height="32"
-                                ItemsSource="{Binding DomainList}"
                                 DisplayMemberPath="DomainName"
+                                ItemsSource="{Binding DomainList}"
                                 SelectedItem="{Binding SelectedDomain, Mode=TwoWay}"
                                 Style="{DynamicResource MaterialDesignComboBox}">
                                 <be:Interaction.Triggers>
@@ -106,9 +106,11 @@
                         <DataGrid
                             Margin="15"
                             AutoGenerateColumns="False"
+                            Background="White"
                             BorderBrush="Gray"
                             BorderThickness="1"
                             CanUserAddRows="False"
+                            HorizontalGridLinesBrush="#F0F0F0"
                             IsReadOnly="True"
                             ItemsSource="{Binding DomainRecords}"
                             RowHeight="45">
@@ -126,7 +128,7 @@
                                 <DataGridTextColumn
                                     Width="*"
                                     Binding="{Binding Name}"
-                                    Header="主机记录" >
+                                    Header="主机记录">
 
                                     <DataGridTextColumn.ElementStyle>
                                         <Style TargetType="TextBlock">
@@ -172,14 +174,17 @@
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
-                                                <Button Content="编辑" Margin="0 0 10 0"
-                                                        IsEnabled="{Binding CanExecuteAction}" 
-                                                        Command="{Binding Path=DataContext.EditRecordCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}}"
-                                                        CommandParameter="{Binding RecordId}" />
-                                                <Button Content="删除"
-                                                        IsEnabled="{Binding CanExecuteAction}"
-                                                        Command="{Binding Path=DataContext.DeleteRecordCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}}"
-                                                        CommandParameter="{Binding RecordId}" />
+                                                <Button
+                                                    Margin="0,0,10,0"
+                                                    Command="{Binding Path=DataContext.EditRecordCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}}"
+                                                    CommandParameter="{Binding RecordId}"
+                                                    Content="编辑"
+                                                    IsEnabled="{Binding CanExecuteAction}" />
+                                                <Button
+                                                    Command="{Binding Path=DataContext.DeleteRecordCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}}"
+                                                    CommandParameter="{Binding RecordId}"
+                                                    Content="删除"
+                                                    IsEnabled="{Binding CanExecuteAction}" />
                                             </StackPanel>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
