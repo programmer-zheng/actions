@@ -1,4 +1,5 @@
-﻿using Volo.Abp;
+﻿using Microsoft.AspNetCore.HttpOverrides;
+using Volo.Abp;
 using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.Modularity;
 
@@ -18,11 +19,15 @@ public class AbpDdnsModule : AbpModule
         var app = context.GetApplicationBuilder();
         var env = context.GetEnvironment();
 
+        app.UseForwardedHeaders(new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+        });
         if (!env.IsDevelopment())
         {
             app.UseExceptionHandler("/Home/Error");
             app.UseHsts();
-            //app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
         }
         else
         {
