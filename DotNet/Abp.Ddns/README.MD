@@ -5,7 +5,21 @@
 - 内网穿透在线列表
 
 ### Docker 镜像使用
+精简
+``` bash
+docker run -itd --name ddns --restart always \
+-p 8080:8080 \
+-e Aliyun:AccessKeyId=keyid \
+-e Aliyun:AccessKeySecret=keysecret \
+-e Aliyun:SecurityGroupName=groupname \
+-e Tencent:SecretId=secretid \
+-e Tencent:SecretKey=secretkey \
+-e Tencent:Domain=domain \
+-e Tencent:Record=recordName \  
+programmerzheng/ddns
+```
 
+完整
 ``` bash
 # 创建存放https证书的目录，并将证书文件上传进去
 mkdir /https
@@ -50,7 +64,7 @@ programmerzheng/ddns
     /ip fir nat set [find chain=dstnat] dst-address=$ip
 
     # 请求内部服务器中转
-    /tool fetch http-method=get keep-result=no url="https://192.168.88.111:8843/ddns?ip=$ip"
+    /tool fetch http-method=get keep-result=no url="http://192.168.88.111:8080/ddns?ip=$ip"
                                   
     # 日志输出改变前后的IP
     :log info "ipv4 address $currentIPv4 changed to $nowIPv4";
@@ -119,7 +133,7 @@ programmerzheng/ddns
     # /ipv6 fir nat set [find chain=dstnat] dst-address=$ip
 
     # 请求内部服务器中转
-    #/tool fetch http-method=get keep-result=no url="https://192.168.88.111:8843/ddns_ipv6?ip=$ip"
+    #/tool fetch http-method=get keep-result=no url="http://192.168.88.111:8080/ddns_ipv6?ip=$ip"
 
     # 日志输出改变前后的IP
     :log info "ipv6 address $currentIPv6 changed to $nowIPv6";
