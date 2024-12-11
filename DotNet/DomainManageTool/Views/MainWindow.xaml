@@ -21,6 +21,23 @@
             AlignmentX="Left"
             ImageSource="/textboxbackground.gif"
             Stretch="None" />
+        <Style BasedOn="{StaticResource {x:Type DataGridCell}}" TargetType="DataGridCell">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="8" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        </Style>
+        <Style BasedOn="{StaticResource {x:Type DataGridRow}}" TargetType="DataGridRow">
+            <Setter Property="BorderBrush" Value="#F0F0F0" />
+            <Setter Property="BorderThickness" Value="1,0,0,1" />
+            <Setter Property="Padding" Value="0" />
+        </Style>
+
+        <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="DataGridColumnHeader">
+            <Setter Property="BorderBrush" Value="#F0F0F0" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+        </Style>
     </Window.Resources>
     <materialDesign:DialogHost DialogTheme="Inherit" Identifier="RootDialog">
         <materialDesign:DrawerHost>
@@ -107,33 +124,21 @@
                             Margin="15"
                             AutoGenerateColumns="False"
                             Background="White"
-                            BorderBrush="Gray"
-                            BorderThickness="1"
                             CanUserAddRows="False"
+                            GridLinesVisibility="None"
                             HorizontalGridLinesBrush="#F0F0F0"
                             IsReadOnly="True"
                             ItemsSource="{Binding DomainRecords}"
                             RowHeight="45">
-                            <!--<DataGrid.Resources>
-                                <Style TargetType="DataGridCell">
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
-                                    <Setter Property="BorderThickness" Value="0"/>
-                            -->
-                            <!--<Setter Property="BorderBrush" Value="Black"/>-->
-                            <!--<Setter Property="BorderThickness" Value="1"/>-->
-                            <!--
-                                </Style>
-                            </DataGrid.Resources>-->
                             <DataGrid.Columns>
                                 <DataGridTextColumn
                                     Width="*"
                                     Binding="{Binding Name}"
                                     Header="主机记录">
-
                                     <DataGridTextColumn.ElementStyle>
                                         <Style TargetType="TextBlock">
-                                            <Setter Property="Text" Value="{Binding Name}" />
                                             <Setter Property="ToolTip" Value="{Binding Name}" />
+                                            <Setter Property="ToolTipService.Placement" Value="Mouse" />
                                         </Style>
                                     </DataGridTextColumn.ElementStyle>
                                 </DataGridTextColumn>
@@ -146,8 +151,8 @@
 
                                     <DataGridTextColumn.ElementStyle>
                                         <Style TargetType="TextBlock">
-                                            <Setter Property="Text" Value="{Binding Value}" />
                                             <Setter Property="ToolTip" Value="{Binding Value}" />
+                                            <Setter Property="ToolTipService.Placement" Value="Mouse" />
                                         </Style>
                                     </DataGridTextColumn.ElementStyle>
                                 </DataGridTextColumn>
@@ -161,8 +166,8 @@
                                     Header="备注">
                                     <DataGridTextColumn.ElementStyle>
                                         <Style TargetType="TextBlock">
-                                            <Setter Property="Text" Value="{Binding Remark}" />
                                             <Setter Property="ToolTip" Value="{Binding Remark}" />
+                                            <Setter Property="ToolTipService.Placement" Value="Mouse" />
                                         </Style>
                                     </DataGridTextColumn.ElementStyle>
                                 </DataGridTextColumn>
