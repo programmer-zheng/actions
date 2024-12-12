@@ -10,11 +10,11 @@ public class Program
 #if DEBUG
             .MinimumLevel.Debug()
 #else
-            .MinimumLevel.Information()
+            .MinimumLevel.Error()
 #endif
             .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
             .Enrich.FromLogContext()
-            .WriteTo.Async(c => c.File("Logs/logs.log"))
+            // .WriteTo.Async(c => c.File("Logs/logs.log"))
             .WriteTo.Async(c => c.Console())
             .CreateLogger();
 
