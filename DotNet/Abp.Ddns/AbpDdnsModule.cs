@@ -38,7 +38,7 @@ public class AbpDdnsModule : AbpModule
 
         app.UseRouting();
 
-        app.UseAuthorization();
+        // app.UseAuthorization();
         app.UseEndpoints(opt => { opt.MapDefaultControllerRoute(); });
     }
 }
