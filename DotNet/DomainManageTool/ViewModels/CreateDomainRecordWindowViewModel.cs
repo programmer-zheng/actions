@@ -109,16 +109,7 @@ public class CreateDomainRecordWindowViewModel : BindableBase, IDialogAware
                 SecretId = _secret.SecretId,
                 SecretKey = _secret.SecretKey
             };
-            // 实例化一个client选项，可选的，没有特殊需求可以跳过
-            ClientProfile clientProfile = new ClientProfile();
-            // 实例化一个http选项，可选的，没有特殊需求可以跳过
-            HttpProfile httpProfile = new HttpProfile();
-            httpProfile.Endpoint = ("dnspod.tencentcloudapi.com");
-            clientProfile.HttpProfile = httpProfile;
-
-            // 实例化要请求产品的client对象,clientProfile是可选的
-            DnspodClient client = new DnspodClient(cred, "", clientProfile);
-            // 实例化一个请求对象,每个接口都会对应一个request对象
+            DnspodClient client = new DnspodClient(cred, "");
             CreateRecordRequest req = new CreateRecordRequest();
             req.Domain = DomainName;
             req.RecordType = RecordType;
@@ -130,7 +121,6 @@ public class CreateDomainRecordWindowViewModel : BindableBase, IDialogAware
                 req.TTL = uint.Parse(RecordTTL);
             }
             req.Remark = RecordRemark;
-            // 返回的resp是一个CreateRecordResponse的实例，与请求对象对应
             try
             {
                 CreateRecordResponse resp = client.CreateRecordSync(req);

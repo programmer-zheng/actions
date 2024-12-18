@@ -4,14 +4,20 @@ using System.Windows.Input;
 namespace DomainManageTool.Views
 {
     /// <summary>
-    /// MainWindow.xaml 的交互逻辑
+    /// SslManageWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class SslManageWindow : Window
     {
-        public MainWindow()
+        public SslManageWindow()
         {
             InitializeComponent();
             BtnMin.Click += (s, e) => { WindowState = WindowState.Minimized; };
+            BtnMax.Click += (s, e) =>
+            {
+                if (WindowState == WindowState.Maximized)
+                    WindowState = WindowState.Normal;
+                else WindowState = WindowState.Maximized;
+            };
             BtnClose.Click += (s, e) => { Close(); };
 
             TitleZone.MouseMove += (s, e) =>

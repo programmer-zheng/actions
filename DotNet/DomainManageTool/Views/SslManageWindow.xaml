@@ -1,0 +1,190 @@
+﻿<Window
+    x:Class="DomainManageTool.Views.SslManageWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:be="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:DomainManageTool.Views"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:prism="http://prismlibrary.com/"
+    Title="SslManageWindow"
+    Width="1500"
+    Height="800"
+    prism:ViewModelLocator.AutoWireViewModel="True"
+    AllowsTransparency="True"
+    Background="{DynamicResource MaterialDesignPaper}"
+    ResizeMode="CanResize"
+    TextElement.FontSize="14"
+    TextElement.FontWeight="Medium"
+    TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+    WindowStartupLocation="CenterScreen"
+    WindowStyle="None"
+    mc:Ignorable="d">
+
+    <Window.Resources>
+        <ImageBrush
+            x:Key="watermark"
+            AlignmentX="Left"
+            ImageSource="/textboxbackground.gif"
+            Stretch="None" />
+        <Style BasedOn="{StaticResource {x:Type DataGridCell}}" TargetType="DataGridCell">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="8" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        </Style>
+        <Style BasedOn="{StaticResource {x:Type DataGridRow}}" TargetType="DataGridRow">
+            <Setter Property="BorderBrush" Value="#F0F0F0" />
+            <Setter Property="BorderThickness" Value="1,0,0,1" />
+            <Setter Property="Padding" Value="0" />
+        </Style>
+
+        <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="DataGridColumnHeader">
+            <Setter Property="BorderBrush" Value="#F0F0F0" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+        </Style>
+    </Window.Resources>
+    <materialDesign:DialogHost DialogTheme="Inherit" Identifier="RootDialog">
+        <materialDesign:DrawerHost>
+            <DockPanel>
+                <materialDesign:ColorZone
+                    x:Name="TitleZone"
+                    materialDesign:ElevationAssist.Elevation="Dp2"
+                    DockPanel.Dock="Top"
+                    Mode="PrimaryMid">
+                    <DockPanel>
+
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                            <Button
+                                x:Name="BtnMin"
+                                Content="{materialDesign:PackIcon Kind=WindowMinimize}"
+                                Style="{DynamicResource MaterialDesignFlatMidBgButton}" />
+                            <Button
+                                x:Name="BtnMax"
+                                Content="{materialDesign:PackIcon Kind=WindowMaximize}"
+                                Style="{DynamicResource MaterialDesignFlatMidBgButton}" />
+                            <Button
+                                x:Name="BtnClose"
+                                Content="{materialDesign:PackIcon Kind=WindowClose}"
+                                Style="{DynamicResource MaterialDesignFlatMidBgButton}" />
+                        </StackPanel>
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="20"
+                            Text="SSL证书管理" />
+                    </DockPanel>
+                </materialDesign:ColorZone>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel
+                        Grid.Row="0"
+                        HorizontalAlignment="Left"
+                        Orientation="Horizontal" />
+                    <DockPanel Grid.Row="1" Margin="15">
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                            <TextBox
+                                x:Name="TextBoxSearch"
+                                Width="300"
+                                Height="32"
+                                Background="{StaticResource watermark}"
+                                Text="{Binding Keywords, Mode=TwoWay}" />
+                            <Button
+                                x:Name="BtnSearch"
+                                Margin="10,0"
+                                Command="{Binding SearchCommand}"
+                                Content="{materialDesign:PackIcon Kind=Search}"
+                                Style="{DynamicResource MaterialDesignFlatMidBgButton}" />
+                        </StackPanel>
+                        <DockPanel HorizontalAlignment="Left" DockPanel.Dock="Left">
+
+                            <Button
+                                Width="150"
+                                Margin="5"
+                                Command="{Binding CreateNewFreeCert}"
+                                Content="申请免费证书"
+                                DockPanel.Dock="Left" />
+                        </DockPanel>
+                    </DockPanel>
+                    <Grid Grid.Row="2">
+                        <DataGrid
+                            Margin="15"
+                            AutoGenerateColumns="False"
+                            Background="White"
+                            CanUserAddRows="False"
+                            GridLinesVisibility="None"
+                            HorizontalGridLinesBrush="#F0F0F0"
+                            IsReadOnly="True"
+                            ItemsSource="{Binding SslCertList}"
+                            RowHeight="45">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn
+                                    Width="*"
+                                    Binding="{Binding Domain}"
+                                    Header="绑定域名">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="ToolTip" Value="{Binding Domain}" />
+                                            <Setter Property="ToolTipService.Placement" Value="Mouse" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn
+                                    Width="150"
+                                    Binding="{Binding CertBeginTime}"
+                                    Header="生效时间" />
+                                <DataGridTextColumn
+                                    Width="150"
+                                    Binding="{Binding CertEndTime}"
+                                    Header="到期时间" />
+                                <DataGridTextColumn
+                                    Width="200"
+                                    Binding="{Binding PackageTypeName}"
+                                    Header="证书类型" />
+                                <DataGridTextColumn
+                                    Width="100"
+                                    Binding="{Binding Alias}"
+                                    Header="别名" />
+                                <DataGridTextColumn
+                                    Width="100"
+                                    Binding="{Binding VerifyType}"
+                                    Header="验证类型" />
+                                <DataGridTextColumn
+                                    Width="100"
+                                    Binding="{Binding StatusName}"
+                                    Header="状态" />
+                                <DataGridTemplateColumn MinWidth="160" Header="操作">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button
+                                                    Margin="0,0,10,0"
+                                                    Command="{Binding Path=DataContext.OpenDownloadDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}}"
+                                                    CommandParameter="{Binding CertificateId}">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <materialDesign:PackIcon Kind="Download" />
+                                                        <TextBlock
+                                                            Margin="8,0,0,0"
+                                                            VerticalAlignment="Center"
+                                                            Text="下载" />
+                                                    </StackPanel>
+                                                </Button>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+
+                </Grid>
+            </DockPanel>
+        </materialDesign:DrawerHost>
+    </materialDesign:DialogHost>
+</Window>

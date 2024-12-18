@@ -78,16 +78,7 @@ namespace DomainManageTool.ViewModels
                 SecretId = _secret.SecretId,
                 SecretKey = _secret.SecretKey
             };
-            // 实例化一个client选项，可选的，没有特殊需求可以跳过
-            ClientProfile clientProfile = new ClientProfile();
-            // 实例化一个http选项，可选的，没有特殊需求可以跳过
-            HttpProfile httpProfile = new HttpProfile();
-            httpProfile.Endpoint = ("dnspod.tencentcloudapi.com");
-            clientProfile.HttpProfile = httpProfile;
-
-            // 实例化要请求产品的client对象,clientProfile是可选的
-            DnspodClient client = new DnspodClient(cred, "", clientProfile);
-            // 实例化一个请求对象,每个接口都会对应一个request对象
+            DnspodClient client = new DnspodClient(cred, "");
             ModifyRecordRequest req = new ModifyRecordRequest();
             req.RecordId = RecordId;
             req.Domain = DomainName;
@@ -96,7 +87,6 @@ namespace DomainManageTool.ViewModels
             req.Value = Record.Value;
             req.SubDomain = Record.Name;
             req.Remark = Record.Remark;
-            // 返回的resp是一个CreateRecordResponse的实例，与请求对象对应
             try
             {
                 ModifyRecordResponse resp = client.ModifyRecordSync(req);
@@ -145,25 +135,14 @@ namespace DomainManageTool.ViewModels
                 SecretId = _secret.SecretId,
                 SecretKey = _secret.SecretKey
             };
-            // 实例化一个client选项，可选的，没有特殊需求可以跳过
-            ClientProfile clientProfile = new ClientProfile();
-            // 实例化一个http选项，可选的，没有特殊需求可以跳过
-            HttpProfile httpProfile = new HttpProfile();
-            httpProfile.Endpoint = ("dnspod.tencentcloudapi.com");
-            clientProfile.HttpProfile = httpProfile;
-
-            // 实例化要请求产品的client对象,clientProfile是可选的
-            DnspodClient client = new DnspodClient(cred, "", clientProfile);
-            // 实例化一个请求对象,每个接口都会对应一个request对象
+            DnspodClient client = new DnspodClient(cred, "");
             DescribeRecordRequest req = new DescribeRecordRequest();
             req.Domain = domainName;
             req.DomainId = domainId;
             req.RecordId = recordId;
             try
             {
-                // 返回的resp是一个DescribeRecordResponse的实例，与请求对象对应
                 DescribeRecordResponse resp = await client.DescribeRecord(req);
-
                 TypeAdapterConfig<RecordInfo, RecordDto>.NewConfig()
                     .Map(dst => dst.RecordId, src => src.Id)
                     .Map(dst => dst.Name, src => src.SubDomain)

@@ -1,17 +1,25 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace DomainManageTool.Views
 {
     /// <summary>
-    /// MainWindow.xaml 的交互逻辑
+    /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class DomainManageWindow : Window
     {
-        public MainWindow()
+        public DomainManageWindow()
         {
             InitializeComponent();
             BtnMin.Click += (s, e) => { WindowState = WindowState.Minimized; };
+            BtnMax.Click += (s, e) =>
+            {
+                if (WindowState == WindowState.Maximized)
+                    WindowState = WindowState.Normal;
+                else WindowState = WindowState.Maximized;
+            };
             BtnClose.Click += (s, e) => { Close(); };
 
             TitleZone.MouseMove += (s, e) =>
@@ -31,6 +39,17 @@ namespace DomainManageTool.Views
                 else WindowState = WindowState.Maximized;
 
             };
+        }
+
+        private void OnTextBoxTextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (sender is TextBox box)
+            {
+                if (string.IsNullOrEmpty(box.Text))
+                    box.Background = (ImageBrush)FindResource("watermark");
+                else
+                    box.Background = null;
+            }
         }
     }
 }

@@ -1,10 +1,10 @@
-﻿using System;
+﻿using DomainManageTool.ViewModels;
+using DomainManageTool.Views;
 using Microsoft.Extensions.Configuration;
 using Prism.Ioc;
+using System;
 using System.IO;
 using System.Windows;
-using DomainManageTool.Views;
-using DomainManageTool.ViewModels;
 
 namespace DomainManageTool
 {
@@ -48,12 +48,26 @@ namespace DomainManageTool
 
             var secret = new PlatFormSecret(secretId, secretKey);
             containerRegistry.RegisterInstance<PlatFormSecret>(secret);
-
+            
             containerRegistry.RegisterDialogWindow<CustomDialogWindow>(); // 替换自带的对话框容器
 
+
+            containerRegistry.RegisterDialog<SslDownloadWindow, SslDownloadWindowViewModel>();
 
             containerRegistry.RegisterDialog<CreateDomainRecordWindow, CreateDomainRecordWindowViewModel>();
             containerRegistry.RegisterDialog<EditDomainRecordWindow, EditDomainRecordWindowViewModel>();
         }
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+            {
+                // 记录异常日志
+                var exception = args.ExceptionObject as Exception;
+                // 记录日志或调试信息
+            };
+            base.OnStartup(e);
+        }
+
     }
 }
