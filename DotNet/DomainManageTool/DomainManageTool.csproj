@@ -3,10 +3,13 @@
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net9.0-windows</TargetFramework>
 		<UseWPF>true</UseWPF>
-		<ApplicationIcon>favicon.ico</ApplicationIcon>
 		<InterceptorsPreviewNamespaces>$(InterceptorsPreviewNamespaces);Microsoft.Extensions.Configuration.Binder.SourceGeneration</InterceptorsPreviewNamespaces>
 		<LangVersion>default</LangVersion>
+		<ApplicationIcon>tencentcloud.ico</ApplicationIcon>
 	</PropertyGroup>
+	<ItemGroup>
+	  <Content Include="tencentcloud.ico" />
+	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Mapster" Version="7.4.0" />
 		<PackageReference Include="MaterialDesignThemes" Version="5.1.0" />
