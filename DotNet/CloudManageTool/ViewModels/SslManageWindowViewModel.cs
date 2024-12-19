@@ -1,4 +1,6 @@
-﻿using CloudManageTool.Views;
+﻿using CloudManageTool.Models;
+using CloudManageTool.Views;
+using Mapster;
 using Prism.Commands;
 using Prism.Dialogs;
 using Prism.Mvvm;
@@ -65,8 +67,8 @@ namespace CloudManageTool.ViewModels
             set { SetProperty(ref _keywords, value); }
         }
 
-        private List<Certificates> _sslList;
-        public List<Certificates> SslCertList
+        private List<SslListDto> _sslList;
+        public List<SslListDto> SslCertList
         {
             get { return _sslList; }
             set { SetProperty(ref _sslList, value); }
@@ -84,7 +86,7 @@ namespace CloudManageTool.ViewModels
                 SslClient client = new SslClient(cred, "");
                 DescribeCertificatesRequest req = new DescribeCertificatesRequest();
                 DescribeCertificatesResponse resp = await client.DescribeCertificates(req);
-                SslCertList = resp.Certificates.ToList();
+                SslCertList =  resp.Certificates.ToList().Adapt<List<SslListDto>>();
             }
             catch (Exception e)
             {
