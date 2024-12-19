@@ -36,7 +36,7 @@
                                 Style="{DynamicResource MaterialDesignFlatMidBgButton}" />
                         </StackPanel>
                         <TextBlock
-                            Margin="5,0"
+                            Margin="15,0"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center"
                             FontSize="20"

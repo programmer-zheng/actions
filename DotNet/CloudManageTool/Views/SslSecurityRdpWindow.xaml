@@ -1,0 +1,61 @@
+﻿<UserControl
+    x:Class="CloudManageTool.Views.SslSecurityRdpWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:CloudManageTool.Views"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:prism="http://prismlibrary.com/"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    prism:ViewModelLocator.AutoWireViewModel="True"
+    Background="{DynamicResource MaterialDesignPaper}"
+    BorderBrush="Gainsboro"
+    BorderThickness="1,0,1,1"
+    mc:Ignorable="d">
+
+    <materialDesign:DialogHost DialogTheme="Inherit" Identifier="RootDialog">
+        <materialDesign:DrawerHost>
+            <DockPanel>
+                <materialDesign:ColorZone
+                    x:Name="TitleZone"
+                    materialDesign:ElevationAssist.Elevation="Dp2"
+                    DockPanel.Dock="Top"
+                    Mode="PrimaryMid">
+                    <DockPanel>
+
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+
+                            <Button
+                                x:Name="BtnClose"
+                                Command="{Binding CancelCommand}"
+                                Content="{materialDesign:PackIcon Kind=WindowClose}"
+                                Style="{DynamicResource MaterialDesignFlatMidBgButton}" />
+                        </StackPanel>
+                        <TextBlock
+                            Margin="15,0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            FontSize="20"
+                            Text="绑定远程桌面证书" />
+                    </DockPanel>
+                </materialDesign:ColorZone>
+                <StackPanel Margin="25" Orientation="Vertical">
+                    <TextBox
+                        Width="800"
+                        Height="500"
+                        Padding="15"
+                        AcceptsReturn="True"
+                        BorderBrush="Gray"
+                        BorderThickness="1"
+                        FontSize="15"
+                        Text="{Binding Description}"
+                        TextWrapping="Wrap"
+                        VerticalScrollBarVisibility="Visible" />
+
+                </StackPanel>
+            </DockPanel>
+        </materialDesign:DrawerHost>
+    </materialDesign:DialogHost>
+</UserControl>

@@ -34,7 +34,7 @@
                                 Style="{DynamicResource MaterialDesignFlatMidBgButton}" />
                         </StackPanel>
                         <TextBlock
-                            Margin="5,0"
+                            Margin="15,0"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center"
                             FontSize="20"
@@ -71,7 +71,19 @@
                         </DataGrid.Columns>
                     </DataGrid>
                     <StackPanel HorizontalAlignment="Center">
-                        <Button Command="{Binding CancelCommand}" Content="取消" />
+                        <Button Command="{Binding CancelCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon
+                                    Width="24"
+                                    Height="24"
+                                    VerticalAlignment="Center"
+                                    Kind="Close" />
+                                <TextBlock
+                                    Margin="8,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Text="关闭" />
+                            </StackPanel>
+                        </Button>
                     </StackPanel>
                 </StackPanel>
             </DockPanel>

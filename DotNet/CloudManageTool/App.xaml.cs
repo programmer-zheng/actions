@@ -53,7 +53,9 @@ namespace CloudManageTool
 
 
             containerRegistry.RegisterDialog<SslDownloadWindow, SslDownloadWindowViewModel>();
-
+            containerRegistry.RegisterDialog<SslCreateWindow, SslCreateWindowViewModel>();
+            containerRegistry.RegisterDialog<SslSecurityRdpWindow, SslSecurityRdpWindowViewModel>();
+            
             containerRegistry.RegisterDialog<CreateDomainRecordWindow, CreateDomainRecordWindowViewModel>();
             containerRegistry.RegisterDialog<EditDomainRecordWindow, EditDomainRecordWindowViewModel>();
         }

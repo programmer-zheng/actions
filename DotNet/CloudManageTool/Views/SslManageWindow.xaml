@@ -89,27 +89,56 @@
                         Orientation="Horizontal" />
                     <DockPanel Grid.Row="1" Margin="15">
                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                            <TextBox
-                                x:Name="TextBoxSearch"
-                                Width="300"
-                                Height="32"
-                                Background="{StaticResource watermark}"
-                                Text="{Binding Keywords, Mode=TwoWay}" />
                             <Button
-                                x:Name="BtnSearch"
                                 Margin="10,0"
-                                Command="{Binding SearchCommand}"
-                                Content="{materialDesign:PackIcon Kind=Search}"
-                                Style="{DynamicResource MaterialDesignFlatMidBgButton}" />
+                                Command="{Binding RefreshCommand}"
+                                Style="{DynamicResource MaterialDesignFlatMidBgButton}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="Refresh" />
+                                    <TextBlock
+                                        Margin="8,0,0,0"
+                                        VerticalAlignment="Center"
+                                        Text="刷新" />
+                                </StackPanel>
+                            </Button>
                         </StackPanel>
                         <DockPanel HorizontalAlignment="Left" DockPanel.Dock="Left">
 
                             <Button
                                 Width="150"
                                 Margin="5"
-                                Command="{Binding CreateNewFreeCert}"
-                                Content="申请免费证书"
-                                DockPanel.Dock="Left" />
+                                Command="{Binding OpenCreateNewFreeCertDialogCommand}"
+                                DockPanel.Dock="Left">
+
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon
+                                        Width="20"
+                                        Height="20"
+                                        VerticalAlignment="Center"
+                                        Kind="FreeBreakfast" />
+                                    <TextBlock
+                                        Margin="8,0,0,0"
+                                        VerticalAlignment="Center"
+                                        Text="申请免费证书" />
+                                </StackPanel>
+                            </Button>
+                            <Button
+                                Width="150"
+                                Margin="5"
+                                Command="{Binding OpenSecurityRdpDialogCommand}"
+                                DockPanel.Dock="Left">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon
+                                        Width="20"
+                                        Height="20"
+                                        VerticalAlignment="Center"
+                                        Kind="SecurityLock" />
+                                    <TextBlock
+                                        Margin="8,0,0,0"
+                                        VerticalAlignment="Center"
+                                        Text="保护远程桌面" />
+                                </StackPanel>
+                            </Button>
                         </DockPanel>
                     </DockPanel>
                     <Grid Grid.Row="2">

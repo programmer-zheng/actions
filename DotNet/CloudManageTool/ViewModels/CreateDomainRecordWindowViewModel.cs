@@ -123,7 +123,7 @@ public class CreateDomainRecordWindowViewModel : BindableBase, IDialogAware
             req.Remark = RecordRemark;
             try
             {
-                CreateRecordResponse resp = client.CreateRecordSync(req);
+                CreateRecordResponse resp = await client.CreateRecord(req);
                 RequestClose.Invoke(ButtonResult.OK);
             }
             catch (System.Exception e)

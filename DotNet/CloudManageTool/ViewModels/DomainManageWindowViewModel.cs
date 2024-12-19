@@ -14,7 +14,7 @@ using TencentCloud.Dnspod.V20210323.Models;
 
 namespace CloudManageTool.ViewModels
 {
-    public class DomainManageWindowViewModel : BindableBase, IDialogAware
+    public class DomainManageWindowViewModel : BindableBase
     {
         private List<RecordDto> _domainRecords;
 
@@ -49,7 +49,6 @@ namespace CloudManageTool.ViewModels
         }
 
 
-
         public AsyncDelegateCommand CreateDomainRecordCommand { get; private set; }
 
         public AsyncDelegateCommand DomainChangedCommand { get; private set; }
@@ -59,8 +58,6 @@ namespace CloudManageTool.ViewModels
 
 
         public AsyncDelegateCommand SearchCommand { get; private set; }
-
-        public DialogCloseListener RequestClose => throw new NotImplementedException();
 
         private readonly PlatFormSecret _secret;
 
@@ -75,7 +72,10 @@ namespace CloudManageTool.ViewModels
             SearchCommand = new AsyncDelegateCommand(LoadDomainRecordList);
             _secret = platFormSecret;
             _dialogService = dialogService;
-            DomainList = LoadDomainList();
+            Task.Run(async () =>
+            {
+                DomainList = await LoadDomainList();
+            });
         }
 
         private async Task EditRecord(string recordId)
@@ -119,7 +119,7 @@ namespace CloudManageTool.ViewModels
             }
         }
 
-        private List<DomainDto> LoadDomainList()
+        private async Task<List<DomainDto>> LoadDomainList()
         {
             Credential cred = new Credential
             {
@@ -128,7 +128,7 @@ namespace CloudManageTool.ViewModels
             };
             DnspodClient client = new DnspodClient(cred, "");
             DescribeDomainListRequest req = new DescribeDomainListRequest();
-            DescribeDomainListResponse resp = client.DescribeDomainListSync(req);
+            DescribeDomainListResponse resp = await client.DescribeDomainList(req);
             TypeAdapterConfig<DomainListItem, DomainDto>.NewConfig().Map(dst => dst.DomainName, src => src.Name);
             var result = resp.DomainList.Adapt<List<DomainDto>>();
             return result;
@@ -141,6 +141,7 @@ namespace CloudManageTool.ViewModels
                 MessageBox.Show("请先选择域名");
                 return;
             }
+
             Credential cred = new Credential
             {
                 SecretId = _secret.SecretId,
@@ -153,6 +154,7 @@ namespace CloudManageTool.ViewModels
             {
                 req.Keyword = Keywords;
             }
+
             req.SortField = "updated_on";
             req.SortType = "desc";
             try
@@ -166,7 +168,6 @@ namespace CloudManageTool.ViewModels
             }
             catch (TencentCloud.Common.TencentCloudSDKException)
             {
-
             }
             catch (Exception e)
             {
@@ -181,6 +182,7 @@ namespace CloudManageTool.ViewModels
                 MessageBox.Show("请先选择域名");
                 return;
             }
+
             DialogParameters dialogParameters = new DialogParameters();
             dialogParameters.Add("DomainId", SelectedDomain.DomainId);
             dialogParameters.Add("DomainName", SelectedDomain.DomainName);
@@ -190,21 +192,6 @@ namespace CloudManageTool.ViewModels
             {
                 await LoadDomainRecordList();
             }
-        }
-
-        public bool CanCloseDialog()
-        {
-            return true;
-        }
-
-        public void OnDialogClosed()
-        {
-            
-        }
-
-        public void OnDialogOpened(IDialogParameters parameters)
-        {
-            
         }
     }
 }

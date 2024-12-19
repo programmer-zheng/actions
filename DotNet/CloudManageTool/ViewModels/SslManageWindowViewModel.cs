@@ -15,8 +15,9 @@ namespace CloudManageTool.ViewModels
 {
     public class SslManageWindowViewModel : BindableBase
     {
-        public AsyncDelegateCommand CreateNewFreeCert { get; }
-        public AsyncDelegateCommand SearchCommand { get; }
+        public AsyncDelegateCommand OpenCreateNewFreeCertDialogCommand { get; }
+        public AsyncDelegateCommand OpenSecurityRdpDialogCommand { get; }
+        public AsyncDelegateCommand RefreshCommand { get; }
 
         public AsyncDelegateCommand<string> OpenDownloadDialogCommand { get; private set; }
 
@@ -29,12 +30,25 @@ namespace CloudManageTool.ViewModels
             _secret = platFormSecret;
 
             OpenDownloadDialogCommand = new AsyncDelegateCommand<string>(OpenDownloadDialog);
-
+            OpenCreateNewFreeCertDialogCommand = new AsyncDelegateCommand(OpenCreateNewFreeCertDialog);
+            OpenSecurityRdpDialogCommand = new AsyncDelegateCommand(OpenSecurityRdpDialog);
+            RefreshCommand = new AsyncDelegateCommand(LoadSslList);
             Task.Run(async () =>
             {
                 await LoadSslList();
             });
             _dialogService = dialogService;
+        }
+
+        private async Task OpenSecurityRdpDialog()
+        {
+            await _dialogService.ShowDialogAsync(nameof(SslSecurityRdpWindow));
+
+        }
+
+        private async Task OpenCreateNewFreeCertDialog()
+        {
+            await _dialogService.ShowDialogAsync(nameof(SslCreateWindow));
         }
 
         private async Task OpenDownloadDialog(string certificateId)

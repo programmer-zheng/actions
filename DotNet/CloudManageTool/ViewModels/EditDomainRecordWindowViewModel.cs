@@ -72,7 +72,6 @@ namespace CloudManageTool.ViewModels
 
         private async Task SaveDomainRecordAsync()
         {
-            // TODO 添加记录逻辑
             Credential cred = new Credential
             {
                 SecretId = _secret.SecretId,
@@ -89,7 +88,7 @@ namespace CloudManageTool.ViewModels
             req.Remark = Record.Remark;
             try
             {
-                ModifyRecordResponse resp = client.ModifyRecordSync(req);
+                ModifyRecordResponse resp = await client.ModifyRecord(req);
                 RequestClose.Invoke(ButtonResult.OK);
             }
             catch (System.Exception e)
@@ -150,7 +149,7 @@ namespace CloudManageTool.ViewModels
                     .Map(dst => dst.Type, src => src.RecordType);
                 return resp.RecordInfo.Adapt<RecordDto>();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw;
             }
