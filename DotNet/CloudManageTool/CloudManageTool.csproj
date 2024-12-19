@@ -21,8 +21,8 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
 		<PackageReference Include="Prism.DryIoc" Version="9.0.537" />
-		<PackageReference Include="TencentCloudSDK.Dnspod" Version="3.0.1123" />
-		<PackageReference Include="TencentCloudSDK.Ssl" Version="3.0.1143" />
+		<PackageReference Include="TencentCloudSDK.Dnspod" Version="3.0.1145" />
+		<PackageReference Include="TencentCloudSDK.Ssl" Version="3.0.1145" />
 	</ItemGroup>
 	<ItemGroup>
 		<Resource Include="textboxbackground.gif" />
