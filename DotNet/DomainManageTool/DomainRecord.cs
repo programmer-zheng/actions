@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DomainManageTool;
+namespace CloudManageTool;
 
 public class DomainRecord
 {

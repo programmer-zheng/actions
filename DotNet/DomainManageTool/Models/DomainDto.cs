@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DomainManageTool.Models
+namespace CloudManageTool.Models
 {
     public class DomainDto
     {

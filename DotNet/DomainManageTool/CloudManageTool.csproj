@@ -6,6 +6,8 @@
 		<InterceptorsPreviewNamespaces>$(InterceptorsPreviewNamespaces);Microsoft.Extensions.Configuration.Binder.SourceGeneration</InterceptorsPreviewNamespaces>
 		<LangVersion>default</LangVersion>
 		<ApplicationIcon>tencentcloud.ico</ApplicationIcon>
+		<AssemblyName>CloudManageTool</AssemblyName>
+		<RootNamespace>CloudManageTool</RootNamespace>
 	</PropertyGroup>
 	<ItemGroup>
 	  <Content Include="tencentcloud.ico" />

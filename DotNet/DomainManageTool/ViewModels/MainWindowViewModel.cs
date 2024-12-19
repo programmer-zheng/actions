@@ -1,9 +1,9 @@
-﻿using DomainManageTool.Views;
+﻿using CloudManageTool.Views;
 using Prism.Commands;
 using Prism.Dialogs;
 using Prism.Mvvm;
 
-namespace DomainManageTool.ViewModels
+namespace CloudManageTool.ViewModels
 {
     public class MainWindowViewModel : BindableBase
     {

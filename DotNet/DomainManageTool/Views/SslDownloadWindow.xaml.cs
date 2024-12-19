@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace DomainManageTool.Views
+namespace CloudManageTool.Views
 {
     /// <summary>
     /// SslDownloadWindow.xaml 的交互逻辑

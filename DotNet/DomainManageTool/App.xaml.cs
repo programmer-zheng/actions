@@ -1,12 +1,12 @@
-﻿using DomainManageTool.ViewModels;
-using DomainManageTool.Views;
+﻿using CloudManageTool.ViewModels;
+using CloudManageTool.Views;
 using Microsoft.Extensions.Configuration;
 using Prism.Ioc;
 using System;
 using System.IO;
 using System.Windows;
 
-namespace DomainManageTool
+namespace CloudManageTool
 {
     /// <summary>
     /// Interaction logic for App.xaml

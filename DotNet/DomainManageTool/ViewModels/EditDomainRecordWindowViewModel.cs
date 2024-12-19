@@ -1,4 +1,4 @@
-﻿using DomainManageTool.Models;
+﻿using CloudManageTool.Models;
 using Prism.Commands;
 using Prism.Dialogs;
 using Prism.Mvvm;
@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using Mapster;
 using System.Windows;
 
-namespace DomainManageTool.ViewModels
+namespace CloudManageTool.ViewModels
 {
     public class EditDomainRecordWindowViewModel : BindableBase, IDialogAware
     {

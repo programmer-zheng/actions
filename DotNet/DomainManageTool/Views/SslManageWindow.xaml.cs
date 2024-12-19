@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 
-namespace DomainManageTool.Views
+namespace CloudManageTool.Views
 {
     /// <summary>
     /// SslManageWindow.xaml 的交互逻辑

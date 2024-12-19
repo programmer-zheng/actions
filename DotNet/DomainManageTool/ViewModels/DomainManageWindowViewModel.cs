@@ -1,4 +1,4 @@
-﻿using DomainManageTool.Models;
+﻿using CloudManageTool.Models;
 using Mapster;
 using Prism.Commands;
 using Prism.Dialogs;
@@ -12,7 +12,7 @@ using TencentCloud.Common.Profile;
 using TencentCloud.Dnspod.V20210323;
 using TencentCloud.Dnspod.V20210323.Models;
 
-namespace DomainManageTool.ViewModels
+namespace CloudManageTool.ViewModels
 {
     public class DomainManageWindowViewModel : BindableBase, IDialogAware
     {

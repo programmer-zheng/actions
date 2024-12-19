@@ -1,4 +1,4 @@
-﻿using DomainManageTool.Models;
+﻿using CloudManageTool.Models;
 using Prism.Commands;
 using Prism.Dialogs;
 using Prism.Mvvm;
@@ -12,7 +12,7 @@ using TencentCloud.Common;
 using TencentCloud.Ssl.V20191205;
 using TencentCloud.Ssl.V20191205.Models;
 
-namespace DomainManageTool.ViewModels
+namespace CloudManageTool.ViewModels
 {
     public class SslDownloadWindowViewModel : BindableBase, IDialogAware
     {

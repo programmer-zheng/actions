@@ -1,4 +1,4 @@
-﻿using DomainManageTool.Models;
+﻿using CloudManageTool.Models;
 using Prism.Commands;
 using Prism.Dialogs;
 using Prism.Mvvm;
@@ -11,7 +11,7 @@ using TencentCloud.Dnspod.V20210323.Models;
 using TencentCloud.Dnspod.V20210323;
 using System.Windows;
 
-namespace DomainManageTool.ViewModels;
+namespace CloudManageTool.ViewModels;
 
 public class CreateDomainRecordWindowViewModel : BindableBase, IDialogAware
 {

@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace DomainManageTool.Views
+namespace CloudManageTool.Views
 {
     /// <summary>
     /// Interaction logic for EditDomainRecordWindow

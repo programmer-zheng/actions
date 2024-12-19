@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace DomainManageTool.Views
+namespace CloudManageTool.Views
 {
     /// <summary>
     /// CreateDomainRecordWindow.xaml 的交互逻辑

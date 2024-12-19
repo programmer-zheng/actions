@@ -1,4 +1,4 @@
-﻿namespace DomainManageTool
+﻿namespace CloudManageTool
 {
     public class PlatFormSecret
     {

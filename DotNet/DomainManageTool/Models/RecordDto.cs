@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DomainManageTool.Models
+namespace CloudManageTool.Models
 {
     public class RecordDto
     {
