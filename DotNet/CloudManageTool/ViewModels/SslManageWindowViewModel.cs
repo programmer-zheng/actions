@@ -50,7 +50,11 @@ namespace CloudManageTool.ViewModels
 
         private async Task OpenCreateNewFreeCertDialog()
         {
-            await _dialogService.ShowDialogAsync(nameof(SslCreateWindow));
+            var dialogResult = await _dialogService.ShowDialogAsync(nameof(SslCreateWindow));
+            if (dialogResult.Result == ButtonResult.OK)
+            {
+                await LoadSslList();
+            }
         }
 
         private async Task OpenDownloadDialog(string certificateId)

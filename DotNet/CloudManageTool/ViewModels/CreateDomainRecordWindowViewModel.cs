@@ -129,7 +129,6 @@ public class CreateDomainRecordWindowViewModel : BindableBase, IDialogAware
             catch (System.Exception e)
             {
                 MessageBox.Show($"添加记录失败：{e.Message}");
-
             }
         }
     }

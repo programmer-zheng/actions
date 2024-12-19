@@ -93,7 +93,7 @@ namespace CloudManageTool.ViewModels
                     req.DeleteDnsAutoRecord = true;
                 }
                 ApplyCertificateResponse resp = await client.ApplyCertificate(req);
-                MessageBox.Show("提交证书申请成功");
+                RequestClose.Invoke(ButtonResult.OK);
             }
             catch (Exception e)
             {
@@ -106,7 +106,7 @@ namespace CloudManageTool.ViewModels
             if (string.IsNullOrWhiteSpace(domain))
                 return false;
 
-            string pattern = @"^(?!-)[A-Za-z0-9-]{1,63}(?<!-)\.[A-Za-z]{2,}$";
+            string pattern = @"^(?!-)(?:[A-Za-z0-9-]{1,63}\.)+[A-Za-z]{2,}$";
             return Regex.IsMatch(domain, pattern);
         }
     }
