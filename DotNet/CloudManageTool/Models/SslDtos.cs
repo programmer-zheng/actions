@@ -19,20 +19,52 @@ public class SslListDto : Certificates
                 case 1://已通过
                 case 4://验证方式为 DNS_AUTO 类型的证书，已添加DNS记录
 
-                //case 0://审核中
-                //case 2://审核失败
-                //case 3://已过期
-                //case 5://企业证书，待提交
-                //case 6://订单取消中
-                //case 7://已取消
-                //case 8://已提交资料，待上传确认函
-                //case 9://证书吊销中
-                //case 10://已吊销
-                //case 11://重颁发中
-                //case 12://待上传吊销确认函
-                //case 13://免费证书待提交资料状态
-                //case 14://已退款
-                    flag =true;
+                    //case 0://审核中
+                    //case 2://审核失败
+                    //case 3://已过期
+                    //case 5://企业证书，待提交
+                    //case 6://订单取消中
+                    //case 7://已取消
+                    //case 8://已提交资料，待上传确认函
+                    //case 9://证书吊销中
+                    //case 10://已吊销
+                    //case 11://重颁发中
+                    //case 12://待上传吊销确认函
+                    //case 13://免费证书待提交资料状态
+                    //case 14://已退款
+                    flag = true;
+                    break;
+                default:
+                    break;
+            }
+            return flag;
+        }
+    }
+
+    public bool CanDelete
+    {
+        get
+        {
+            var flag = false;
+            switch (Status)
+            {
+                //case 1://已通过
+                //case 4://验证方式为 DNS_AUTO 类型的证书，已添加DNS记录
+
+                    //case 0://审核中
+                    //case 2://审核失败
+                    case 3://已过期
+                    //case 5://企业证书，待提交
+                    //case 6://订单取消中
+                    case 7://已取消
+                    //case 8://已提交资料，待上传确认函
+                    //case 9://证书吊销中
+                    case 10://已吊销
+                    //case 11://重颁发中
+                    //case 12://待上传吊销确认函
+                    //case 13://免费证书待提交资料状态
+                    //case 14://已退款
+                    flag = true;
                     break;
                 default:
                     break;
@@ -41,6 +73,7 @@ public class SslListDto : Certificates
         }
     }
 }
+
 
 
 public class SslDownloadDto

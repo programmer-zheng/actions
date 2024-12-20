@@ -21,7 +21,11 @@ namespace CloudManageTool.ViewModels
         public AsyncDelegateCommand OpenSecurityRdpDialogCommand { get; }
         public AsyncDelegateCommand RefreshCommand { get; }
 
+        public AsyncDelegateCommand<string> RevokeCertificateCommand { get; }
+        public AsyncDelegateCommand<string> DeleteCertificateCommand { get; }
+
         public AsyncDelegateCommand<string> OpenDownloadDialogCommand { get; private set; }
+
 
 
         private readonly PlatFormSecret _secret;
@@ -34,12 +38,64 @@ namespace CloudManageTool.ViewModels
             OpenDownloadDialogCommand = new AsyncDelegateCommand<string>(OpenDownloadDialog);
             OpenCreateNewFreeCertDialogCommand = new AsyncDelegateCommand(OpenCreateNewFreeCertDialog);
             OpenSecurityRdpDialogCommand = new AsyncDelegateCommand(OpenSecurityRdpDialog);
+            RevokeCertificateCommand = new AsyncDelegateCommand<string>(RevokeCertificate);
+            DeleteCertificateCommand = new AsyncDelegateCommand<string>(DeleteCertificate);
+
             RefreshCommand = new AsyncDelegateCommand(LoadSslList);
             Task.Run(async () =>
             {
                 await LoadSslList();
             });
             _dialogService = dialogService;
+        }
+
+        private async Task DeleteCertificate(string certificateId)
+        {
+            try
+            {
+                Credential cred = new Credential
+                {
+                    SecretId = _secret.SecretId,
+                    SecretKey = _secret.SecretKey
+                };
+                SslClient client = new SslClient(cred, "");
+                DeleteCertificateRequest req = new DeleteCertificateRequest();
+                req.CertificateId = certificateId;
+                DeleteCertificateResponse resp = client.DeleteCertificateSync(req);
+
+                await LoadSslList();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "删除证书出现异常");
+            }
+        }
+
+        // 吊销证书
+        private async Task RevokeCertificate(string certificateId)
+        {
+            var result = MessageBox.Show("确认吊销吗？", "提示", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (result == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    Credential cred = new Credential
+                    {
+                        SecretId = _secret.SecretId,
+                        SecretKey = _secret.SecretKey
+                    };
+                    SslClient client = new SslClient(cred, "");
+                    RevokeCertificateRequest req = new RevokeCertificateRequest();
+                    req.CertificateId = certificateId;
+                    RevokeCertificateResponse resp = client.RevokeCertificateSync(req);
+
+                    await LoadSslList();
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message, "吊销证书出现异常");
+                }
+            }
         }
 
         private async Task OpenSecurityRdpDialog()
@@ -90,7 +146,7 @@ namespace CloudManageTool.ViewModels
                 SslClient client = new SslClient(cred, "");
                 DescribeCertificatesRequest req = new DescribeCertificatesRequest();
                 DescribeCertificatesResponse resp = await client.DescribeCertificates(req);
-                SslCertList =  resp.Certificates.ToList().Adapt<List<SslListDto>>();
+                SslCertList = resp.Certificates.ToList().Adapt<List<SslListDto>>();
             }
             catch (Exception e)
             {
