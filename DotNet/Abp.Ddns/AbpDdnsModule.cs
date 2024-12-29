@@ -12,6 +12,11 @@ public class AbpDdnsModule : AbpModule
     {
         var services = context.Services;
         services.AddControllersWithViews();
+        services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+        });
+
     }
 
     public override void OnApplicationInitialization(ApplicationInitializationContext context)
@@ -19,10 +24,7 @@ public class AbpDdnsModule : AbpModule
         var app = context.GetApplicationBuilder();
         var env = context.GetEnvironment();
 
-        app.UseForwardedHeaders(new ForwardedHeadersOptions
-        {
-            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-        });
+        app.UseForwardedHeaders();
         if (!env.IsDevelopment())
         {
             app.UseExceptionHandler("/Home/Error");
