@@ -6,6 +6,13 @@ using System.Web;
 using Abp.Ddns.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
+using tik4net;
+using tik4net.Objects;
+using tik4net.Objects.Interface;
+using tik4net.Objects.Interface.Wireless;
+using tik4net.Objects.Ip;
+using tik4net.Objects.Ip.DhcpServer;
+using tik4net.Objects.Ip.Firewall;
 using Volo.Abp.AspNetCore.Mvc;
 
 namespace Abp.Ddns.Controllers
@@ -23,109 +30,6 @@ namespace Abp.Ddns.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        [Route("/wifi")]
-        public IActionResult WifiOnline(string domain, string username, string password, int port)
-        {
-            using (var mikrotik = new Mikrotik(domain, port, username, password))
-            {
-                //查询wifi在线主机
-                var onlineWifiHosts = mikrotik.GetWifiOnline();
-                //查询dhcp主机
-                var onlineHosts = mikrotik.GetDhcpHosts();
-                onlineHosts = (from host in onlineHosts
-                    join wifi in onlineWifiHosts on host.MacAddress equals wifi.MacAddress
-                    orderby wifi.Interface
-                    select new HostInfo
-                    {
-                        HostName = host.HostName,
-                        OnLineTime = wifi.OnLineTime,
-                        Interface = wifi.Interface,
-                        Comment = host.Comment,
-                    }).ToList();
-                return Json(onlineHosts);
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="domain">远程路由器的IP或域名</param>
-        /// <param name="username">api用户名</param>
-        /// <param name="password">api密码</param>
-        /// <param name="port">api端口号</param>
-        /// <param name="mac">远程启动设备的mac地址</param>
-        /// <returns></returns>
-        [Route("/wol")]
-        public IActionResult Wol(string domain, string username, string password, int port, string mac, string intface = "")
-        {
-            var msg = "已通知远程主机启动";
-
-            #region 参数校验
-
-            if (string.IsNullOrWhiteSpace(domain))
-            {
-                msg = "请提供远程路由器的IP或域名";
-            }
-
-            if (string.IsNullOrWhiteSpace(username))
-            {
-                msg = "请提供远程路由器的用户名";
-            }
-
-            if (string.IsNullOrWhiteSpace(password))
-            {
-                msg = "请提供远程路由器的密码";
-            }
-
-            if (port < 1)
-            {
-                msg = "请正确提供远程路由器的API端口号";
-            }
-
-            if (string.IsNullOrWhiteSpace(mac))
-            {
-                msg = "请提供远程设备的Mac地址";
-            }
-
-            #endregion
-
-            try
-            {
-                domain = HttpUtility.UrlDecode(domain);
-                username = HttpUtility.UrlDecode(username);
-                password = HttpUtility.UrlDecode(password);
-                mac = HttpUtility.UrlDecode(mac).Replace("-", ":");
-                using (var mikrotik = new Mikrotik(domain, port, username, password))
-                {
-                    if (!string.IsNullOrWhiteSpace(intface))
-                    {
-                        mikrotik.Wol(mac, intface);
-                    }
-                    else
-                    {
-                        var intfaceList = mikrotik.GetInterfaceList();
-                        foreach (var item in intfaceList)
-                        {
-                            mikrotik.Wol(mac, item);
-                        }
-                    }
-                }
-            }
-            catch (ArgumentException e)
-            {
-                msg = $"参数异常:{e.Message}";
-            }
-            catch (SocketException e)
-            {
-                msg = $"连接异常:{e.Message}";
-            }
-            catch (Exception e)
-            {
-                msg = $"未知异常:{e.Message}";
-            }
-
-            return Json(new { Message = msg });
-        }
 
         /// <summary>
         /// 获取内网穿透在线列表

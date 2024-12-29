@@ -15,7 +15,11 @@ docker run -itd --name ddns --restart always \
 -e Tencent:SecretId=secretid \
 -e Tencent:SecretKey=secretkey \
 -e Tencent:Domain=domain \
--e Tencent:Record=recordName \  
+-e Tencent:Record=recordName \
+-e Ros:Host=rosHost \
+-e Ros:Port=8728 \
+-e Ros:UserName=userName \
+-e Ros:Password=password \
 programmerzheng/ddns
 ```
 
@@ -34,7 +38,7 @@ docker run -itd --name ddns --restart always \
 -e Tencent:SecretId=secretid \
 -e Tencent:SecretKey=secretkey \
 -e Tencent:Domain=domain \
--e Tencent:Record=recordName \   
+-e Tencent:Record=recordName \
 -e Tencent:RecordV6=recordName \
 -e ASPNETCORE_URLS="https://+;http://+" \
 -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/xxxx.pfx \
