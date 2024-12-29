@@ -194,14 +194,24 @@ public class RosController : AbpController
 
                 if (!string.IsNullOrWhiteSpace(intface))
                 {
-                    connection.CallCommandSync($"/tool/wol interface = {intface} mac={mac}");
+                    var command = connection.CreateCommandAndParameters("/tool/wol", TikCommandParameterFormat.NameValue, "mac", mac, "interface", intface);
+                    command.ExecuteSingleRow();
                 }
                 else
                 {
                     var interfaces = connection.LoadList<Interface>();
+                    interfaces = interfaces.Where(t => t.Type == "ether").ToList();
                     foreach (var item in interfaces)
                     {
-                        connection.CallCommandSync($"/tool/wol interface = {item} mac={mac}");
+                        try
+                        {
+                            var command = connection.CreateCommandAndParameters("/tool/wol", TikCommandParameterFormat.NameValue, "mac", mac, "interface", item.Name);
+                            command.ExecuteSingleRow();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                        }
                     }
                 }
             }
