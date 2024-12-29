@@ -35,15 +35,26 @@ public class RosController : AbpController
         {
             if (string.IsNullOrWhiteSpace(remoteIp))
             {
-                var remoteIpAddress = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress;
+                var headers = _httpContextAccessor.HttpContext.Request.Headers;
 
-                remoteIp = remoteIpAddress?.MapToIPv4().ToString();
-                if (remoteIp.Equals("0.0.0.1"))
+                // 优先获取 X-Forwarded-For
+                string clientIp = headers["X-Forwarded-For"].FirstOrDefault();
+                if (!string.IsNullOrWhiteSpace(clientIp))
                 {
-                    remoteIp = string.Empty;
+                    remoteIp = clientIp;
                 }
+                else
+                {
+                    var remoteIpAddress = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress;
 
-                Logger.LogDebug(remoteIpAddress.ToString());
+                    remoteIp = remoteIpAddress?.MapToIPv4().ToString();
+                    if (remoteIp.Equals("0.0.0.1"))
+                    {
+                        remoteIp = string.Empty;
+                    }
+
+                    Logger.LogDebug(remoteIpAddress.ToString());
+                }
             }
 
             if (string.IsNullOrWhiteSpace(remoteIp))
