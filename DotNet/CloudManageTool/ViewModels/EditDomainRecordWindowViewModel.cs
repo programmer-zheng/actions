@@ -1,31 +1,20 @@
 ﻿using CloudManageTool.Models;
+using Mapster;
 using Prism.Commands;
 using Prism.Dialogs;
-using Prism.Mvvm;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using TencentCloud.Common.Profile;
-using TencentCloud.Common;
-using TencentCloud.Dnspod.V20210323.Models;
-using TencentCloud.Dnspod.V20210323;
 using System.Threading.Tasks;
-using Mapster;
 using System.Windows;
+using TencentCloud.Common;
+using TencentCloud.Dnspod.V20210323;
+using TencentCloud.Dnspod.V20210323.Models;
 
 namespace CloudManageTool.ViewModels
 {
-    public class EditDomainRecordWindowViewModel : BindableBase, IDialogAware
+    public class EditDomainRecordWindowViewModel : DomainRecordBaseViewModel, IDialogAware
     {
         public DialogCloseListener RequestClose { get; }
 
-        private List<string> _recordTypeList;
-
-        public List<string> RecordTypeList
-        {
-            get => _recordTypeList;
-            set => SetProperty(ref _recordTypeList, value);
-        }
 
         private RecordDto _record;
 
@@ -35,31 +24,13 @@ namespace CloudManageTool.ViewModels
             set => SetProperty(ref _record, value);
         }
 
-        private List<string> _lineType;
-
-        public List<string> RecordLineList
-        {
-            get => _lineType;
-            set => SetProperty(ref _lineType, value);
-        }
-
-        public DelegateCommand CancelCommand { get; private set; }
-
         public AsyncDelegateCommand SaveDomainRecordCommand { get; private set; }
 
-        public string DomainName { get; set; }
-
-        public ulong DomainId { get; set; }
 
         public ulong RecordId { get; set; }
 
-        private readonly PlatFormSecret _secret;
-        public EditDomainRecordWindowViewModel(PlatFormSecret platFormSecret)
+        public EditDomainRecordWindowViewModel(PlatFormSecret platFormSecret) : base(platFormSecret)
         {
-            _secret = platFormSecret;
-
-            RecordTypeList = new List<string> { "A", "CNAME", "MX", "TXT", "AAAA", "NS", "CAA", "SRV", "HTTPS", "SVCB", "SPF", "显性URL", "隐性URL" };
-            RecordLineList = new List<string> { "默认" };
 
             CancelCommand = new DelegateCommand(() =>
             {
@@ -72,29 +43,32 @@ namespace CloudManageTool.ViewModels
 
         private async Task SaveDomainRecordAsync()
         {
-            Credential cred = new Credential
+            if (Valid())
             {
-                SecretId = _secret.SecretId,
-                SecretKey = _secret.SecretKey
-            };
-            DnspodClient client = new DnspodClient(cred, "");
-            ModifyRecordRequest req = new ModifyRecordRequest();
-            req.RecordId = RecordId;
-            req.Domain = DomainName;
-            req.RecordType = Record.Type;
-            req.RecordLine = Record.Line;
-            req.Value = Record.Value;
-            req.SubDomain = Record.Name;
-            req.Remark = Record.Remark;
-            try
-            {
-                ModifyRecordResponse resp = await client.ModifyRecord(req);
-                RequestClose.Invoke(ButtonResult.OK);
-            }
-            catch (System.Exception e)
-            {
-                MessageBox.Show($"添加记录失败：{e.Message}");
+                Credential cred = new Credential
+                {
+                    SecretId = _secret.SecretId,
+                    SecretKey = _secret.SecretKey
+                };
+                DnspodClient client = new DnspodClient(cred, "");
+                ModifyRecordRequest req = new ModifyRecordRequest();
+                req.RecordId = RecordId;
+                req.Domain = DomainName;
+                req.RecordType = Record.Type;
+                req.RecordLine = Record.Line;
+                req.Value = Record.Value;
+                req.SubDomain = Record.Name;
+                req.Remark = Record.Remark;
+                try
+                {
+                    ModifyRecordResponse resp = await client.ModifyRecord(req);
+                    RequestClose.Invoke(ButtonResult.OK);
+                }
+                catch (System.Exception e)
+                {
+                    MessageBox.Show($"添加记录失败：{e.Message}");
 
+                }
             }
         }
 

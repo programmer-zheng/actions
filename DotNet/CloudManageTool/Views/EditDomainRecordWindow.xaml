@@ -2,14 +2,15 @@
     x:Class="CloudManageTool.Views.EditDomainRecordWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:be="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:CloudManageTool.Views"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:prism="http://prismlibrary.com/"
     Width="800"
-    Height="380"
-    d:DesignHeight="380"
+    Height="400"
+    d:DesignHeight="400"
     d:DesignWidth="800"
     prism:ViewModelLocator.AutoWireViewModel="True"
     Background="{DynamicResource MaterialDesignPaper}"
@@ -62,7 +63,13 @@
                                     Width="200"
                                     ItemsSource="{Binding RecordTypeList}"
                                     SelectedValue="{Binding Record.Type, Mode=TwoWay}"
-                                    Style="{DynamicResource MaterialDesignComboBox}" />
+                                    Style="{DynamicResource MaterialDesignComboBox}">
+                                    <be:Interaction.Triggers>
+                                        <be:EventTrigger EventName="GotFocus">
+                                            <be:InvokeCommandAction Command="{Binding ShowDescriptionCommand}" CommandParameter="RecordType" />
+                                        </be:EventTrigger>
+                                    </be:Interaction.Triggers>
+                                </ComboBox>
                             </StackPanel>
                             <StackPanel
                                 Height="30"
@@ -78,7 +85,13 @@
                                 <TextBox
                                     Width="200"
                                     Style="{DynamicResource MaterialDesignTextBox}"
-                                    Text="{Binding Record.Name, Mode=TwoWay}" />
+                                    Text="{Binding Record.Name, Mode=TwoWay}">
+                                    <be:Interaction.Triggers>
+                                        <be:EventTrigger EventName="GotFocus">
+                                            <be:InvokeCommandAction Command="{Binding ShowDescriptionCommand}" CommandParameter="RecordName" />
+                                        </be:EventTrigger>
+                                    </be:Interaction.Triggers>
+                                </TextBox>
                             </StackPanel>
                             <StackPanel
                                 Height="30"
@@ -95,7 +108,13 @@
                                     Width="200"
                                     ItemsSource="{Binding RecordLineList}"
                                     SelectedValue="{Binding Record.Line, Mode=TwoWay}"
-                                    Style="{DynamicResource MaterialDesignComboBox}" />
+                                    Style="{DynamicResource MaterialDesignComboBox}">
+                                    <be:Interaction.Triggers>
+                                        <be:EventTrigger EventName="GotFocus">
+                                            <be:InvokeCommandAction Command="{Binding ShowDescriptionCommand}" CommandParameter="RecordLine" />
+                                        </be:EventTrigger>
+                                    </be:Interaction.Triggers>
+                                </ComboBox>
                             </StackPanel>
                             <StackPanel
                                 Height="30"
@@ -111,7 +130,13 @@
                                 <TextBox
                                     Width="200"
                                     Style="{DynamicResource MaterialDesignTextBox}"
-                                    Text="{Binding Record.Value, Mode=TwoWay}" />
+                                    Text="{Binding Record.Value, Mode=TwoWay}">
+                                    <be:Interaction.Triggers>
+                                        <be:EventTrigger EventName="GotFocus">
+                                            <be:InvokeCommandAction Command="{Binding ShowDescriptionCommand}" CommandParameter="RecordValue" />
+                                        </be:EventTrigger>
+                                    </be:Interaction.Triggers>
+                                </TextBox>
                             </StackPanel>
                             <StackPanel
                                 Height="30"
@@ -127,7 +152,13 @@
                                 <TextBox
                                     Width="200"
                                     Style="{DynamicResource MaterialDesignTextBox}"
-                                    Text="{Binding Record.TTL, Mode=TwoWay}" />
+                                    Text="{Binding Record.TTL, Mode=TwoWay}">
+                                    <be:Interaction.Triggers>
+                                        <be:EventTrigger EventName="GotFocus">
+                                            <be:InvokeCommandAction Command="{Binding ShowDescriptionCommand}" CommandParameter="RecordTTL" />
+                                        </be:EventTrigger>
+                                    </be:Interaction.Triggers>
+                                </TextBox>
                             </StackPanel>
                             <StackPanel
                                 Height="30"
@@ -143,8 +174,17 @@
                                 <TextBox
                                     Width="200"
                                     Style="{DynamicResource MaterialDesignTextBox}"
-                                    Text="{Binding Record.Remark, Mode=TwoWay}" />
+                                    Text="{Binding Record.Remark, Mode=TwoWay}">
+                                    <be:Interaction.Triggers>
+                                        <be:EventTrigger EventName="GotFocus">
+                                            <be:InvokeCommandAction Command="{Binding ShowDescriptionCommand}" CommandParameter="RecordRemark" />
+                                        </be:EventTrigger>
+                                    </be:Interaction.Triggers>
+                                </TextBox>
                             </StackPanel>
+                        </StackPanel>
+                        <StackPanel>
+                            <TextBlock Margin="25,5" Width="420" FontSize="16" TextWrapping="Wrap" Text="{Binding Description}" d:Text="这是一段文字"/>
                         </StackPanel>
                     </StackPanel>
                     <StackPanel
