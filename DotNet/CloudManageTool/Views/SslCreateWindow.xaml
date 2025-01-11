@@ -85,7 +85,10 @@
                             Grid.Row="2"
                             HorizontalAlignment="Center"
                             Orientation="Horizontal">
-                            <Button Width="150" Command="{Binding CreateSslCommand}">
+                            <Button
+                                Width="150"
+                                Command="{Binding CreateSslCommand}"
+                                IsDefault="True">
                                 <StackPanel Orientation="Horizontal">
                                     <materialDesign:PackIcon
                                         Width="24"
@@ -101,7 +104,8 @@
                             <Button
                                 Width="150"
                                 Margin="15,0"
-                                Command="{Binding CancelCommand}">
+                                Command="{Binding CancelCommand}"
+                                IsCancel="True">
                                 <StackPanel Orientation="Horizontal">
                                     <materialDesign:PackIcon
                                         Width="24"

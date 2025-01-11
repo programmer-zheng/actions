@@ -184,7 +184,22 @@
                             </StackPanel>
                         </StackPanel>
                         <StackPanel>
-                            <TextBlock Margin="25,5" Width="420" FontSize="16" TextWrapping="Wrap" Text="{Binding Description}" d:Text="这是一段文字"/>
+
+                            <TextBlock
+                                Width="420"
+                                Margin="25,5"
+                                FontSize="16"
+                                Text="{Binding Description}"
+                                TextWrapping="Wrap">
+                                <d:TextBlock.Inlines>
+                                    A：将域名指向一个 IP 地址。<LineBreak />
+                                    CNAME：将域名指向另一个域名，再由另一个域名提供 IP 地址。<LineBreak />
+                                    MX：设置邮箱，让邮箱能收到邮件。<LineBreak />
+                                    TXT：对域名进行标识和说明，绝大多数的 TXT 记录是用来做 SPF 记录（反垃圾邮件）。<LineBreak />
+                                    AAAA：将域名指向一个 IPv6 地址，如 2400:da00::dbf:0:100。<LineBreak />
+                                    HTTPS：将域名指向另一个域名指定值，再由另一个域名提供 IP 地址，就需要添加 HTTPS 记录。<LineBreak />
+                                    隐、显性 URL：将一个域名指向另外一个已经存在的站点。</d:TextBlock.Inlines>
+                            </TextBlock>
                         </StackPanel>
                     </StackPanel>
                     <StackPanel
@@ -200,12 +215,14 @@
                                     Width="100"
                                     Margin="10,0"
                                     Command="{Binding SaveDomainRecordCommand}"
-                                    Content="确定" />
+                                    Content="确定"
+                                    IsDefault="True" />
                                 <Button
                                     Width="100"
                                     Margin="10,0"
                                     Command="{Binding CancelCommand}"
-                                    Content="取消" />
+                                    Content="取消"
+                                    IsCancel="True" />
                             </StackPanel>
                         </DockPanel>
                     </StackPanel>

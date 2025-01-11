@@ -71,7 +71,7 @@
                         </DataGrid.Columns>
                     </DataGrid>
                     <StackPanel HorizontalAlignment="Center">
-                        <Button Command="{Binding CancelCommand}">
+                        <Button Command="{Binding CancelCommand}" IsCancel="True">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon
                                     Width="24"

@@ -31,6 +31,7 @@
                                 x:Name="BtnClose"
                                 Command="{Binding CancelCommand}"
                                 Content="{materialDesign:PackIcon Kind=WindowClose}"
+                                IsCancel="True"
                                 Style="{DynamicResource MaterialDesignFlatMidBgButton}" />
                         </StackPanel>
                         <TextBlock
@@ -43,8 +44,8 @@
                 </materialDesign:ColorZone>
                 <StackPanel Margin="25" Orientation="Vertical">
                     <TextBox
-                        Width="800"
-                        Height="500"
+                        Width="750"
+                        Height="370"
                         Padding="15"
                         AcceptsReturn="True"
                         BorderBrush="Gray"

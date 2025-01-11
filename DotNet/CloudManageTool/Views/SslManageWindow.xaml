@@ -65,7 +65,7 @@
                                 x:Name="BtnMax"
                                 Content="{materialDesign:PackIcon Kind=WindowMaximize}"
                                 Style="{DynamicResource MaterialDesignFlatMidBgButton}" />
-                            <Button
+                            <Button IsCancel="True"
                                 x:Name="BtnClose"
                                 Content="{materialDesign:PackIcon Kind=WindowClose}"
                                 Style="{DynamicResource MaterialDesignFlatMidBgButton}" />

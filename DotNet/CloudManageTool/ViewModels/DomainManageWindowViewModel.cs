@@ -63,6 +63,10 @@ namespace CloudManageTool.ViewModels
 
         private readonly IDialogService _dialogService;
 
+        public DomainManageWindowViewModel()
+        {
+        }
+
         public DomainManageWindowViewModel(PlatFormSecret platFormSecret, IDialogService dialogService)
         {
             CreateDomainRecordCommand = new AsyncDelegateCommand(ShowCreateDomainRecordWindowDialog);
