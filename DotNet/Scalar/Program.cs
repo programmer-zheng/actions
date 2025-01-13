@@ -23,10 +23,11 @@ namespace Scalar
                 app.MapScalarApiReference(options =>
                 {
                     options.WithTitle("文档中心") //设置浏览器标签页标题
-                        .WithForceThemeMode(ThemeMode.Dark) // 设置默认主题为暗色
+                        .WithForceThemeMode(ThemeMode.Dark) // 强制页面只能使用深色模式
+                        .WithTheme(ScalarTheme.Kepler) // 设置默认主题
                         // .WithEndpointPrefix("/swagger/{documentName}") // 默认为/scalar/v1，更改后使用/swagger/v1访问
                         .WithDefaultHttpClient(ScalarTarget.JavaScript, ScalarClient.Axios)
-                        .WithTheme(ScalarTheme.Kepler);
+                        ;
                     ;
 
                     // options.EnabledClients = new[] { ScalarClient.HttpClient, ScalarClient.Axios, ScalarClient.Curl, ScalarClient.AsyncHttp, ScalarClient.Request };
@@ -50,9 +51,11 @@ namespace Scalar
 
             app.UseAuthorization();
 
+            app.UseRouting();
 
-            app.MapControllers();
+            // app.MapControllers();
 
+            app.UseEndpoints(endpoints => { endpoints.MapControllerRoute("Default", "{controller}/{action}/{id?}"); });
             app.Run();
         }
     }
