@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -11,9 +10,6 @@ namespace VideoMerge
 {
     public class AutoVideoMergeWorker : AsyncPeriodicBackgroundWorkerBase
     {
-        private readonly IConfiguration _configuration;
-
-
         /// <summary>
         /// 搜索模式（指定后缀或*）
         /// </summary>
@@ -21,12 +17,11 @@ namespace VideoMerge
 
         private readonly VideoMergeConfigOption _configOption;
 
-        public AutoVideoMergeWorker(AbpAsyncTimer timer, IServiceScopeFactory serviceScopeFactory, IConfiguration configuration, IOptions<VideoMergeConfigOption> configureOptions)
+        public AutoVideoMergeWorker(AbpAsyncTimer timer, IServiceScopeFactory serviceScopeFactory, IOptions<VideoMergeConfigOption> configureOptions)
             : base(timer, serviceScopeFactory)
         {
             timer.Period = 1000 * 3;
             timer.Start();
-            _configuration = configuration;
             _configOption = configureOptions.Value;
             _searchPattern = $"*{_configOption.VideoSuffix}";
         }
@@ -215,7 +210,7 @@ namespace VideoMerge
             }
             catch (Exception e)
             {
-                Logger.LogError($"获取子级目录失败", e);
+                Logger.LogError(e, $"获取子级目录失败");
             }
 
             return [];
