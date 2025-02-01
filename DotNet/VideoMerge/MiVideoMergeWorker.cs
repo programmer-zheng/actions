@@ -85,6 +85,10 @@ namespace VideoMerge
             {
                 var manifestFile = Path.Combine(_configOption.BaseDirectory, $"{item.Date.ToString("yyyyMMdd")}_{item.VideoType}.txt");
                 var outputFile = Path.Combine(_configOption.BaseDirectory, item.Date.ToString("yyyy-MM"), $"{item.Date.ToString("yyyyMMdd")}_{item.VideoType}.mp4");
+                if (File.Exists(outputFile))
+                {
+                    continue;
+                }
 
                 var videoFiles = item.files.OrderBy(t => t.FileName).Select(t => t.FileName).ToList();
                 await WriteVideoFileList(manifestFile, videoFiles);

@@ -33,7 +33,11 @@ apt-get install -y ffmpeg
 ## Docker 
 ``` bash
 # 绑定本地 /micamera 目录到Docker容器的 /app/videos 目录
-docker run -itd --name video-merge --restart always -v /micamera:/app/videos programmerzheng/video-merge
+docker run -itd \
+--name video-merge \
+--restart always \
+-v /micamera:/app/videos \
+programmerzheng/video-merge
 ```
 
 ### 其他链接
