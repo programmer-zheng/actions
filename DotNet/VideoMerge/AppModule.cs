@@ -2,11 +2,13 @@
 using Volo.Abp;
 using Volo.Abp.Autofac;
 using Volo.Abp.BackgroundWorkers;
+using Volo.Abp.BackgroundWorkers.Quartz;
 using Volo.Abp.Modularity;
 
 namespace VideoMerge;
 
 [DependsOn(typeof(AbpAutofacModule),
+    typeof(AbpBackgroundWorkersQuartzModule),
     typeof(AbpBackgroundWorkersModule))]
 public class AppModule : AbpModule
 {

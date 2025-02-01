@@ -1,16 +1,17 @@
 ﻿using System.Diagnostics;
-using Microsoft.Extensions.DependencyInjection;
+using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Volo.Abp.BackgroundWorkers;
-using Volo.Abp.Threading;
+using Quartz;
+using Quartz.Impl.Triggers;
+using Volo.Abp.BackgroundWorkers.Quartz;
 
 namespace VideoMerge
 {
     /// <summary>
     /// 小米室外摄像机视频合并
     /// </summary>
-    public class XiaomiOutdoorCameraMergeWorker : AsyncPeriodicBackgroundWorkerBase
+    public class XiaomiOutdoorCameraMergeWorker : QuartzBackgroundWorkerBase
     {
         public class MergeDto
         {
@@ -29,21 +30,21 @@ namespace VideoMerge
 
         private readonly VideoMergeConfigOption _configOption;
 
-        public XiaomiOutdoorCameraMergeWorker(AbpAsyncTimer timer, IServiceScopeFactory serviceScopeFactory, IOptions<VideoMergeConfigOption> configureOptions)
-            : base(timer, serviceScopeFactory)
+        public XiaomiOutdoorCameraMergeWorker(IOptions<VideoMergeConfigOption> configureOptions)
         {
-            timer.Period = 1000 * 3;
-            timer.Start();
+            JobDetail = JobBuilder.Create<XiaomiOutdoorCameraMergeWorker>().WithIdentity(nameof(XiaomiOutdoorCameraMergeWorker)).Build();
+            Trigger = TriggerBuilder.Create().WithIdentity(nameof(XiaomiOutdoorCameraMergeWorker))
+                // .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(10, 0))
+                .WithSimpleSchedule(s => s.WithIntervalInHours(12))
+                .StartNow()
+                .Build();
             _configOption = configureOptions.Value;
             _searchPattern = $"*{_configOption.VideoSuffix}";
         }
 
 
-        protected override async Task DoWorkAsync(PeriodicBackgroundWorkerContext workerContext)
+        public override async Task Execute(IJobExecutionContext context)
         {
-            // 第一次启动后，修改同步周期
-            Timer.Period = 1000 * 60 * _configOption.MergeCycle;
-
             if (!Directory.Exists(_configOption.BaseDirectory))
             {
                 Logger.LogError($"视频存储目录：{_configOption.BaseDirectory} 不存在，无法进行视频转换操作");
@@ -87,6 +88,10 @@ namespace VideoMerge
                 var outputFile = Path.Combine(_configOption.BaseDirectory, item.Date.ToString("yyyy-MM"), $"{item.Date.ToString("yyyyMMdd")}_{item.VideoType}.mp4");
                 if (File.Exists(outputFile))
                 {
+                    if (File.Exists(manifestFile))
+                    {
+                        File.Exists(manifestFile);
+                    }
                     continue;
                 }
 
@@ -94,7 +99,6 @@ namespace VideoMerge
                 await WriteVideoFileList(manifestFile, videoFiles);
                 await ExecuteVideoMergeAsync(manifestFile, outputFile);
             }
-            // await ProcessDirectory(dir, currentDateHour, lastModifyTime);
         }
 
         private void CreateFolder(string configOptionBaseDirectory, List<DateOnly> dates)
@@ -140,7 +144,7 @@ namespace VideoMerge
                 {
                     var fileName = item.Name;
                     var arr = fileName.Split("_");
-                    var dt = DateOnly.ParseExact(arr[2].Substring(0, 8), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture);
+                    var dt = DateOnly.ParseExact(arr[2].Substring(0, 8), "yyyyMMdd", CultureInfo.InvariantCulture);
                     list.Add(new MergeDto { VideoType = arr[0], FileName = fileName, Date = dt });
                 }
             }
