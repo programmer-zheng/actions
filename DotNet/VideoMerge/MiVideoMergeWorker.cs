@@ -83,7 +83,7 @@ namespace VideoMerge
                 .ToList();
             foreach (var item in groupList)
             {
-                var manifestFile = Path.Combine(_configOption.BaseDirectory, item.Date.ToString("yyyy-MM"), $"{item.Date.ToString("yyyyMMdd")}_{item.VideoType}.txt");
+                var manifestFile = Path.Combine(_configOption.BaseDirectory, $"{item.Date.ToString("yyyyMMdd")}_{item.VideoType}.txt");
                 var outputFile = Path.Combine(_configOption.BaseDirectory, item.Date.ToString("yyyy-MM"), $"{item.Date.ToString("yyyyMMdd")}_{item.VideoType}.mp4");
 
                 var videoFiles = item.files.OrderBy(t => t.FileName).Select(t => t.FileName).ToList();
