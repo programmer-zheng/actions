@@ -10,7 +10,6 @@ namespace VideoMerge;
     typeof(AbpBackgroundWorkersModule))]
 public class AppModule : AbpModule
 {
-
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         var services = context.Services;
@@ -21,6 +20,7 @@ public class AppModule : AbpModule
 
     public override async Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
     {
-        await context.AddBackgroundWorkerAsync<AutoVideoMergeWorker>();
+        // await context.AddBackgroundWorkerAsync<AutoVideoMergeWorker>();
+        await context.AddBackgroundWorkerAsync<XiaomiOutdoorCameraMergeWorker>();
     }
 }
