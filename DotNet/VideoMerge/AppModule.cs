@@ -23,6 +23,6 @@ public class AppModule : AbpModule
     public override async Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
     {
         // await context.AddBackgroundWorkerAsync<AutoVideoMergeWorker>();
-        await context.AddBackgroundWorkerAsync<XiaomiOutdoorCameraMergeWorker>();
+        // await context.AddBackgroundWorkerAsync<XiaomiOutdoorCameraMergeWorker>();
     }
 }

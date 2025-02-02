@@ -19,6 +19,8 @@ namespace VideoMerge
 
             public string FileName { get; set; }
 
+            public string FileFullPath { get; set; }
+
             public DateOnly Date { get; set; }
         }
 
@@ -32,6 +34,7 @@ namespace VideoMerge
 
         public XiaomiOutdoorCameraMergeWorker(IOptions<VideoMergeConfigOption> configureOptions)
         {
+            AutoRegister = false;// 取消自动注册
             JobDetail = JobBuilder.Create<XiaomiOutdoorCameraMergeWorker>().WithIdentity(nameof(XiaomiOutdoorCameraMergeWorker)).Build();
             Trigger = TriggerBuilder.Create().WithIdentity(nameof(XiaomiOutdoorCameraMergeWorker))
                 // .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(10, 0))
@@ -88,10 +91,26 @@ namespace VideoMerge
                 var outputFile = Path.Combine(_configOption.BaseDirectory, item.Date.ToString("yyyy-MM"), $"{item.Date.ToString("yyyyMMdd")}_{item.VideoType}.mp4");
                 if (File.Exists(outputFile))
                 {
-                    if (File.Exists(manifestFile))
+                    // 如果合并后的目标文件已经存在，且清单文件存在，则删除清单文件，避免重复执行合并操作，之所以不在转换后立即执行，是避免转换有错误
+                    try
                     {
-                        File.Exists(manifestFile);
+                        if (File.Exists(manifestFile))
+                        {
+                            File.Exists(manifestFile);
+                            foreach (var file in item.files)
+                            {
+                                if (File.Exists(file.FileFullPath))
+                                {
+                                    File.Delete(file.FileFullPath);
+                                }
+                            }
+                        }
                     }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(ex,"删除文件失败");
+                    }
+
                     continue;
                 }
 
@@ -145,7 +164,7 @@ namespace VideoMerge
                     var fileName = item.Name;
                     var arr = fileName.Split("_");
                     var dt = DateOnly.ParseExact(arr[2].Substring(0, 8), "yyyyMMdd", CultureInfo.InvariantCulture);
-                    list.Add(new MergeDto { VideoType = arr[0], FileName = fileName, Date = dt });
+                    list.Add(new MergeDto { VideoType = arr[0], FileName = fileName, Date = dt, FileFullPath = item.FullName });
                 }
             }
             catch (Exception e)
