@@ -1,4 +1,5 @@
 using CustomTemplateSearch;
+using CustomTemplateSearch.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
