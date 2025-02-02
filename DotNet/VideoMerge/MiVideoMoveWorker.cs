@@ -21,7 +21,11 @@ namespace VideoMerge
 
             public string FileFullPath { get; set; }
 
-            public DateOnly Date { get; set; }
+            public DateTime StartTime { get; set; }
+
+            public DateTime EndTime { get; set; }
+
+            public DateTime LastModifyTime { get; set; }
         }
 
 
@@ -37,7 +41,7 @@ namespace VideoMerge
             JobDetail = JobBuilder.Create<MiVideoMoveWorker>().WithIdentity(nameof(MiVideoMoveWorker)).Build();
             Trigger = TriggerBuilder.Create().WithIdentity(nameof(MiVideoMoveWorker))
                 // .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(10, 0))
-                .WithSimpleSchedule(s => s.WithIntervalInHours(12))
+                .WithSimpleSchedule(s => s.WithIntervalInHours(1))
                 .StartNow()
                 .Build();
             _configOption = configureOptions.Value;
@@ -57,13 +61,13 @@ namespace VideoMerge
             // 获取根目录下的文件
             var rootFiles = GetRootFiles(_configOption.BaseDirectory);
 
-            var dates = rootFiles.Select(t => t.Date).Distinct().ToList();
+            var dates = rootFiles.Select(t => t.EndTime).Distinct().ToList();
             CreateFolder(_configOption.BaseDirectory, dates);
 
             // 按日期分组
             var groupList = rootFiles
-                .Where(t => t.Date < DateOnly.FromDateTime(DateTime.Today))
-                .GroupBy(t => new { t.Date })
+                .Where(t => t.LastModifyTime < DateTime.Now.AddHours(-1))
+                .GroupBy(t => t.EndTime.Date)
                 .Select(t => new
                 {
                     t.Key.Date,
@@ -112,7 +116,7 @@ namespace VideoMerge
         /// </summary>
         /// <param name="rootDir">根目录</param>
         /// <param name="dates"></param>
-        private void CreateFolder(string rootDir, List<DateOnly> dates)
+        private void CreateFolder(string rootDir, List<DateTime> dates)
         {
             foreach (var item in dates)
             {
@@ -136,9 +140,18 @@ namespace VideoMerge
                 foreach (var item in files)
                 {
                     var fileName = item.Name;
-                    var arr = fileName.Split("_");
-                    var dt = DateOnly.ParseExact(arr[2].Substring(0, 8), "yyyyMMdd", CultureInfo.InvariantCulture);
-                    list.Add(new MergeDto { VideoType = arr[0], FileName = fileName, Date = dt, FileFullPath = item.FullName });
+                    var arr = fileName.Split(["_"], StringSplitOptions.RemoveEmptyEntries);
+                    var type = arr[0];
+                    var startTime = DateTime.ParseExact(arr[1].Substring(0, 8), "yyyyMMdd", CultureInfo.InvariantCulture);
+                    var dateTime = DateTime.ParseExact(arr[2].Substring(0, 8), "yyyyMMdd", CultureInfo.InvariantCulture);
+                    list.Add(new MergeDto
+                    {
+                        VideoType = type,
+                        FileName = fileName,
+                        FileFullPath = item.FullName,
+                        StartTime = startTime, EndTime = dateTime,
+                        LastModifyTime = item.LastWriteTime,
+                    });
                 }
             }
             catch (Exception e)
