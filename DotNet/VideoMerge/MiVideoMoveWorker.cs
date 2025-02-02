@@ -140,7 +140,7 @@ namespace VideoMerge
                 foreach (var item in files)
                 {
                     var fileName = item.Name;
-                    var arr = fileName.Split(["_"], StringSplitOptions.RemoveEmptyEntries);
+                    var arr = fileName.Split(["_", "."], StringSplitOptions.RemoveEmptyEntries);
                     var type = arr[0];
                     var startTime = DateTime.ParseExact(arr[1].Substring(0, 8), "yyyyMMdd", CultureInfo.InvariantCulture);
                     var dateTime = DateTime.ParseExact(arr[2].Substring(0, 8), "yyyyMMdd", CultureInfo.InvariantCulture);
