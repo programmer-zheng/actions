@@ -38,14 +38,14 @@ namespace VideoMerge
 
         public MiVideoMoveWorker(IOptions<VideoMergeConfigOption> configureOptions)
         {
+            _configOption = configureOptions.Value;
+            _searchPattern = $"*{_configOption.VideoSuffix}";
             JobDetail = JobBuilder.Create<MiVideoMoveWorker>().WithIdentity(nameof(MiVideoMoveWorker)).Build();
             Trigger = TriggerBuilder.Create().WithIdentity(nameof(MiVideoMoveWorker))
                 // .WithSimpleSchedule(s => s.WithIntervalInSeconds(10).RepeatForever())
                 .WithSimpleSchedule(s => s.WithIntervalInMinutes(_configOption.MoveMinutes).RepeatForever())
                 .StartNow()
                 .Build();
-            _configOption = configureOptions.Value;
-            _searchPattern = $"*{_configOption.VideoSuffix}";
         }
 
 
