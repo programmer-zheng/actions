@@ -40,8 +40,8 @@ namespace VideoMerge
         {
             JobDetail = JobBuilder.Create<MiVideoMoveWorker>().WithIdentity(nameof(MiVideoMoveWorker)).Build();
             Trigger = TriggerBuilder.Create().WithIdentity(nameof(MiVideoMoveWorker))
-                // .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(10, 0))
-                .WithSimpleSchedule(s => s.WithIntervalInHours(1))
+                // .WithSimpleSchedule(s => s.WithIntervalInSeconds(10).RepeatForever())
+                .WithSimpleSchedule(s => s.WithIntervalInHours(1).RepeatForever())
                 .StartNow()
                 .Build();
             _configOption = configureOptions.Value;
