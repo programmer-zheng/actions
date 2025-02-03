@@ -2,11 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoMerge", "VideoMerge.csproj", "{B17F51FF-A8EB-4029-A002-77D512FE6FFC}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFolder", "SolutionFolder", "{5CDCFA91-A0CE-4E7C-9741-2942AE12D68E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "github_actions", "github_actions", "{5CDCFA91-A0CE-4E7C-9741-2942AE12D68E}"
 	ProjectSection(SolutionItems) = preProject
 		..\..\.github\workflows\dotnet-video-merge.yml = ..\..\.github\workflows\dotnet-video-merge.yml
-		README.MD = README.MD
-		Dockerfile = Dockerfile
 	EndProjectSection
 EndProject
 Global
