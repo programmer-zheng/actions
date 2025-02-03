@@ -29,5 +29,11 @@ namespace VideoMerge
         /// </summary>
         [Required]
         public int KeepDays { get; set; }
+
+        /// <summary>
+        /// 移动视频文件周期（单位分钟）
+        /// </summary>
+        [Required]
+        public int MoveMinutes { get; set; }
     }
 }

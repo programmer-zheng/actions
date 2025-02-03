@@ -41,7 +41,7 @@ namespace VideoMerge
             JobDetail = JobBuilder.Create<MiVideoMoveWorker>().WithIdentity(nameof(MiVideoMoveWorker)).Build();
             Trigger = TriggerBuilder.Create().WithIdentity(nameof(MiVideoMoveWorker))
                 // .WithSimpleSchedule(s => s.WithIntervalInSeconds(10).RepeatForever())
-                .WithSimpleSchedule(s => s.WithIntervalInHours(1).RepeatForever())
+                .WithSimpleSchedule(s => s.WithIntervalInMinutes(_configOption.MoveMinutes).RepeatForever())
                 .StartNow()
                 .Build();
             _configOption = configureOptions.Value;
@@ -64,7 +64,7 @@ namespace VideoMerge
 
             // 按日期分组
             var groupList = rootFiles
-                .Where(t => t.LastModifyTime < DateTime.Now.AddHours(-1))
+                .Where(t => t.LastModifyTime < DateTime.Now.AddMinutes(-_configOption.MoveMinutes))
                 .GroupBy(t => t.EndTime.Date)
                 .Select(t => new
                 {
