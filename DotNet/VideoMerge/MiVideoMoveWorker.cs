@@ -100,6 +100,7 @@ namespace VideoMerge
             }
 
             DeleteExpiredFiles();
+            Logger.LogInformation($"视频移动完成");
         }
 
         /// <summary>

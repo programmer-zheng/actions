@@ -25,7 +25,6 @@ jobs:
             ${{ secrets.DOCKER_HUB_USERNAME }}/video-merge
           # generate Docker tags based on the following events/attributes
           tags: |
-            type=ref,event=branch
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
