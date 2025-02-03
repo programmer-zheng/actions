@@ -61,8 +61,6 @@ namespace VideoMerge
             // 获取根目录下的文件
             var rootFiles = GetRootFiles(_configOption.BaseDirectory);
 
-            var dates = rootFiles.Select(t => t.EndTime).Distinct().ToList();
-            CreateFolder(_configOption.BaseDirectory, dates);
 
             // 按日期分组
             var groupList = rootFiles
@@ -75,6 +73,8 @@ namespace VideoMerge
                 })
                 .ToList();
 
+            var dates = groupList.Select(t => t.Date).Distinct().ToList();
+            CreateFolder(_configOption.BaseDirectory, dates);
             foreach (var item in groupList)
             {
                 // 将相应日期的视频文件移到对应日期的文件夹下
@@ -83,6 +83,13 @@ namespace VideoMerge
                     var destFile = Path.Combine(_configOption.BaseDirectory, item.Date.ToString("yyyy-MM-dd"), videoFile.FileName);
                     try
                     {
+                        if (File.Exists(destFile))
+                        {
+                            // 如果目标文件已经存在，删除源文件
+                            File.Delete(videoFile.FileFullPath);
+                            continue;
+                        }
+
                         File.Move(videoFile.FileFullPath, destFile);
                     }
                     catch (Exception e)
@@ -142,8 +149,8 @@ namespace VideoMerge
                     var fileName = item.Name;
                     var arr = fileName.Split(["_", "."], StringSplitOptions.RemoveEmptyEntries);
                     var type = arr[0];
-                    var startTime = DateTime.ParseExact(arr[1].Substring(0, 8), "yyyyMMdd", CultureInfo.InvariantCulture);
-                    var dateTime = DateTime.ParseExact(arr[2].Substring(0, 8), "yyyyMMdd", CultureInfo.InvariantCulture);
+                    var startTime = DateTime.ParseExact(arr[1], "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
+                    var dateTime = DateTime.ParseExact(arr[2], "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
                     list.Add(new MergeDto
                     {
                         VideoType = type,

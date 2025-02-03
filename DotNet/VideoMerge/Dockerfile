@@ -22,6 +22,8 @@ RUN dotnet build "VideoMerge.csproj" -c Release -o /app/build
 FROM build AS publish
 RUN dotnet publish "VideoMerge.csproj" -c Release -o /app/publish /p:UseAppHost=false
 RUN sed -i 's/"BaseDirectory"[^,\n]*/"BaseDirectory":"\/app\/videos"/g' /app/publish/appsettings.json 
+# 修改日志级别
+RUN sed -i 's/"Default"[^,\n]*/"Default":"Information"/g' /app/publish/appsettings.json 
 
 
 FROM base AS final
