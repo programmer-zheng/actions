@@ -1,6 +1,15 @@
-@Scalar_HostAddress = http://localhost:5186
+@Scalar_HostAddress = https://localhost:51871
 
-GET {{Scalar_HostAddress}}/weatherforecast/
-Accept: application/json
+### 正常情况下，返回包装后的结果 
+GET {{Scalar_HostAddress}}/api/WeatherForecast/FutureDates?days=5
 
-###
+### 异常情况，返回错误码及错误信息                   
+GET {{Scalar_HostAddress}}/api/WeatherForecast/FutureDates?days=11
+
+### 模型验证失败，返回错误码及错误信息                   
+POST {{Scalar_HostAddress}}/api/WeatherForecast/ModelBindTest
+Content-Type: application/json
+
+{
+  "IsStudent": null
+}

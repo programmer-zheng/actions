@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Mvc;
 using Scalar.AspNetCore;
+using Scalar.Filters;
 
 namespace Scalar
 {
@@ -13,12 +15,23 @@ namespace Scalar
             builder.Services.AddControllers(options =>
             {
                 // 添加自定义过滤器
-                options.Filters.Add<CustomActionFilter>();
+                // options.Filters.Add(typeof(CustomValidFilter), 1);
+                // options.Filters.Add(typeof(CustomResultFilter), 2);
+                // options.Filters.Add(typeof(CustomExceptionFilter), 3);
+                options.Filters.Add<CustomValidFilter>();
+                options.Filters.Add<CustomResultFilter>();
+                options.Filters.Add<CustomExceptionFilter>();
             });
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                // 关闭 [ApiController] 自动返回 400 的行为
+                options.SuppressModelStateInvalidFilter = true;
+            });
 
             var app = builder.Build();
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
