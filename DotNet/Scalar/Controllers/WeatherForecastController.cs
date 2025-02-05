@@ -26,7 +26,7 @@ namespace Scalar.Controllers
         /// <returns></returns>
         [HttpGet("GetWeatherForecast")]
         [EndpointDescription("未来几天天气")]
-        public IEnumerable<WeatherForecast> GetWeatherForecast([Required, Range(1, 10),Description("指定未来几天")] int days = 5)
+        public IEnumerable<WeatherForecast> GetWeatherForecast([Required, Range(1, 10), Description("指定未来几天")] int days = 5)
         {
             return Enumerable.Range(1, days).Select(index => new WeatherForecast
                 {
@@ -39,8 +39,13 @@ namespace Scalar.Controllers
 
         [HttpGet("FutureDates")]
         [EndpointDescription("未来几天日期")]
-        public IEnumerable<DateOnly> FutureDates([Required, Range(1, 10),Description("指定未来几天")] int days = 5)
+        public IEnumerable<DateOnly> FutureDates([Required, Description("指定未来几天")] int days = 5)
         {
+            if (days > 10)
+            {
+                throw new CustomException(5001, "只能查询未来10天以内日期");
+            }
+
             return Enumerable.Range(1, days).Select(index => DateOnly.FromDateTime(DateTime.Now.AddDays(index)));
         }
     }
