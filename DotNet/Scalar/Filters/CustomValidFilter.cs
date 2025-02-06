@@ -14,10 +14,10 @@ public class CustomValidFilter : IAsyncActionFilter
                 .Where(t => t.ValidationState == ModelValidationState.Invalid)
                 .Select(t => t.Errors.FirstOrDefault()?.ErrorMessage ?? "")
                 .ToList();
-            var rsp = new ApiResponse()
+            var rsp = new ApiResponse
             {
                 Code = 400,
-                Message = string.Join(",", errorMessages),
+                Message = string.Join(",", errorMessages)
             };
             context.Result = new ObjectResult(rsp)
             {

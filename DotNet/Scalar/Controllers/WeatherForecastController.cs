@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using Scalar.Dtos;
 
 namespace Scalar.Controllers;
 
@@ -21,13 +22,13 @@ public class WeatherForecastController : ControllerBase
     }
 
     /// <summary>
-    /// 未来几天天气
+    ///     未来几天天气
     /// </summary>
     /// <param name="days">指定未来几天</param>
     /// <returns></returns>
     [HttpGet]
     [EndpointDescription("未来几天天气")]
-    public IEnumerable<WeatherForecast> GetWeatherForecast([Required, Range(1, 10), Description("指定未来几天")] int days = 5)
+    public IEnumerable<WeatherForecast> GetWeatherForecast([Required] [Range(1, 10)] [Description("指定未来几天")] int days = 5)
     {
         return Enumerable.Range(1, days).Select(index => new WeatherForecast
             {
@@ -40,30 +41,21 @@ public class WeatherForecastController : ControllerBase
 
     [HttpGet]
     [EndpointDescription("未来几天日期")]
-    public IEnumerable<DateOnly> FutureDates([Required, Description("指定未来几天")] int days = 5)
+    public IEnumerable<DateOnly> FutureDates([Required] [Description("指定未来几天")] int days = 5)
     {
-        if (days > 10)
-        {
-            throw new CustomException(5001, "只能查询未来10天以内日期");
-        }
+        if (days > 10) throw new CustomException(5001, "只能查询未来10天以内日期");
 
         return Enumerable.Range(1, days).Select(index => DateOnly.FromDateTime(DateTime.Now.AddDays(index)));
     }
 
+    /// <summary>
+    ///     模型绑定测试
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     [HttpPost]
     public ModelBindTestDto ModelBindTest([FromBody] ModelBindTestDto model)
     {
         return model;
     }
-}
-
-public class ModelBindTestDto
-{
-    public string Name { get; set; }
-
-    [Range(1, 200), DefaultValue(100)]
-    public int Age { get; set; }
-
-
-    public bool IsStudent { get; set; }
 }

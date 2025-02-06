@@ -9,7 +9,7 @@ public class CustomResultFilter : IAsyncResultFilter
     {
         if (context.Result is ObjectResult objectResult && objectResult.StatusCode == null)
         {
-            var rsp = new ApiResponse()
+            var rsp = new ApiResponse
             {
                 Code = objectResult.StatusCode ?? 200, Message = "success",
                 Data = objectResult.Value

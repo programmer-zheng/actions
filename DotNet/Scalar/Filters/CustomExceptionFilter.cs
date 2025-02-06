@@ -8,15 +8,12 @@ public class CustomExceptionFilter : IAsyncExceptionFilter
     public Task OnExceptionAsync(ExceptionContext context)
     {
         var code = 500;
-        if (context.Exception is CustomException customException)
-        {
-            code = customException.Code;
-        }
+        if (context.Exception is CustomException customException) code = customException.Code;
 
-        context.Result = new ObjectResult(new ApiResponse()
+        context.Result = new ObjectResult(new ApiResponse
         {
             Code = code, // context.HttpContext.Response.StatusCode,
-            Message = context.Exception.Message,
+            Message = context.Exception.Message
         });
         return Task.CompletedTask;
     }

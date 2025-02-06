@@ -22,7 +22,7 @@ public class CustomNotFoundMiddleware
             var response = new ApiResponse
             {
                 Code = 404,
-                Message = "The requested resource was not found.",
+                Message = "The requested resource was not found."
             };
 
             await context.Response.WriteAsJsonAsync(response);
