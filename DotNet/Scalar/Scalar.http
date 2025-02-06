@@ -13,3 +13,6 @@ Content-Type: application/json
 {
   "IsStudent": null
 }
+
+### 访问不存在的api地址                   
+GET {{Scalar_HostAddress}}/api/WeatherForecast/NotFoundApi

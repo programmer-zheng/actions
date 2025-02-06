@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Scalar.AspNetCore;
 using Scalar.Filters;
+using Scalar.Middleware;
 
 namespace Scalar
 {
@@ -69,6 +70,7 @@ namespace Scalar
 
             app.UseRouting();
 
+            app.UseMiddleware<CustomNotFoundMiddleware>();
             // app.MapControllers();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllerRoute("Default", "{controller}/{action}/{id?}"); });
