@@ -12,11 +12,13 @@
 #    && rm -rf ffmpeg-release-amd64-static.tar.xz ffmpeg-*-static
 
 ########## 方式二：通过ADD指令，添加压缩包会自动解压，拷贝文件到相关目录，移除解压目录和源文件 ##########
-ADD ffmpeg-release-amd64-static.tar.xz /
-RUN cp /ffmpeg-*-static/ffmpeg /usr/local/bin/ffmpeg \
-    && rm -rf /ffmpeg-release-amd64-static.tar.xz /ffmpeg-*-static
+#ADD ffmpeg-release-amd64-static.tar.xz /
+#RUN cp /ffmpeg-*-static/ffmpeg /usr/local/bin/ffmpeg \
+#    && rm -rf /ffmpeg-release-amd64-static.tar.xz /ffmpeg-*-static
 
+######### 方式三：将压缩包通过ADD指令添加到 build 镜像中，最终将编译结果与解压的文件一同复制到相关目录 ##########
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ADD ffmpeg-release-amd64-static.tar.xz /
 WORKDIR /src
 COPY ["VideoMerge.csproj", "./"]
 RUN dotnet restore "VideoMerge.csproj"
@@ -35,5 +37,6 @@ FROM base AS final
 RUN echo "Asia/Shanghai" > /etc/timezone
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY --from=publish /ffmpeg-*-static/ffmpeg /usr/local/bin/ffmpeg
 ENV TZ=Asia/Shanghai
 ENTRYPOINT ["dotnet", "VideoMerge.dll"]
