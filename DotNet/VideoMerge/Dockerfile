@@ -1,15 +1,20 @@
 ﻿FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
 
-# 安装 xz-utils 以支持 .tar.xz 文件解压
-RUN apt-get update && apt-get install -y xz-utils \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* 
+########## 方式一：安装解压工具，解压文件后，复制相关文件到指定目录，移除解压目录和源文件 ##########
+## 安装 xz-utils 以支持 .tar.xz 文件解压
+#RUN apt-get update && apt-get install -y xz-utils \
+#    && apt-get clean && rm -rf /var/lib/apt/lists/* 
 
-# 拷贝本地ffmpeg文件包到基础镜像中，解压后拷贝至相关目录
-COPY ffmpeg-release-amd64-static.tar.xz .
-RUN tar -xvf ffmpeg-release-amd64-static.tar.xz \
-    && cp ffmpeg-*-static/ffmpeg /usr/local/bin/ffmpeg \
-#    && cp ffmpeg-*-static/ffprobe /usr/local/bin/ffprobe \ # 目前用不到不复制
-    && rm -rf ffmpeg-release-amd64-static.tar.xz ffmpeg-*-static
+## 拷贝本地ffmpeg文件包到基础镜像中，解压后拷贝至相关目录
+#COPY ffmpeg-release-amd64-static.tar.xz .
+#RUN tar -xvf ffmpeg-release-amd64-static.tar.xz \
+#    && cp ffmpeg-*-static/ffmpeg /usr/local/bin/ffmpeg \
+#    && rm -rf ffmpeg-release-amd64-static.tar.xz ffmpeg-*-static
+
+########## 方式二：通过ADD指令，添加压缩包会自动解压，拷贝文件到相关目录，移除解压目录和源文件 ##########
+ADD ffmpeg-release-amd64-static.tar.xz /
+RUN cp /ffmpeg-*-static/ffmpeg /usr/local/bin/ffmpeg \
+    && rm -rf /ffmpeg-release-amd64-static.tar.xz /ffmpeg-*-static
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
