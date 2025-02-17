@@ -1,4 +1,5 @@
-﻿using Opc.Ua;
+﻿using Newtonsoft.Json;
+using Opc.Ua;
 using Opc.Ua.Client;
 
 namespace OpcDemo;
@@ -51,9 +52,16 @@ public class OpcUaClient
         }
     }
 
-    public void AddSubcription(string subscriptionName, string[] subNodeIds, Action<MonitoredItem, MonitoredItemNotificationEventArgs> callback)
+    /// <summary>
+    /// 添加订阅
+    /// </summary>
+    /// <param name="subscriptionName">订阅名称</param>
+    /// <param name="subNodeIds">订阅的节点数组，注意：不能是父节点，必须是具体有值的子节点</param>
+    /// <param name="callback">订阅回调</param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public void AddSubscription(string subscriptionName, string[] subNodeIds, Action<MonitoredItem, MonitoredItemNotificationEventArgs> callback)
     {
-        if (subNodeIds?.Length == 0)
+        if (subNodeIds == null || subNodeIds.Length == 0)
         {
             throw new ArgumentNullException(nameof(subNodeIds), "订阅节点不能为空");
         }
@@ -84,9 +92,10 @@ public class OpcUaClient
                 monitoredItem.Notification += (item, args) => callback(item, args);
                 subscription.AddItem(monitoredItem);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Console.WriteLine($"无法为{subNodeIds[i]}添加订阅");
+                throw;
             }
         }
 
@@ -129,22 +138,21 @@ public class OpcUaClient
         ClientBase.ValidateResponse(valueCollection, nodesToRead);
         ClientBase.ValidateDiagnosticInfos(diagnosticInfoCollection, nodesToRead);
         var list = new List<object>();
-        Console.WriteLine($"{new string('=', 10)} 批量读取节点值 {new string('=', 10)}");
         for (var i = 0; i < valueCollection.Count; i++)
         {
             DataValue dataValue = valueCollection[i];
             var nodeId = nodesToRead[i].NodeId;
 
-            // 打印节点值
-            Console.WriteLine($"{dataValue.ServerTimestamp:yyyy-MM-dd HH:mm:ss} -> NodeId: {nodeId}  Value: {dataValue.Value}");
             list.Add(new
             {
                 Timestamp = $"{dataValue.ServerTimestamp:yyyy-MM-dd HH:mm:ss}",
                 NodeId = nodeId,
-                Value = dataValue.Value,
+                dataValue.Value,
             });
         }
 
+        Console.WriteLine($"{new string('=', 10)} 批量读取节点值 {new string('=', 10)}");
+        Console.WriteLine(JsonConvert.SerializeObject(list));
         Console.WriteLine();
 
         return list;
@@ -155,7 +163,7 @@ public class OpcUaClient
     /// </summary>
     /// <param name="nodeId"></param>
     /// <returns></returns>
-    public object ReadNode(string nodeId)
+    public object? ReadNode(string nodeId)
     {
         try
         {
@@ -165,19 +173,17 @@ public class OpcUaClient
             }
 
             // 创建一个读取请求
-            ReadValueIdCollection nodesToRead = new ReadValueIdCollection
-            {
+            ReadValueIdCollection nodesToRead =
+            [
                 new ReadValueId
                 {
                     NodeId = NodeId.Parse(nodeId),
                     AttributeId = Attributes.Value
                 }
-            };
+            ];
 
             // 读取节点的值
-            DataValueCollection results;
-            DiagnosticInfoCollection diagnosticInfos;
-            session.Read(null, 0, TimestampsToReturn.Both, nodesToRead, out results, out diagnosticInfos);
+            session.Read(null, 0, TimestampsToReturn.Both, nodesToRead, out var results, out var diagnosticInfos);
 
             // 检查读取结果
             ClientBase.ValidateResponse(results, nodesToRead);
@@ -210,7 +216,6 @@ public class OpcUaClient
         {
             session.Close();
             session.Dispose();
-            Console.WriteLine("已断开连接");
         }
     }
 }

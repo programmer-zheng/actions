@@ -1,4 +1,7 @@
-﻿namespace OpcDemo;
+﻿using Newtonsoft.Json;
+using Opc.Ua;
+
+namespace OpcDemo;
 
 class Program
 {
@@ -16,22 +19,24 @@ class Program
 
         // 批量读取节点
         var parentNodeId = "ns=3;s=85/0:Simulation";
-        var list = client.BatchReadWithParentNodeId(parentNodeId);
+        client.BatchReadWithParentNodeId(parentNodeId);
 
-        var subscriptionNodes = new string[]
+        var subscriptionNodes = new[]
         {
             "ns=3;i=1001",
-            "ns=3;i=1005"
+            "ns=3;i=1005",
         };
-        client.AddSubcription("订阅", subscriptionNodes, (monitoredItem, e) =>
+        client.AddSubscription("订阅", subscriptionNodes, (monitoredItem, e) =>
         {
-            foreach (var notification in monitoredItem.DequeueValues())
+            MonitoredItemNotification notification = e.NotificationValue as MonitoredItemNotification;
+            foreach (var item in monitoredItem.DequeueValues())
             {
-                Console.WriteLine($"{notification.ServerTimestamp:yyyy-MM-dd HHmm:ss} 节点 {monitoredItem.DisplayName} 的值更新为: {notification.Value}");
+                Console.WriteLine(JsonConvert.SerializeObject(notification));
+                Console.WriteLine($"{item.ServerTimestamp:yyyy-MM-dd HHmm:ss} 节点 {monitoredItem.DisplayName} 的值更新为: {item.Value}");
             }
         });
 
-        Console.ReadKey();
+        // Console.ReadKey();
 
         client.Disconnect();
     }
