@@ -7,6 +7,7 @@ class Program
         // 测试从 OPC UA Simulation Server 读取数据
         var client = new OpcUaClient();
         var serverUrl = "opc.tcp://127.0.0.1:53530/OPCUA/SimulationServer";
+        serverUrl = "opc.tcp://192.168.188.35:53530/OPCUA/SimulationServer";
         client.Connect(serverUrl);
 
         // 读取节点（示例节点ID，需替换为实际节点）
