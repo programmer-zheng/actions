@@ -158,6 +158,41 @@ public class OpcUaClient
         return list;
     }
 
+    public void WriteValue(string nodeId, object value)
+    {
+        try
+        {
+            WriteValueCollection nodesToWrite =
+            [
+                new WriteValue()
+                {
+                    NodeId = new NodeId(nodeId),
+                    AttributeId = Attributes.Value,
+                    Value = new DataValue()
+                    {
+                        Value = value, // 设置要写入的值
+                        StatusCode = StatusCodes.Good
+                    }
+                }
+            ];
+            session.Write(null, nodesToWrite, out var results, out var diagnosticInfos);
+            ClientBase.ValidateResponse(results, nodesToWrite);
+            ClientBase.ValidateDiagnosticInfos(diagnosticInfos, nodesToWrite);
+            if (!StatusCode.IsGood(results[0]))
+            {
+                throw new Exception($"{results[0]},节点 {nodeId} 的值更新失败");
+            }
+            else
+            {
+                Console.WriteLine($"节点 {nodeId} 的值更新成功");
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"写入失败: {e.Message}");
+        }
+    }
+
     /// <summary>
     /// 读取单个节点的值
     /// </summary>

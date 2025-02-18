@@ -13,8 +13,11 @@ class Program
         serverUrl = "opc.tcp://192.168.188.35:53530/OPCUA/SimulationServer";
         client.Connect(serverUrl);
 
-        // 读取节点（示例节点ID，需替换为实际节点）
-        var value = client.ReadNode("ns=3;i=1002");
+        // 写入数据
+        client.WriteValue("ns=3;i=1007", 1.0d);
+
+        // 读取节点数据（示例节点ID，需替换为实际节点）
+        var value = client.ReadNode("ns=3;i=1007");
         Console.WriteLine($"读取到的值: {value}");
 
         // 批量读取节点
