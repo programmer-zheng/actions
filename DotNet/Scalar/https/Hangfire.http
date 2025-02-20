@@ -1,0 +1,9 @@
+@Scalar_HostAddress = http://localhost:5186
+
+### 创建重复执行的任务 
+GET {{Scalar_HostAddress}}/api/Hangfire/RecurringJob
+
+
+### 删除重复执行的任务 
+GET {{Scalar_HostAddress}}/api/Hangfire/RemoveJob
+
