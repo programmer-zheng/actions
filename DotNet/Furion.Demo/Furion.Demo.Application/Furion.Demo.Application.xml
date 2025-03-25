@@ -4,7 +4,7 @@
         <name>Furion.Demo.Application</name>
     </assembly>
     <members>
-        <member name="M:Furion.Demo.Application.System.Services.FurionDemoApi.SayHello">
+        <member name="M:Furion.Demo.Application.System.FurionDemoApiAppService.SayHello">
             <summary>
             打招呼
             </summary>

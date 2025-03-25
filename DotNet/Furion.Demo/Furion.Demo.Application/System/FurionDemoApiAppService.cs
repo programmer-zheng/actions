@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Furion.Demo.Application.System.Services;
+namespace Furion.Demo.Application.System;
 
-public class FurionDemoApi : IDynamicApiController
+[ApiDescriptionSettings("CustomGroup","CustomGroup2", Description = "自定义分组")]
+[Route("api/FurionDemoApi")]
+public class FurionDemoApiAppService : IDynamicApiController
 {
 
     /// <summary>
