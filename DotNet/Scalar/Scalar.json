@@ -1,0 +1,273 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Scalar | v1",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/Hangfire/RecurringJob": {
+      "get": {
+        "tags": [
+          "Hangfire"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Hangfire/RemoveJob": {
+      "get": {
+        "tags": [
+          "Hangfire"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Quartz/RecurringJob": {
+      "get": {
+        "tags": [
+          "Quartz"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Quartz/RemoveJob": {
+      "get": {
+        "tags": [
+          "Quartz"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/WeatherForecast/GetWeatherForecast": {
+      "get": {
+        "tags": [
+          "WeatherForecast"
+        ],
+        "description": "未来几天天气",
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "description": "指定未来几天",
+            "required": true,
+            "schema": {
+              "maximum": 10,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 5
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WeatherForecast"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WeatherForecast"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WeatherForecast"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/WeatherForecast/FutureDates": {
+      "get": {
+        "tags": [
+          "WeatherForecast"
+        ],
+        "description": "未来几天日期",
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "description": "指定未来几天",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 5
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/WeatherForecast/ModelBindTest": {
+      "post": {
+        "tags": [
+          "WeatherForecast"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModelBindTestDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModelBindTestDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModelBindTestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelBindTestDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelBindTestDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelBindTestDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ModelBindTestDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "age": {
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32",
+            "default": 100
+          },
+          "isStudent": {
+            "type": "boolean"
+          }
+        }
+      },
+      "WeatherForecast": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "日期",
+            "format": "date"
+          },
+          "temperatureC": {
+            "type": "integer",
+            "description": "摄氏度",
+            "format": "int32"
+          },
+          "temperatureF": {
+            "type": "integer",
+            "description": "华氏度",
+            "format": "int32"
+          },
+          "summary": {
+            "type": "string",
+            "description": "描述",
+            "nullable": true
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Hangfire"
+    },
+    {
+      "name": "Quartz"
+    },
+    {
+      "name": "WeatherForecast"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+﻿@Scalar_HostAddress = http://localhost:15186
+
+### 单例测试 
+GET {{Scalar_HostAddress}}/SingletonTest/Get
+
+### 作用域测试 
+GET {{Scalar_HostAddress}}/ScopedTest/Get
+
+### 瞬态测试
+GET {{Scalar_HostAddress}}/TransientTest/Get
