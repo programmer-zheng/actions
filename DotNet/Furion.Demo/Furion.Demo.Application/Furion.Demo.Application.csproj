@@ -23,8 +23,4 @@
 		<ProjectReference Include="..\Furion.Demo.Core\Furion.Demo.Core.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<Folder Include="System\Services\" />
-	</ItemGroup>
-
 </Project>
