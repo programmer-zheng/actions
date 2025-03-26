@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Threading.Channels;
 
 namespace Furion.Demo.Web.Core;
 
@@ -15,8 +16,15 @@ public class Startup : AppStartup
 
         services.AddCorsAccessor();
 
+        services.AddEventBus();// 添加事件总线
+
         services.AddControllers()
                 .AddInjectWithUnifyResult();
+
+        var monitorChannel = Channel.CreateUnbounded<string>();
+        services.AddKeyedSingleton<Channel<string>>("Monitor", Channel.CreateUnbounded<string>());
+
+
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
