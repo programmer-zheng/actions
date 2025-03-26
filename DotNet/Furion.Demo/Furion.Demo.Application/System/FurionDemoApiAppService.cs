@@ -67,7 +67,6 @@ public class FurionDemoApiAppService : IDynamicApiController, ITransient
                     await _channel.Writer.WriteAsync("data: 200 from task\n\n").ConfigureAwait(false);
                     await Task.Delay(1000);
                 }
-                _channel.Writer.Complete();
             });
             await foreach (var message in _channel.Reader.ReadAllAsync())
             {
