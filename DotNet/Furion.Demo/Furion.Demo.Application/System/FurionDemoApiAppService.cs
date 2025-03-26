@@ -58,16 +58,16 @@ public class FurionDemoApiAppService : IDynamicApiController, ITransient
         httpContext.Response.Headers.Add("Connection", "keep-alive");
         try
         {
-            await _channel.Writer.WriteAsync("data: 200\n\n").ConfigureAwait(false);
-            _ = Task.Run(async () =>
-            {
-                while (!httpContext.RequestAborted.IsCancellationRequested)
-                {
+            await _channel.Writer.WriteAsync("data: \n");
+            //_ = Task.Run(async () =>
+            //{
+            //    while (!httpContext.RequestAborted.IsCancellationRequested)
+            //    {
 
-                    await _channel.Writer.WriteAsync("data: 200 from task\n\n").ConfigureAwait(false);
-                    await Task.Delay(1000);
-                }
-            });
+            //        await _channel.Writer.WriteAsync("data: 200 from task\n\n").ConfigureAwait(false);
+            //        await Task.Delay(1000);
+            //    }
+            //});
             await foreach (var message in _channel.Reader.ReadAllAsync())
             {
                 if (httpContext.RequestAborted.IsCancellationRequested)
@@ -75,8 +75,8 @@ public class FurionDemoApiAppService : IDynamicApiController, ITransient
                     break;
                 }
                 var dataPage = Encoding.UTF8.GetBytes(message);
-                await httpContext.Response.Body.WriteAsync(dataPage, 0, dataPage.Length).ConfigureAwait(false);
-                await httpContext.Response.Body.FlushAsync().ConfigureAwait(false);
+                await httpContext.Response.Body.WriteAsync(dataPage, 0, dataPage.Length);
+                await httpContext.Response.Body.FlushAsync();
                 //await _channel.Writer.WriteAsync(message);
             }
         }
