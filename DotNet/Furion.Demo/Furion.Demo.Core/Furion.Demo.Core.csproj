@@ -12,10 +12,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Furion.Extras.Authentication.JwtBearer"  />
+		<PackageReference Include="Furion.Extras.Authentication.JwtBearer" />
 		<PackageReference Include="Furion.Extras.ObjectMapper.Mapster" />
 		<PackageReference Include="Furion.Pure" />
+		<PackageReference Include="SqlSugar.TDengineCore" />
 		<PackageReference Include="SqlSugarCore" />
+		<PackageReference Include="TDengine.Ado.Data" />
 	</ItemGroup>
 
 </Project>

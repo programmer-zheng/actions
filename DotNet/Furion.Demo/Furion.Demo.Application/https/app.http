@@ -3,3 +3,8 @@
 ### 发送消息，测试事件订阅
 GET {{HostAddress}}/api/FurionDemoApi/send-message
 
+### TdEngine测试插入
+GET {{HostAddress}}/api/td-engine
+
+### TdEngine测试查询
+GET {{HostAddress}}/api/td-engine/test

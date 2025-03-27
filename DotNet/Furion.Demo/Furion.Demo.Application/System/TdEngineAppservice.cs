@@ -20,6 +20,13 @@ public class TdEngineAppservice : IDynamicApiController
         this.repository = repository;
     }
 
+    [HttpGet]
+    public async Task Insert()
+    {
+        await repository.InsertAsync(new PointDataEntity { PointNumber = "152A01", PointValue = 23.4 });
+    }
+
+    [HttpGet]
     public async Task<object> Test()
     {
         var list = await repository.GetListAsync();

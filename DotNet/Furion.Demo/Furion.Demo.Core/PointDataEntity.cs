@@ -1,4 +1,5 @@
 ﻿using SqlSugar;
+using SqlSugar.TDengine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,18 +9,13 @@ using System.Threading.Tasks;
 namespace Furion.Demo.Core;
 
 [SugarTable("point_data")]
-public class PointDataEntity
+public class PointDataEntity : STable
 {
 
-    /// <summary>
-    /// 测点编号
-    /// </summary>
-    [SugarColumn(ColumnDescription = "测点编号")]
+    [SugarColumn(IsPrimaryKey = true, InsertServerTime = true)]
+    public DateTime ts { get; set; }
+
     public string PointNumber { get; set; }
 
-    /// <summary>
-    /// 测点值
-    /// </summary>
-    [SugarColumn(ColumnDescription = "测点值")]
     public double PointValue { get; set; }
 }

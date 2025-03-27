@@ -16,3 +16,10 @@ dotnet new install Furion.SqlSugar.Template.Api
 # -f 指定.NET版本
 dotnet new furionapi -n Furion.Demo -f net8
 ```
+
+
+## 依赖环境Docker创建
+### tdengine
+``` bash
+docker run -itd --name tdengine --restart always -p 6030:6030 -p 6041:6041 -p 6043:6043 -p 6044-6049:6044-6049 -p 6044-6045:6044-6045/udp -p 6060:6060 tdengine/tdengine:3.3.2.0
+```

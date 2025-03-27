@@ -16,9 +16,6 @@ public class Startup : AppStartup
         services.AddConsoleFormatter();
         services.AddJwt<JwtHandler>();
 
-        // 添加SqlSugar
-        services.AddSingleton<ISqlSugarClient>(DbContext.Instance); // 单例注册
-        services.AddScoped(typeof(SugarRepository<>));
 
 
         services.AddCorsAccessor();
@@ -31,6 +28,7 @@ public class Startup : AppStartup
         var monitorChannel = Channel.CreateUnbounded<string>();
         services.AddKeyedSingleton<Channel<string>>("Monitor", Channel.CreateUnbounded<string>());
 
+        services.AddSqlSugarTdSupport();
 
     }
 

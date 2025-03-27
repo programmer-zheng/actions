@@ -1,12 +1,14 @@
 <Project>
-	<PropertyGroup>
-		<!-- Enable central package management, https://learn.microsoft.com/en-us/nuget/consume-packages/Central-Package-Management -->
-		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-	</PropertyGroup>
-	<ItemGroup>
-		<PackageVersion Include="Furion.Extras.Authentication.JwtBearer" Version="4.9.7.34" />
-		<PackageVersion Include="Furion.Extras.ObjectMapper.Mapster" Version="4.9.7.34" />
-		<PackageVersion Include="Furion.Pure" Version="4.9.7.34" />
-		<PackageVersion Include="SqlSugarCore" Version="5.1.4.185" />
-	</ItemGroup>
+  <PropertyGroup>
+    <!-- Enable central package management, https://learn.microsoft.com/en-us/nuget/consume-packages/Central-Package-Management -->
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Furion.Extras.Authentication.JwtBearer" Version="4.9.7.34" />
+    <PackageVersion Include="Furion.Extras.ObjectMapper.Mapster" Version="4.9.7.34" />
+    <PackageVersion Include="Furion.Pure" Version="4.9.7.34" />
+    <PackageVersion Include="SqlSugar.TDengineCore" Version="4.18.5" />
+    <PackageVersion Include="SqlSugarCore" Version="5.1.4.185" />
+    <PackageVersion Include="TDengine.Ado.Data" Version="3.1.7" />
+  </ItemGroup>
 </Project>
