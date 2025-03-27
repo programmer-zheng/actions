@@ -14,5 +14,15 @@
             SqlSugar 数据库实例
             </summary>
         </member>
+        <member name="P:Furion.Demo.Core.PointDataEntity.PointNumber">
+            <summary>
+            测点编号
+            </summary>
+        </member>
+        <member name="P:Furion.Demo.Core.PointDataEntity.PointValue">
+            <summary>
+            测点值
+            </summary>
+        </member>
     </members>
 </doc>

@@ -1,8 +1,10 @@
 ﻿using Furion;
+using Furion.Demo.Core;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SqlSugar;
 using System.Threading.Channels;
 
 namespace Furion.Demo.Web.Core;
@@ -13,6 +15,11 @@ public class Startup : AppStartup
     {
         services.AddConsoleFormatter();
         services.AddJwt<JwtHandler>();
+
+        // 添加SqlSugar
+        services.AddSingleton<ISqlSugarClient>(DbContext.Instance); // 单例注册
+        services.AddScoped(typeof(SugarRepository<>));
+
 
         services.AddCorsAccessor();
 

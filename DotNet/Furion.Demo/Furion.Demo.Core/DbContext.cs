@@ -17,6 +17,8 @@ public static class DbContext
         App.GetConfig<List<ConnectionConfig>>("ConnectionConfigs")
         , db =>
         {
+            // https://www.donet5.com/Home/Doc?typeId=1181
             // 这里配置全局事件，比如拦截执行 SQL
         });
+
 }
