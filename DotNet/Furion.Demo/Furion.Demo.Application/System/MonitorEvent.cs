@@ -21,7 +21,6 @@ public class MonitorEvent : IEventSubscriber, ISingleton
     [EventSubscribe("Monitor_Event")]
     public async Task HandleEvent(EventHandlerExecutingContext context)
     {
-        var source = context.Source;
         var data = context.GetPayload<CustomMonitorEventDto>();
         await _channel.Writer.WriteAsync($"data: {JsonConvert.SerializeObject(data)} from event \n\n").ConfigureAwait(false);
     }

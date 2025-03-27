@@ -1,0 +1,5 @@
+# For more info on HTTP files go to https://aka.ms/vs/httpfile
+
+### 发送消息，测试事件订阅
+GET {{HostAddress}}/api/FurionDemoApi/send-message
+

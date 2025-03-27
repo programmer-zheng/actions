@@ -32,16 +32,18 @@ public class FurionDemoApiAppService : IDynamicApiController, ITransient
     /// 打招呼
     /// </summary>
     /// <returns></returns>
-    [ActionName("SayHello")]
+    [HttpGet]
     public string SayHello()
     {
         return "Hello Furion";
     }
 
-    public async Task SendMessage()
+    [HttpGet]
+    public async Task<CustomMonitorEventDto> SendMessage()
     {
         var obj = new CustomMonitorEventDto { Id = Random.Shared.Next(10000, 99999), Msg = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") };
         await _eventPublisher.PublishAsync("Monitor_Event", obj);
+        return obj;
     }
 
     [ActionName("ServerSendEvent")]
