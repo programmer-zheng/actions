@@ -11,12 +11,13 @@ public class MySqlAppService : IDynamicApiController
 
     private readonly ISugarRepository<PointEntity> repository;
 
-    private readonly SqlSugarClient _sqlSugarClient;
+    private readonly ISqlSugarClient _sqlSugarClient;
 
-    public MySqlAppService(ISugarRepository<PointEntity> repository, IServiceProvider serviceProvider)
+    public MySqlAppService(ISugarRepository<PointEntity> repository, ISqlSugarClient sqlSugarClient /*IServiceProvider serviceProvider*/)
     {
         this.repository = repository;
-        _sqlSugarClient = serviceProvider.GetKeyedService<SqlSugarClient>("MySQL");
+        _sqlSugarClient = sqlSugarClient;
+        //_sqlSugarClient = serviceProvider.GetKeyedService<SqlSugarClient>("MySQL");
     }
 
 

@@ -19,13 +19,14 @@ public class TdEngineAppservice : IDynamicApiController
 
     // https://www.donet5.com/Home/Doc?typeId=2566
 
-    private readonly ITdSugarRepository<PointDataEntity> repository;
+    private readonly ISugarRepository<PointDataEntity> repository;
 
-    private readonly SqlSugarClient _sqlSugarClient;
+    private readonly ISqlSugarClient _sqlSugarClient;
 
-    public TdEngineAppservice(ITdSugarRepository<PointDataEntity> repository, IServiceProvider serviceProvider)
+    public TdEngineAppservice(ISugarRepository<PointDataEntity> repository,ISqlSugarClient sqlSugarClient /*IServiceProvider serviceProvider*/)
     {
-        _sqlSugarClient = serviceProvider.GetKeyedService<SqlSugarClient>("Td");
+        _sqlSugarClient = sqlSugarClient;
+        //_sqlSugarClient = serviceProvider.GetKeyedService<SqlSugarClient>("Td");
         this.repository = repository;
     }
 
