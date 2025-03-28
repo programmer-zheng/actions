@@ -1,4 +1,8 @@
-﻿using Furion.Demo.Core;
+﻿using Furion.Demo.Application.System.Dtos;
+using Furion.Demo.Core;
+using Furion.HttpRemote;
+using SqlSugar.TDengine;
+using StackExchange.Profiling.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,21 +19,42 @@ public class TdEngineAppservice : IDynamicApiController
 
     private readonly ISugarRepository<PointDataEntity> repository;
 
-    public TdEngineAppservice(ISugarRepository<PointDataEntity> repository)
+    private readonly ISqlSugarClient _sqlSugarClient;
+
+    public TdEngineAppservice(ISugarRepository<PointDataEntity> repository, ISqlSugarClient sqlSugarClient)
     {
         this.repository = repository;
+        _sqlSugarClient = sqlSugarClient;
     }
 
-    [HttpGet]
-    public async Task Insert()
+    /// <summary>
+    /// 往TdEngine中插入数据
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    [HttpPost("InsertTdData")]
+    public async Task CreateAsync(List<CreateTdDataDto> input)
     {
-        await repository.InsertAsync(new PointDataEntity { PointNumber = "152A01", PointValue = 23.4 });
+
+        var data = input.Adapt<List<PointDataEntity>>();
+        data.ForEach(t=>t.PointValue = Random.Shared.Next(10, 50));
+        await _sqlSugarClient.Insertable(data)
+            .SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.SNO}_{it.PointNumber}")
+            .ExecuteCommandAsync();
     }
 
-    [HttpGet]
-    public async Task<object> Test()
+    /// <summary>
+    /// 查询TdEngine中的数据
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    [HttpPost("QueryTdData")]
+    public async Task<object> QueryDataAsync(QueryTdDataDto input)
     {
-        var list = await repository.GetListAsync();
+        var list = await repository.AsQueryable()
+            .WhereIF(!input.Sno.IsNullOrWhiteSpace(), t => t.SNO.Equals(input.Sno))
+            .WhereIF(!input.PointNumber.IsNullOrWhiteSpace(), t => t.PointNumber.Equals(input.PointNumber))
+            .ToListAsync();
         return list;
     }
 }

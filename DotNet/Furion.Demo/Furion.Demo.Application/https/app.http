@@ -4,7 +4,26 @@
 GET {{HostAddress}}/api/FurionDemoApi/send-message
 
 ### TdEngine≤‚ ‘≤Â»Î
-GET {{HostAddress}}/api/td-engine
+POST {{HostAddress}}/api/td-engine/inserttddata
+Content-Type: application/json
+[{
+	"sno": "152",
+	"pointNumber": "152A01",
+	"pointType": "1D"
+}, {
+	"sno": "152",
+	"pointNumber": "152A02",
+	"pointType": "3F"
+}, {
+	"sno": "154",
+	"pointNumber": "154B03",
+	"pointType": "2G"
+}]
 
 ### TdEngine≤‚ ‘≤È—Ø
-GET {{HostAddress}}/api/td-engine/test
+POST {{HostAddress}}/api/td-engine/querytddata
+Content-Type: application/json
+{
+  "sno": "152",
+  "pointNumber": ""
+}

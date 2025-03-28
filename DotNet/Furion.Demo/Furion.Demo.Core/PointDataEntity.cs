@@ -9,11 +9,16 @@ using System.Threading.Tasks;
 namespace Furion.Demo.Core;
 
 [SugarTable("point_data")]
-public class PointDataEntity : STable
+[STable(STableName = "point_data", Tag1 = nameof(SNO), Tag2 = nameof(PointNumber))]
+public class PointDataEntity //: STable
 {
 
     [SugarColumn(IsPrimaryKey = true, InsertServerTime = true)]
     public DateTime ts { get; set; }
+
+    public string SNO { get; set; }
+
+    public string PointType { get; set; }
 
     public string PointNumber { get; set; }
 

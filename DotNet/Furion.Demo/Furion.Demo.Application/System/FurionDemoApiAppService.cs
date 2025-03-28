@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Furion.Demo.Application.System;
 
-[ApiDescriptionSettings("CustomGroup", "CustomGroup2", Description = "自定义分组")]
+[ApiDescriptionSettings("Furion CustomGroup", Description = "自定义分组")]
 [Route("api/FurionDemoApi")]
 public class FurionDemoApiAppService : IDynamicApiController, ITransient
 {
