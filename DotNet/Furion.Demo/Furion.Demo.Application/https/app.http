@@ -2,28 +2,3 @@
 
 ### 发送消息，测试事件订阅
 GET {{HostAddress}}/api/FurionDemoApi/send-message
-
-### TdEngine测试插入
-POST {{HostAddress}}/api/td-engine/inserttddata
-Content-Type: application/json
-[{
-	"sno": "152",
-	"pointNumber": "152A01",
-	"pointType": "1D"
-}, {
-	"sno": "152",
-	"pointNumber": "152A02",
-	"pointType": "3F"
-}, {
-	"sno": "154",
-	"pointNumber": "154B03",
-	"pointType": "2G"
-}]
-
-### TdEngine测试查询
-POST {{HostAddress}}/api/td-engine/querytddata
-Content-Type: application/json
-{
-  "sno": "152",
-  "pointNumber": ""
-}

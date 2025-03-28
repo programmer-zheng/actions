@@ -1,0 +1,30 @@
+### MySQL测试插入
+POST {{HostAddress}}/api/mysql/InsertData
+Content-Type: application/json
+
+[{
+	"sno": "152",
+	"pointNumber": "152A01",
+	"pointType": "1D"
+}, {
+	"sno": "152",
+	"pointNumber": "152A02",
+	"pointType": "3F"
+}, {
+	"sno": "154",
+	"pointNumber": "154B03",
+	"pointType": "2G"
+}]
+
+
+### MySQL测试查询
+POST {{HostAddress}}/api/mysql/QueryData
+Content-Type: application/json
+
+{
+  "sno": "152",
+  "pointNumber": ""
+}
+
+### 备份数据库
+GET {{HostAddress}}/api/mysql/BackupDatabase 

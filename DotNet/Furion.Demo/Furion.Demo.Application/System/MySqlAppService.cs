@@ -1,36 +1,27 @@
 ﻿using Furion.Demo.Application.System.Dtos;
 using Furion.Demo.Core;
-using Furion.HttpRemote;
 using Microsoft.Extensions.DependencyInjection;
-using SqlSugar.TDengine;
 using StackExchange.Profiling.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Furion.Demo.Application.System;
 
-[Route("api/Td")]
-public class TdEngineAppservice : IDynamicApiController
+[Route("api/MySQL")]
+public class MySqlAppService : IDynamicApiController
 {
-    // https://docs.taosdata.com/develop/sql/
 
-    // https://www.donet5.com/Home/Doc?typeId=2566
-
-    private readonly ITdSugarRepository<PointDataEntity> repository;
+    private readonly ISugarRepository<PointEntity> repository;
 
     private readonly SqlSugarClient _sqlSugarClient;
 
-    public TdEngineAppservice(ITdSugarRepository<PointDataEntity> repository, IServiceProvider serviceProvider)
+    public MySqlAppService(ISugarRepository<PointEntity> repository, IServiceProvider serviceProvider)
     {
-        _sqlSugarClient = serviceProvider.GetKeyedService<SqlSugarClient>("Td");
         this.repository = repository;
+        _sqlSugarClient = serviceProvider.GetKeyedService<SqlSugarClient>("MySQL");
     }
 
+
     /// <summary>
-    /// 往TdEngine中插入数据
+    /// 往MySql中插入数据
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
@@ -38,15 +29,14 @@ public class TdEngineAppservice : IDynamicApiController
     public async Task CreateAsync(List<CreateTdDataDto> input)
     {
 
-        var data = input.Adapt<List<PointDataEntity>>();
+        var data = input.Adapt<List<PointEntity>>();
         data.ForEach(t => t.PointValue = Random.Shared.Next(10, 50));
-        await _sqlSugarClient.Insertable(data)
-            .SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.SNO}_{it.PointNumber}")
-            .ExecuteCommandAsync();
+        //await _sqlSugarClient.Insertable(data).ExecuteCommandAsync();
+        await repository.InsertRangeAsync(data);
     }
 
     /// <summary>
-    /// 查询TdEngine中的数据
+    /// 查询MySql中的数据
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
@@ -65,7 +55,7 @@ public class TdEngineAppservice : IDynamicApiController
     {
         try
         {
-            var path = Path.Combine(AppContext.BaseDirectory, "tdbackup.bak");
+            var path = Path.Combine(AppContext.BaseDirectory, "mysql.sql");
             _sqlSugarClient.DbMaintenance.BackupDataBase(_sqlSugarClient.Ado.Connection.Database, path);
             return "success";
         }

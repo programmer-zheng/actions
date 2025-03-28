@@ -28,7 +28,7 @@ public class Startup : AppStartup
         var monitorChannel = Channel.CreateUnbounded<string>();
         services.AddKeyedSingleton<Channel<string>>("Monitor", Channel.CreateUnbounded<string>());
 
-        services.AddSqlSugarTdSupport();
+        services.AddSqlSugar();
 
     }
 
