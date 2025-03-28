@@ -56,8 +56,9 @@ public class MySqlAppService : IDynamicApiController
     {
         try
         {
+            var client = repository.Context;
             var path = Path.Combine(AppContext.BaseDirectory, "mysql.sql");
-            _sqlSugarClient.DbMaintenance.BackupDataBase(_sqlSugarClient.Ado.Connection.Database, path);
+            client.DbMaintenance.BackupDataBase(client.Ado.Connection.Database, path);
             return "success";
         }
         catch (Exception ex)

@@ -21,7 +21,14 @@ public static class SqlSugarSetup
         //var sugarClient = DbContext.Instance;
         // 添加SqlSugar
         var connectionConfigs = App.GetConfig<List<ConnectionConfig>>("ConnectionConfigs");
-        SqlSugarScope sugarClient = new(connectionConfigs);
+        SqlSugarScope sugarClient = new(connectionConfigs, db =>
+        {
+            foreach (var item in connectionConfigs)
+            {
+                var dbProvider = db.GetConnectionScope(item.ConfigId);
+                SetupSugarAop(dbProvider);
+            }
+        });
         SugarScope = sugarClient;
         services.AddSingleton<ISqlSugarClient>(sugarClient);
         services.AddScoped(typeof(ISugarRepository<>), typeof(SugarRepository<>));
@@ -51,4 +58,32 @@ public static class SqlSugarSetup
         }
     }
 
+    private static void SetupSugarAop(SqlSugarScopeProvider db)
+    {
+        db.Aop.OnLogExecuting = (sql, paras) =>
+        {
+            var rawSql = UtilMethods.GetNativeSql(sql, paras);
+            var log = $"【{DateTime.Now}-{db.CurrentConnectionConfig.DbType} Execute SQL】\r\n{sql}\r\n";
+            var originColor = Console.ForegroundColor;
+            if (sql.StartsWith("SELECT", StringComparison.OrdinalIgnoreCase))
+                Console.ForegroundColor = ConsoleColor.Green;
+            if (sql.StartsWith("UPDATE", StringComparison.OrdinalIgnoreCase) || sql.StartsWith("INSERT", StringComparison.OrdinalIgnoreCase))
+                Console.ForegroundColor = ConsoleColor.Yellow;
+            if (sql.StartsWith("DELETE", StringComparison.OrdinalIgnoreCase))
+                Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(log);
+            Console.ForegroundColor = originColor;
+        };
+
+        db.Aop.OnError = (sugarException) =>
+        {
+            if (sugarException.Parametres == null) return;
+            var rawSql = UtilMethods.GetNativeSql(sugarException.Sql, (SugarParameter[])sugarException.Parametres);
+            var log = $"【{DateTime.Now}-{db.CurrentConnectionConfig.DbType} Error SQL】\r\n{rawSql}\r\n";
+            var originColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine(log);
+            Console.ForegroundColor = originColor;
+        };
+    }
 }

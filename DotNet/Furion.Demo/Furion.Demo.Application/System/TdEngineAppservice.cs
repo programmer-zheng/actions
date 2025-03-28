@@ -66,8 +66,9 @@ public class TdEngineAppservice : IDynamicApiController
     {
         try
         {
-            var path = Path.Combine(AppContext.BaseDirectory, "tdbackup.bak");
-            _sqlSugarClient.DbMaintenance.BackupDataBase(_sqlSugarClient.Ado.Connection.Database, path);
+            var client = repository.Context;
+            var path = Path.Combine(AppContext.BaseDirectory, "td.sql");
+            client.DbMaintenance.BackupDataBase(client.Ado.Connection.Database, path);
             return "success";
         }
         catch (Exception ex)
