@@ -1,25 +1,28 @@
 # Furion DEMO
-## ÏîÄ¿³õÊ¼»¯
-### ½ÅÊÖ¼Ü°²×°
-[furion--sqlsugar-½ÅÊÖ¼Ü°²×°](https://furion.net/docs/template#2722-furion--sqlsugar-%E8%84%9A%E6%89%8B%E6%9E%B6%E5%AE%89%E8%A3%85)
+## é¡¹ç›®åˆå§‹åŒ–
+### è„šæ‰‹æ¶å®‰è£…
+[furion--sqlsugar-è„šæ‰‹æ¶å®‰è£…](https://furion.net/docs/template#2722-furion--sqlsugar-%E8%84%9A%E6%89%8B%E6%9E%B6%E5%AE%89%E8%A3%85)
 ``` bash
-# Mvc Ä£°å
+
+# Mvc æ¨¡æ¿
 dotnet new install Furion.SqlSugar.Template.Mvc
 
-# WebApi Ä£°å
+# WebApi æ¨¡æ¿
 dotnet new install Furion.SqlSugar.Template.Api
 ```
 
-### Ê¹ÓÃ½ÅÊÖ¼Ü
+### ä½¿ç”¨è„šæ‰‹æ¶
 ``` bash
-# -n Ö¸¶¨ÏîÄ¿Ãû³Æ 
-# -f Ö¸¶¨.NET°æ±¾
+# -n æŒ‡å®šé¡¹ç›®åç§° 
+# -f æŒ‡å®š.NETç‰ˆæœ¬
 dotnet new furionapi -n Furion.Demo -f net8
 ```
 
 
-## ÒÀÀµ»·¾³Docker´´½¨
+## ä¾èµ–ç¯å¢ƒDockeråˆ›å»º
 ### tdengine
 ``` bash
+
+# Docker åˆ›å»ºtdengine 
 docker run -itd --name tdengine --restart always -p 6030:6030 -p 6041:6041 -p 6043:6043 -p 6044-6049:6044-6049 -p 6044-6045:6044-6045/udp -p 6060:6060 tdengine/tdengine:3.3.2.0
 ```
