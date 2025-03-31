@@ -4,6 +4,16 @@
         <name>Furion.Demo.Core</name>
     </assembly>
     <members>
+        <member name="T:Furion.Demo.Core.TraditionDataTableAttribute">
+            <summary>
+            标记传统关系型数据库表
+            </summary>
+        </member>
+        <member name="T:Furion.Demo.Core.TimingDataTableAttribute">
+            <summary>
+            标记时序数据库表
+            </summary>
+        </member>
         <member name="T:Furion.Demo.Core.DbContext">
             <summary>
             数据库上下文对象
@@ -12,6 +22,11 @@
         <member name="F:Furion.Demo.Core.DbContext.Instance">
             <summary>
             SqlSugar 数据库实例
+            </summary>
+        </member>
+        <member name="T:Furion.Demo.Core.PointEntity">
+            <summary>
+            MySQL数据库中的表
             </summary>
         </member>
     </members>
