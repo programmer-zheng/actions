@@ -71,7 +71,7 @@ public static class SqlSugarSetup
     /// <param name="db"></param>
     private static void SetupSugarAop(SqlSugarProvider db)
     {
-        db.QueryFilter.AddTableFilter<IDeleted>(t => t.IsDeleted == false);
+        db.QueryFilter.AddTableFilter<ISoftDelete>(t => t.IsDeleted == false);
         db.Aop.OnLogExecuting = (sql, paras) =>
         {
             var rawSql = UtilMethods.GetNativeSql(sql, paras);

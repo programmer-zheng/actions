@@ -61,7 +61,7 @@ public class PointEntity : BaseEntity
     public double PointValue { get; set; }
 }
 
-public abstract class BaseEntity : IDeleted
+public abstract class BaseEntity : ISoftDelete
 {
     public long Id { get; set; }
 
@@ -69,11 +69,16 @@ public abstract class BaseEntity : IDeleted
 
     [SugarColumn(IsNullable = true)]
     public DateTime? DeletionTime { get; set; }
+
+    [SugarColumn(IsNullable = true)]
+    public long? DeleterUserId { get; set; }
 }
 
-public interface IDeleted
+public interface ISoftDelete
 {
     bool IsDeleted { get; set; }
 
     DateTime? DeletionTime { get; set; }
+
+    long? DeleterUserId { get; set; }
 }
