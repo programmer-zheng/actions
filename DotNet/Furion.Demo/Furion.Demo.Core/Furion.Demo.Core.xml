@@ -29,5 +29,18 @@
             MySQL数据库中的表
             </summary>
         </member>
+        <member name="M:Furion.Demo.Core.SqlSugarSetup.InitDatabase(SqlSugar.SqlSugarProvider,SqlSugar.DbType)">
+            <summary>
+            初始化数据库
+            </summary>
+            <param name="db"></param>
+            <param name="dbType"></param>
+        </member>
+        <member name="M:Furion.Demo.Core.SqlSugarSetup.SetupSugarAop(SqlSugar.SqlSugarProvider)">
+            <summary>
+            配置Sugar AOP
+            </summary>
+            <param name="db"></param>
+        </member>
     </members>
 </doc>

@@ -46,7 +46,7 @@ public class PointDataEntity
 /// </summary>
 [SugarTable("Point_Data")]
 [TraditionDataTable]
-public class PointEntity
+public class PointEntity : BaseEntity
 {
 
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
@@ -59,4 +59,21 @@ public class PointEntity
     public string PointNumber { get; set; }
 
     public double PointValue { get; set; }
+}
+
+public abstract class BaseEntity : IDeleted
+{
+    public long Id { get; set; }
+
+    public bool IsDeleted { get; set; }
+
+    [SugarColumn(IsNullable = true)]
+    public DateTime? DeletionTime { get; set; }
+}
+
+public interface IDeleted
+{
+    bool IsDeleted { get; set; }
+
+    DateTime? DeletionTime { get; set; }
 }

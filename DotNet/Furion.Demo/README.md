@@ -31,3 +31,42 @@ dotnet new furionapi -n Furion.Demo -f net8
 # Docker 创建tdengine 
 docker run -itd --name tdengine --restart always -p 6030:6030 -p 6041:6041 -p 6043:6043 -p 6044-6049:6044-6049 -p 6044-6045:6044-6045/udp -p 6060:6060 tdengine/tdengine:3.3.2.0
 ```
+
+## 仓储与ISqlSugarClient查询区别
+
+### 仓储
+
+``` c#
+var list = await repository.AsQueryable()
+    .WhereIF(!input.Sno.IsNullOrWhiteSpace(), t => t.SNO.Equals(input.Sno))
+    .WhereIF(!input.PointNumber.IsNullOrWhiteSpace(), t => t.PointNumber.Equals(input.PointNumber))
+    .ToListAsync();
+return list;
+```
+
+
+
+``` sql
+SELECT `Id`,`SNO`,`PointType`,`PointNumber`,`PointValue`,`IsDeleted` 
+FROM `Point_Data`  
+WHERE  (`SNO` = @MethodConst0)   AND ( `IsDeleted` = @IsDeleted1 )
+```
+
+### ISqlSugarClient
+
+``` c#
+var list = await repository.Context.Queryable<PointEntity>()
+   .WhereIF(!input.Sno.IsNullOrWhiteSpace(), t => t.SNO.Equals(input.Sno))
+   .WhereIF(!input.PointNumber.IsNullOrWhiteSpace(), t => t.PointNumber.Equals(input.PointNumber))
+   .Select(t => new { t.SNO, t.PointNumber, t.PointType, t.PointValue })
+   .ToListAsync();
+return list;
+```
+
+
+
+``` sql
+SELECT  `SNO` AS `SNO` , `PointNumber` AS `PointNumber` , `PointType` AS `PointType` , `PointValue` AS `PointValue`  
+FROM `Point_Data`  
+WHERE  (`SNO` = @MethodConst0)   AND ( `IsDeleted` = @IsDeleted1 )
+```

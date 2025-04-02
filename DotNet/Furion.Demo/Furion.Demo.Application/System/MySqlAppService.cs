@@ -29,10 +29,8 @@ public class MySqlAppService : IDynamicApiController
     [HttpPost("InsertData")]
     public async Task CreateAsync(List<CreateTdDataDto> input)
     {
-
         var data = input.Adapt<List<PointEntity>>();
         data.ForEach(t => t.PointValue = Random.Shared.Next(10, 50));
-        //await _sqlSugarClient.Insertable(data).ExecuteCommandAsync();
         await repository.InsertRangeAsync(data);
     }
 
@@ -49,6 +47,25 @@ public class MySqlAppService : IDynamicApiController
             .WhereIF(!input.PointNumber.IsNullOrWhiteSpace(), t => t.PointNumber.Equals(input.PointNumber))
             .ToListAsync();
         return list;
+
+        /*        var list = await repository.Context.Queryable<PointEntity>()
+                    .WhereIF(!input.Sno.IsNullOrWhiteSpace(), t => t.SNO.Equals(input.Sno))
+                    .WhereIF(!input.PointNumber.IsNullOrWhiteSpace(), t => t.PointNumber.Equals(input.PointNumber))
+                    .Select(t => new { t.SNO, t.PointNumber, t.PointType, t.PointValue })
+                    .ToListAsync();
+                return list;*/
+    }
+
+    /// <summary>
+    /// 删除
+    /// </summary>
+    /// <param name="ids"></param>
+    /// <returns></returns>
+    [ActionName("DeleteData")]
+    public async Task<bool> DeleteAsync(List<long> ids)
+    {
+        var result = await repository.DeleteAsync(t => ids.Contains(t.Id));
+        return result;
     }
 
     [HttpGet("BackupDatabase")]

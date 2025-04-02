@@ -28,3 +28,11 @@ Content-Type: application/json
 
 ### 备份数据库
 GET {{HostAddress}}/api/mysql/BackupDatabase 
+
+### 测试删除数据
+DELETE {{HostAddress}}/api/mysql/DeleteData
+Content-Type: application/json
+
+[
+	1
+]

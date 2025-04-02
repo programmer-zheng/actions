@@ -18,15 +18,16 @@ public static class SqlSugarSetup
 
     public static void AddSqlSugar(this IServiceCollection services)
     {
-        //var sugarClient = DbContext.Instance;
         // 添加SqlSugar
         var connectionConfigs = App.GetConfig<List<ConnectionConfig>>("ConnectionConfigs");
         SqlSugarScope sugarClient = new(connectionConfigs, db =>
         {
             foreach (var item in connectionConfigs)
             {
-                var dbProvider = db.GetConnectionScope(item.ConfigId);
+                var dbProvider = db.GetConnection(item.ConfigId);
                 SetupSugarAop(dbProvider);
+                // 之所以不在此初始化数据库，是因为默认启动时，不会立即创建数据库
+                //InitDatabase(dbProvider, item.DbType);
             }
         });
         SugarScope = sugarClient;
@@ -36,19 +37,8 @@ public static class SqlSugarSetup
         {
             foreach (var item in connectionConfigs)
             {
-                var entityTypes = App.EffectiveTypes
-                       .Where(u => !u.IsInterface && !u.IsAbstract && u.IsClass && u.IsDefined(typeof(SugarTable), false))
-                       .WhereIF(item.DbType == DbType.TDengine, u => u.IsDefined(typeof(TimingDataTableAttribute), true))
-                       .WhereIF(item.DbType == DbType.MySql, u => u.IsDefined(typeof(TraditionDataTableAttribute), true))
-                       .ToList();
                 var sqlSugarProvider = sugarClient.GetConnection(item.ConfigId);
-                var currentDbName = sqlSugarProvider.Ado.Connection.Database;// 当前连接的数据库名称
-                sqlSugarProvider.DbMaintenance.CreateDatabase(currentDbName);
-
-                foreach (var entityType in entityTypes)
-                {
-                    sqlSugarProvider.CodeFirst.InitTables(entityType);
-                }
+                InitDatabase(sqlSugarProvider, item.DbType);
             }
         }
         catch (Exception e)
@@ -58,8 +48,30 @@ public static class SqlSugarSetup
         }
     }
 
-    private static void SetupSugarAop(SqlSugarScopeProvider db)
+    /// <summary>
+    /// 初始化数据库
+    /// </summary>
+    /// <param name="db"></param>
+    /// <param name="dbType"></param>
+    private static void InitDatabase(SqlSugarProvider db, DbType dbType)
     {
+        var entityTypes = App.EffectiveTypes
+                       .Where(u => !u.IsInterface && !u.IsAbstract && u.IsClass && u.IsDefined(typeof(SugarTable), false))
+                       .WhereIF(dbType == DbType.TDengine, u => u.IsDefined(typeof(TimingDataTableAttribute), true))
+                       .WhereIF(dbType == DbType.MySql, u => u.IsDefined(typeof(TraditionDataTableAttribute), true))
+                       .ToArray();
+        var databaseName = db.Ado.Connection.Database;
+        db.DbMaintenance.CreateDatabase(databaseName);
+        db.CodeFirst.InitTables(entityTypes);
+    }
+
+    /// <summary>
+    /// 配置Sugar AOP
+    /// </summary>
+    /// <param name="db"></param>
+    private static void SetupSugarAop(SqlSugarProvider db)
+    {
+        db.QueryFilter.AddTableFilter<IDeleted>(t => t.IsDeleted == false);
         db.Aop.OnLogExecuting = (sql, paras) =>
         {
             var rawSql = UtilMethods.GetNativeSql(sql, paras);
