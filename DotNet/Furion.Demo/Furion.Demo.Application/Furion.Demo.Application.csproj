@@ -7,6 +7,12 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <Compile Remove="Monitor\https\**" />
+	  <EmbeddedResource Remove="Monitor\https\**" />
+	  <None Remove="Monitor\https\**" />
+	</ItemGroup>
+
 
 	<ItemGroup>
 		<None Remove="applicationsettings.json" />

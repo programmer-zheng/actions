@@ -1,4 +1,4 @@
-﻿using Furion.Demo.Application.System.Dtos;
+﻿using Furion.Demo.Application.Monitor.Dtos;
 using Furion.EventBus;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
-namespace Furion.Demo.Application.System;
+namespace Furion.Demo.Application.Monitor;
 
 public class MonitorEvent : IEventSubscriber, ISingleton
 {
@@ -18,11 +18,12 @@ public class MonitorEvent : IEventSubscriber, ISingleton
     {
         _channel = serviceProvider.GetKeyedService<Channel<string>>("Monitor");
     }
+
     [EventSubscribe("Monitor_Event")]
     public async Task HandleEvent(EventHandlerExecutingContext context)
     {
         var data = context.GetPayload<CustomMonitorEventDto>();
-        await _channel.Writer.WriteAsync($"data: {JsonConvert.SerializeObject(data)} from event \n\n").ConfigureAwait(false);
+        await _channel.Writer.WriteAsync($"data: {JsonConvert.SerializeObject(data)}\n\n").ConfigureAwait(false);
     }
     
 }

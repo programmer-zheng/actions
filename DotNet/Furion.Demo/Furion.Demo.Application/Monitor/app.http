@@ -1,0 +1,7 @@
+@HostAddress=https://localhost:5001
+
+### 测点数据变更
+GET {{HostAddress}}/api/monitor/point-change
+
+### 分站数据变更
+GET {{HostAddress}}/api/monitor/station-change
