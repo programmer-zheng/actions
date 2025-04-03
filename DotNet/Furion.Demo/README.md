@@ -26,10 +26,19 @@ dotnet new furionapi -n Furion.Demo -f net8
 
 ## 依赖环境Docker创建
 ### tdengine
+部署完成后，将本地Cookie `TDengine-Token`的值改为`Basic%20cm9vdDp0YW9zZGF0YQ==`   
+再访问`/explorer`页面，即可跳过登录界面的手机验证码，也无须登录
+
+``` bash
+# 也可以执行以下代码，跳过注册
+cat > /etc/taos/explorer-register.cfg << EOF
+http://buildkitsandbox:6041|18115181215|106001d6240e84aac2f32bea17060e24bf29a027
+EOF
+```
 ``` bash
 
 # Docker 创建tdengine 
-docker run -itd --name tdengine --restart always -p 6030:6030 -p 6041:6041 -p 6043:6043 -p 6044-6049:6044-6049 -p 6044-6045:6044-6045/udp -p 6060:6060 tdengine/tdengine:3.3.2.0
+docker run -itd --name tdengine --restart always -p 6030:6030 -p 6041:6041 -p 6043:6043 -p 6044-6049:6044-6049 -p 6044-6045:6044-6045/udp -p 6060:6060 tdengine/tdengine:3.3.3.0
 ```
 
 ## 仓储与ISqlSugarClient查询区别
