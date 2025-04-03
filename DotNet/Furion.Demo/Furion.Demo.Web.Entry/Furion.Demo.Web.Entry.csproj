@@ -11,6 +11,13 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Furion.Demo.Web.Core\Furion.Demo.Web.Core.csproj" />
 	</ItemGroup>
+
+
+	<ItemGroup>
+	  <Folder Include="wwwroot\js\" />
+	  <Folder Include="wwwroot\css\" />
+	  <Folder Include="wwwroot\images\" />
+	</ItemGroup>
 	<ProjectExtensions>
 		<VisualStudio>
 			<UserProperties properties_4launchsettings_1json__JsonSchema="" />
