@@ -38,7 +38,7 @@ public class Startup : AppStartup
         {
             app.UseDeveloperExceptionPage();
         }
-
+        app.UseStaticFiles();
         app.UseHttpsRedirection();
 
         app.UseRouting();
