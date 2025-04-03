@@ -40,6 +40,20 @@ EOF
 # Docker 创建tdengine 
 docker run -itd --name tdengine --restart always -p 6030:6030 -p 6041:6041 -p 6043:6043 -p 6044-6049:6044-6049 -p 6044-6045:6044-6045/udp -p 6060:6060 tdengine/tdengine:3.3.3.0
 ```
+[taosdump | TDengine 文档 | 涛思数据](https://docs.taosdata.com/2.6/reference/taosdump/)
+
+#### 备份/恢复
+``` bash
+# 备份
+taosdump -h localhost -P 6030 -D furiondemo_td -o D:\taos_backup
+```
+
+``` bash
+# 恢复
+taosdump -h localhost -P 6030 -i D:\taos_backup
+```
+
+
 
 ## 仓储与ISqlSugarClient查询区别
 
