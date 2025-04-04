@@ -2,6 +2,7 @@
 
 public class PointRealTimeDataDto
 {
+    public long Id { get; set; }
     public string PointNumber { get; set; }
 
     public string PointName { get; set; }

@@ -2,6 +2,8 @@
 
 public class StationMonitorDto
 {
+    public long Id { get; set; }
+
     /// <summary>
     /// 分站号
     /// </summary>

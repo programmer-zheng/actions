@@ -33,14 +33,14 @@ public class MonitorAppService : IDynamicApiController, ITransient
     {
         _pointRealTimeData = new()
         {
-            new (){ PointNumber="153A03",PointName=" 高低浓甲烷", InstallAddress="安装位置", PointValue="0.02%", Status="正常" },
-            new (){ PointNumber="153A04",PointName=" 瓦斯", InstallAddress="安装位置", PointValue="0.01%", Status="正常" }
+            new (){ Id=1234, PointNumber="153A03",PointName=" 高低浓甲烷", InstallAddress="安装位置", PointValue="0.02%", Status="正常" },
+            new (){ Id=5678, PointNumber="153A04",PointName=" 瓦斯", InstallAddress="安装位置", PointValue="0.01%", Status="正常" }
         };
 
         _stationMonitorData = new()
         {
-            new(){ Sno="152", Model="24型", Address="安装位置", BatteryVoltage="27.6v", Status="正常" },
-            new(){ Sno="153", Model="16型", Address="安装位置", BatteryVoltage="27.6v", Status="正常" },
+            new(){ Id=1357, Sno="152", Model="24型", Address="安装位置", BatteryVoltage="27.6v", Status="正常" },
+            new(){ Id=2468, Sno="153", Model="16型", Address="安装位置", BatteryVoltage="27.6v", Status="正常" },
         };
     }
 
@@ -53,7 +53,7 @@ public class MonitorAppService : IDynamicApiController, ITransient
     {
         var data = new List<PointRealTimeDataDto>()
         {
-            new (){ PointNumber="153A04",PointName=" 瓦斯", InstallAddress="安装位置", PointValue= $"{Random.Shared.Next(1,3)}%", Status="异常" }
+            new (){ Id=5678, PointNumber="153A04",PointName=" 瓦斯", InstallAddress="安装位置", PointValue= $"{Random.Shared.Next(1,5)}%", Status="异常" }
         };
         var obj = new CustomMonitorEventDto(MonitorEventType.Point, data);
         await _eventPublisher.PublishAsync("Monitor_Event", obj);
@@ -69,7 +69,7 @@ public class MonitorAppService : IDynamicApiController, ITransient
 
         var data = new List<StationMonitorDto>()
         {
-            new(){ Sno="152", Model="24型", Address="安装位置", BatteryVoltage=$"{Random.Shared.Next(20,30)}v", Status="正常" },
+            new(){ Id=1357, Sno="152", Model="24型", Address="安装位置", BatteryVoltage=$"{Random.Shared.Next(20,30)}v", Status="正常" },
         };
         var obj = new CustomMonitorEventDto(MonitorEventType.Station, data);
         await _eventPublisher.PublishAsync("Monitor_Event", obj);
@@ -109,7 +109,7 @@ public class MonitorAppService : IDynamicApiController, ITransient
         }
         httpContext.Response.Headers.Add("Content-Type", "text/event-stream");
         httpContext.Response.Headers.Add("Cache-Control", "no-cache");
-        httpContext.Response.Headers.Add("Connection", "keep-alive");
+        //httpContext.Response.Headers.Add("Connection", "keep-alive");
         try
         {
             await _channel.Writer.WriteAsync("data: \n");

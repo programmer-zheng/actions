@@ -2,6 +2,7 @@
 using Furion.EventBus;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,11 @@ public class MonitorEvent : IEventSubscriber, ISingleton
     public async Task HandleEvent(EventHandlerExecutingContext context)
     {
         var data = context.GetPayload<CustomMonitorEventDto>();
-        await _channel.Writer.WriteAsync($"data: {JsonConvert.SerializeObject(data)}\n\n").ConfigureAwait(false);
+        var dataStr = JsonConvert.SerializeObject(data, new JsonSerializerSettings
+        {
+            ContractResolver = new CamelCasePropertyNamesContractResolver()
+        });
+        await _channel.Writer.WriteAsync($"data: {dataStr}\n\n");
     }
-    
+
 }
