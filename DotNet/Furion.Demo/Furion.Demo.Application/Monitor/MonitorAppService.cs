@@ -50,9 +50,11 @@ public class MonitorAppService : IDynamicApiController, ITransient
     [HttpGet]
     public async Task PointChangeAsync()
     {
+        var randomNumber = Math.Round(Random.Shared.NextDouble(), 2);
+        var status = randomNumber < 0.5 ? "正常" : "异常";
         var data = new List<PointRealTimeDataDto>()
         {
-            new (){ Id=5678, PointNumber="153A04",PointName=" 瓦斯", InstallAddress="安装位置", PointValue= $"{Random.Shared.Next(1,5)}%", Status="异常" }
+            new (){ Id=5678, PointNumber="153A04",PointName=" 瓦斯", InstallAddress="安装位置", PointValue= $"{randomNumber}%", Status=status }
         };
         var obj = new CustomMonitorEventDto(MonitorEventType.Point, data);
         await _eventPublisher.PublishAsync("Monitor_Event", obj);
@@ -65,10 +67,11 @@ public class MonitorAppService : IDynamicApiController, ITransient
     [HttpGet]
     public async Task StationChangeAsync()
     {
-
+        var randomNumber = Random.Shared.Next(10, 30);
+        var status = randomNumber < 15 ? "正常" : "异常";
         var data = new List<StationMonitorDto>()
         {
-            new(){ Id=1357, Sno="152", Model="24型", Address="安装位置", BatteryVoltage=$"{Random.Shared.Next(20,30)}v", Status="正常" },
+            new(){ Id=1357, Sno="152", Model="24型", Address="安装位置", BatteryVoltage=$"{randomNumber}v", Status=status },
         };
         var obj = new CustomMonitorEventDto(MonitorEventType.Station, data);
         await _eventPublisher.PublishAsync("Monitor_Event", obj);
@@ -110,36 +113,58 @@ public class MonitorAppService : IDynamicApiController, ITransient
         httpContext.Response.Headers.Add("Cache-Control", "no-cache");
         httpContext.Response.Headers.Add("Connection", "keep-alive");
         httpContext.Response.Headers.Add("X-Accel-Buffering", "no"); // 禁用Nginx缓冲
-        
+
         try
         {
             // 发送初始连接成功消息
             var initialMessage = Encoding.UTF8.GetBytes("data: {\"type\":\"connected\"}\n\n");
             await httpContext.Response.Body.WriteAsync(initialMessage, 0, initialMessage.Length);
             await httpContext.Response.Body.FlushAsync();
-            
+
             // 使用CancellationTokenSource来管理连接
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(httpContext.RequestAborted);
-            
+
             // 设置超时时间，防止连接无限期保持
-            cts.CancelAfter(TimeSpan.FromHours(1));
-            
+            cts.CancelAfter(TimeSpan.FromHours(24)); // 延长超时时间到24小时
+
+            // 创建心跳定时器
+            var heartbeatTimer = new Timer(async _ =>
+            {
+                try
+                {
+                    if (!httpContext.RequestAborted.IsCancellationRequested && !cts.Token.IsCancellationRequested)
+                    {
+                        var heartbeatMessage = Encoding.UTF8.GetBytes("data: {\"type\":\"heartbeat\"}\n\n");
+                        await httpContext.Response.Body.WriteAsync(heartbeatMessage, 0, heartbeatMessage.Length);
+                        await httpContext.Response.Body.FlushAsync();
+                        Log.Debug("SSE心跳已发送");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("发送SSE心跳出错", ex);
+                }
+            }, null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30)); // 每30秒发送一次心跳
+
+            // 注册取消回调，确保定时器被释放
+            cts.Token.Register(() => heartbeatTimer.Dispose());
+
             await foreach (var message in _channel.Reader.ReadAllAsync(cts.Token))
             {
                 if (httpContext.RequestAborted.IsCancellationRequested || cts.Token.IsCancellationRequested)
                 {
                     break;
                 }
-                
+
                 var jsonMessage = JsonConvert.SerializeObject(message, new JsonSerializerSettings
                 {
                     ContractResolver = new CamelCasePropertyNamesContractResolver()
                 });
-                
+
                 var dataPage = Encoding.UTF8.GetBytes($"data: {jsonMessage}\n\n");
                 await httpContext.Response.Body.WriteAsync(dataPage, 0, dataPage.Length);
                 await httpContext.Response.Body.FlushAsync();
-                
+
                 // 添加日志以便调试
                 Log.Information($"SSE消息已发送: {jsonMessage}");
             }
