@@ -6,6 +6,7 @@ using Newtonsoft.Json.Serialization;
 using System.Text;
 using System.Threading.Channels;
 using System.Threading;
+using System.Collections.Concurrent;
 
 namespace Furion.Demo.Application.Monitor;
 
@@ -13,8 +14,8 @@ public class MonitorAppService : IDynamicApiController, ITransient
 {
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly Channel<CustomMonitorEventDto> _channel;
-
     private readonly IEventPublisher _eventPublisher;
+    private static readonly ConcurrentDictionary<string, HttpResponse> _activeConnections = new();
 
     private List<PointRealTimeDataDto> _pointRealTimeData;
     private List<StationMonitorDto> _stationMonitorData;
@@ -98,6 +99,30 @@ public class MonitorAppService : IDynamicApiController, ITransient
     }
 
     /// <summary>
+    /// 广播消息到所有连接的客户端
+    /// </summary>
+    private async Task BroadcastMessageAsync(string message)
+    {
+        var messageBytes = Encoding.UTF8.GetBytes(message);
+        var tasks = new List<Task>();
+        
+        foreach (var connection in _activeConnections.Values)
+        {
+            try
+            {
+                tasks.Add(connection.Body.WriteAsync(messageBytes, 0, messageBytes.Length));
+                tasks.Add(connection.Body.FlushAsync());
+            }
+            catch (Exception ex)
+            {
+                Log.Error("向客户端发送消息时出错", ex);
+            }
+        }
+        
+        await Task.WhenAll(tasks);
+    }
+
+    /// <summary>
     /// sse
     /// </summary>
     /// <returns></returns>
@@ -109,17 +134,25 @@ public class MonitorAppService : IDynamicApiController, ITransient
         {
             return;
         }
+        
+        // 设置SSE响应头
         httpContext.Response.Headers.Add("Content-Type", "text/event-stream");
         httpContext.Response.Headers.Add("Cache-Control", "no-cache");
         httpContext.Response.Headers.Add("Connection", "keep-alive");
         httpContext.Response.Headers.Add("X-Accel-Buffering", "no"); // 禁用Nginx缓冲
 
+        // 生成连接ID并添加到活动连接列表
+        var connectionId = Guid.NewGuid().ToString();
+        _activeConnections.TryAdd(connectionId, httpContext.Response);
+        
         try
         {
             // 发送初始连接成功消息
             var initialMessage = Encoding.UTF8.GetBytes("data: {\"type\":\"connected\"}\n\n");
             await httpContext.Response.Body.WriteAsync(initialMessage, 0, initialMessage.Length);
             await httpContext.Response.Body.FlushAsync();
+            
+            Log.Information($"新的SSE连接已建立，连接ID: {connectionId}，当前活动连接数: {_activeConnections.Count}");
 
             // 使用CancellationTokenSource来管理连接
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(httpContext.RequestAborted);
@@ -134,10 +167,9 @@ public class MonitorAppService : IDynamicApiController, ITransient
                 {
                     if (!httpContext.RequestAborted.IsCancellationRequested && !cts.Token.IsCancellationRequested)
                     {
-                        var heartbeatMessage = Encoding.UTF8.GetBytes("data: {\"type\":\"heartbeat\"}\n\n");
-                        await httpContext.Response.Body.WriteAsync(heartbeatMessage, 0, heartbeatMessage.Length);
-                        await httpContext.Response.Body.FlushAsync();
-                        Log.Debug("SSE心跳已发送");
+                        var heartbeatMessage = "data: {\"type\":\"heartbeat\"}\n\n";
+                        await BroadcastMessageAsync(heartbeatMessage);
+                        Log.Debug("SSE心跳已发送到所有客户端");
                     }
                 }
                 catch (Exception ex)
@@ -161,24 +193,27 @@ public class MonitorAppService : IDynamicApiController, ITransient
                     ContractResolver = new CamelCasePropertyNamesContractResolver()
                 });
 
-                var dataPage = Encoding.UTF8.GetBytes($"data: {jsonMessage}\n\n");
-                await httpContext.Response.Body.WriteAsync(dataPage, 0, dataPage.Length);
-                await httpContext.Response.Body.FlushAsync();
+                var dataMessage = $"data: {jsonMessage}\n\n";
+                await BroadcastMessageAsync(dataMessage);
 
                 // 添加日志以便调试
-                Log.Information($"SSE消息已发送: {jsonMessage}");
+                Log.Information($"SSE消息已广播到所有客户端: {jsonMessage}");
             }
         }
         catch (OperationCanceledException)
         {
-            Log.Information("SSE连接已取消");
+            Log.Information($"SSE连接已取消，连接ID: {connectionId}");
         }
         catch (Exception ex)
         {
-            Log.Error("响应SSE出错", ex);
+            Log.Error($"响应SSE出错，连接ID: {connectionId}", ex);
         }
         finally
         {
+            // 从活动连接列表中移除
+            _activeConnections.TryRemove(connectionId, out _);
+            Log.Information($"SSE连接已关闭，连接ID: {connectionId}，当前活动连接数: {_activeConnections.Count}");
+            
             // 确保连接正确关闭
             if (!httpContext.Response.HasStarted)
             {

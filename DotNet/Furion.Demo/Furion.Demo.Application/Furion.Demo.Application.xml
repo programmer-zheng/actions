@@ -53,6 +53,11 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Furion.Demo.Application.Monitor.MonitorAppService.BroadcastMessageAsync(System.String)">
+            <summary>
+            广播消息到所有连接的客户端
+            </summary>
+        </member>
         <member name="M:Furion.Demo.Application.Monitor.MonitorAppService.ServerSendEventAsync">
             <summary>
             sse
