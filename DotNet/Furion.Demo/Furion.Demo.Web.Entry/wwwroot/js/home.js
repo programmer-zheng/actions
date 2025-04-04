@@ -6,11 +6,80 @@
     function renderData(parentDivId, data) {
         var parentDiv = document.getElementById(parentDivId);
         parentDiv.innerHTML = ''; // 清空之前的内容
+        
+        // 检查数据是否为空
+        if (!data || data.length === 0) {
+            var emptyMessage = document.createElement('div');
+            emptyMessage.className = 'empty-data';
+            emptyMessage.textContent = '暂无数据';
+            parentDiv.appendChild(emptyMessage);
+            return;
+        }
+        
+        // 创建表格
+        var table = document.createElement('table');
+        table.className = 'data-table';
+        
+        // 创建表头
+        var thead = document.createElement('thead');
+        var headerRow = document.createElement('tr');
+        
+        // 根据数据类型设置不同的表头
+        if (parentDivId === 'points') {
+            headerRow.innerHTML = `
+                <th>ID</th>
+                <th>测点编号</th>
+                <th>测点名称</th>
+                <th>测点值</th>
+                <th>安装位置</th>
+                <th>状态</th>
+            `;
+        } else if (parentDivId === 'stations') {
+            headerRow.innerHTML = `
+                <th>ID</th>
+                <th>分站号</th>
+                <th>型号</th>
+                <th>电池电压</th>
+                <th>安装位置</th>
+                <th>状态</th>
+            `;
+        }
+        
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+        
+        // 创建表体
+        var tbody = document.createElement('tbody');
+        
         data.forEach(item => {
-            var newElement = document.createElement("div");
-            newElement.innerHTML = "数据: " + JSON.stringify(item); // 假设数据有 Data 属性
-            parentDiv.appendChild(newElement);
+            var row = document.createElement('tr');
+            
+            // 根据数据类型设置不同的单元格内容
+            if (parentDivId === 'points') {
+                row.innerHTML = `
+                    <td>${item.id || ''}</td>
+                    <td>${item.pointNumber || ''}</td>
+                    <td>${item.pointName || ''}</td>
+                    <td>${item.pointValue || ''}</td>
+                    <td>${item.installAddress || ''}</td>
+                    <td class="status-cell ${item.status === '正常' ? 'status-normal' : 'status-abnormal'}">${item.status || ''}</td>
+                `;
+            } else if (parentDivId === 'stations') {
+                row.innerHTML = `
+                    <td>${item.id || ''}</td>
+                    <td>${item.sno || ''}</td>
+                    <td>${item.model || ''}</td>
+                    <td>${item.batteryVoltage || ''}</td>
+                    <td>${item.address || ''}</td>
+                    <td class="status-cell ${item.status === '正常' ? 'status-normal' : 'status-abnormal'}">${item.status || ''}</td>
+                `;
+            }
+            
+            tbody.appendChild(row);
         });
+        
+        table.appendChild(tbody);
+        parentDiv.appendChild(table);
     }
 
     function initEventSource() {
