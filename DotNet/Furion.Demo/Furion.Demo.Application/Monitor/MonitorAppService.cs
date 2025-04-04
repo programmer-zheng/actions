@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System.Text;
 using System.Threading.Channels;
+using System.Threading;
 
 namespace Furion.Demo.Application.Monitor;
 
@@ -107,42 +108,57 @@ public class MonitorAppService : IDynamicApiController, ITransient
         }
         httpContext.Response.Headers.Add("Content-Type", "text/event-stream");
         httpContext.Response.Headers.Add("Cache-Control", "no-cache");
-        //httpContext.Response.Headers.Add("Connection", "keep-alive");
+        httpContext.Response.Headers.Add("Connection", "keep-alive");
+        httpContext.Response.Headers.Add("X-Accel-Buffering", "no"); // 禁用Nginx缓冲
+        
         try
         {
-            //await _channel.Writer.WriteAsync(null);
-            //_ = Task.Run(async () =>
-            //{
-            //    while (!httpContext.RequestAborted.IsCancellationRequested)
-            //    {
-
-            //        await _channel.Writer.WriteAsync("data: \n");
-            //        await Task.Delay(1000 * 30);
-            //    }
-            //});
-            await foreach (var message in _channel.Reader.ReadAllAsync())
+            // 发送初始连接成功消息
+            var initialMessage = Encoding.UTF8.GetBytes("data: {\"type\":\"connected\"}\n\n");
+            await httpContext.Response.Body.WriteAsync(initialMessage, 0, initialMessage.Length);
+            await httpContext.Response.Body.FlushAsync();
+            
+            // 使用CancellationTokenSource来管理连接
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(httpContext.RequestAborted);
+            
+            // 设置超时时间，防止连接无限期保持
+            cts.CancelAfter(TimeSpan.FromHours(1));
+            
+            await foreach (var message in _channel.Reader.ReadAllAsync(cts.Token))
             {
-                if (httpContext.RequestAborted.IsCancellationRequested)
+                if (httpContext.RequestAborted.IsCancellationRequested || cts.Token.IsCancellationRequested)
                 {
                     break;
                 }
+                
                 var jsonMessage = JsonConvert.SerializeObject(message, new JsonSerializerSettings
                 {
                     ContractResolver = new CamelCasePropertyNamesContractResolver()
                 });
+                
                 var dataPage = Encoding.UTF8.GetBytes($"data: {jsonMessage}\n\n");
                 await httpContext.Response.Body.WriteAsync(dataPage, 0, dataPage.Length);
                 await httpContext.Response.Body.FlushAsync();
-                //await _channel.Writer.WriteAsync(message);
+                
+                // 添加日志以便调试
+                Log.Information($"SSE消息已发送: {jsonMessage}");
             }
         }
-        catch (OperationCanceledException oce)
+        catch (OperationCanceledException)
         {
-            Log.Error("用户取消了");
+            Log.Information("SSE连接已取消");
         }
         catch (Exception ex)
         {
-            Log.Error("响应sse出错", ex);
+            Log.Error("响应SSE出错", ex);
+        }
+        finally
+        {
+            // 确保连接正确关闭
+            if (!httpContext.Response.HasStarted)
+            {
+                httpContext.Response.StatusCode = 200;
+            }
         }
     }
 }

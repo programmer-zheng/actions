@@ -3,16 +3,50 @@
 <head>
     <meta charset="utf-8" />
     <title>实时更新示例</title>
+    <style>
+        .button-container {
+            margin: 20px 0;
+        }
+        button {
+            padding: 8px 16px;
+            margin-right: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .data-container {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
-    <h3>测点数据</h3>
-    <div id="points">
-
+    <h2>物联网设备实时监控</h2>
+    
+    <div class="button-container">
+        <button id="testPointChange">模拟测点数据变更</button>
+        <button id="testStationChange">模拟分站数据变更</button>
     </div>
-    <h3>分站数据</h3>
-    <div id="stations">
-
+    
+    <div class="data-container">
+        <h3>测点数据</h3>
+        <div id="points"></div>
     </div>
+    
+    <div class="data-container">
+        <h3>分站数据</h3>
+        <div id="stations"></div>
+    </div>
+    
+    <div id="updates"></div>
+    
     <script src="js/home.js"></script>
 </body>
 </html>
