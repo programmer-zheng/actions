@@ -31,6 +31,13 @@ dotnet new furionapi -n Furion.Demo -f net8
 
 ``` bash
 # 也可以执行以下代码，跳过注册
+# 方式一：直接将指定字符串写入到docker容器里面的文件
+echo "http://buildkitsandbox:6041|18115181215|106001d6240e84aac2f32bea17060e24bf29a027" | docker exec -i tdengine sh -c 'cat > /etc/taos/explorer-register.cfg'
+
+# 方式二：
+# 1、进入容器
+docker exec -it tdengine /bin/bash
+# 2、创建文件
 cat > /etc/taos/explorer-register.cfg << EOF
 http://buildkitsandbox:6041|18115181215|106001d6240e84aac2f32bea17060e24bf29a027
 EOF
