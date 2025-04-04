@@ -1,19 +1,17 @@
 ﻿using Furion.Demo.Application.Monitor.Dtos;
 using Furion.EventBus;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System.Text;
 using System.Threading.Channels;
-using System.Threading.Tasks;
 
 namespace Furion.Demo.Application.Monitor;
 
 public class MonitorAppService : IDynamicApiController, ITransient
 {
     private readonly IHttpContextAccessor _contextAccessor;
-    private readonly Channel<string> _channel;
+    private readonly Channel<CustomMonitorEventDto> _channel;
 
     private readonly IEventPublisher _eventPublisher;
 
@@ -23,7 +21,7 @@ public class MonitorAppService : IDynamicApiController, ITransient
     public MonitorAppService(IHttpContextAccessor contextAccessor, IServiceProvider serviceProvider, IEventPublisher eventPublisher)
     {
         _contextAccessor = contextAccessor;
-        _channel = serviceProvider.GetKeyedService<Channel<string>>("Monitor");
+        _channel = serviceProvider.GetKeyedService<Channel<CustomMonitorEventDto>>("Monitor");
         _eventPublisher = eventPublisher;
 
         InitData();
@@ -112,7 +110,7 @@ public class MonitorAppService : IDynamicApiController, ITransient
         //httpContext.Response.Headers.Add("Connection", "keep-alive");
         try
         {
-            await _channel.Writer.WriteAsync("data: \n");
+            //await _channel.Writer.WriteAsync(null);
             //_ = Task.Run(async () =>
             //{
             //    while (!httpContext.RequestAborted.IsCancellationRequested)
@@ -128,7 +126,11 @@ public class MonitorAppService : IDynamicApiController, ITransient
                 {
                     break;
                 }
-                var dataPage = Encoding.UTF8.GetBytes(message);
+                var jsonMessage = JsonConvert.SerializeObject(message, new JsonSerializerSettings
+                {
+                    ContractResolver = new CamelCasePropertyNamesContractResolver()
+                });
+                var dataPage = Encoding.UTF8.GetBytes($"data: {jsonMessage}\n\n");
                 await httpContext.Response.Body.WriteAsync(dataPage, 0, dataPage.Length);
                 await httpContext.Response.Body.FlushAsync();
                 //await _channel.Writer.WriteAsync(message);

@@ -1,4 +1,5 @@
 ﻿using Furion;
+using Furion.Demo.Application.Monitor.Dtos;
 using Furion.Demo.Core;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -26,7 +27,7 @@ public class Startup : AppStartup
                 .AddInjectWithUnifyResult();
 
         var monitorChannel = Channel.CreateUnbounded<string>();
-        services.AddKeyedSingleton<Channel<string>>("Monitor", Channel.CreateUnbounded<string>());
+        services.AddKeyedSingleton<Channel<CustomMonitorEventDto>>("Monitor", Channel.CreateUnbounded<CustomMonitorEventDto>());
 
         services.AddSqlSugar();
 
