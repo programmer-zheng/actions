@@ -8,6 +8,16 @@ namespace Scalar.Controllers;
 [Route("api/[controller]/[action]")]
 public class QuartzController : ControllerBase
 {
+    private readonly IScheduler _scheduler;
+
+    private readonly ISchedulerFactory _schedulerFactory;
+
+    public QuartzController(IScheduler scheduler, ISchedulerFactory schedulerFactory)
+    {
+        _scheduler = scheduler;
+        _schedulerFactory = schedulerFactory;
+    }
+
     [HttpGet]
     public async Task RecurringJob()
     {
@@ -15,6 +25,7 @@ public class QuartzController : ControllerBase
         var job = JobBuilder.Create<MyJob>()
             .WithIdentity("MyJob", "Group1")
             .UsingJobData("id", 1234)
+            .StoreDurably()
             .UsingJobData("name", "张三")
             .Build();
 
@@ -25,25 +36,25 @@ public class QuartzController : ControllerBase
             .WithSimpleSchedule(builder => builder.WithIntervalInSeconds(10).RepeatForever()) // 每10秒执行一次，且一直重复
             .Build();
 
-        // 获取调度器实例
-        var scheduler = await StdSchedulerFactory.GetDefaultScheduler();
-        await scheduler.Start();
-
-        // 调度任务
-        await scheduler.ScheduleJob(job, trigger);
+        if (await _scheduler.CheckExists(job.Key))
+        {
+            await _scheduler.ResumeJob(job.Key);
+        }
+        else
+        {
+            // 调度任务
+            await _scheduler.ScheduleJob(job, trigger);
+        }
     }
 
     [HttpGet]
     public async Task RemoveJob()
     {
-        var scheduler = await StdSchedulerFactory.GetDefaultScheduler();
-        await scheduler.Start();
-
         // 假设你已经知道触发器的名称和组名
         var triggerKey = new TriggerKey("MyTrigger", "Group1");
 
         // 删除触发器
-        await scheduler.UnscheduleJob(triggerKey);
+        await _scheduler.UnscheduleJob(triggerKey);
     }
 }
 
@@ -51,7 +62,7 @@ public class MyJob : IJob
 {
     public Task Execute(IJobExecutionContext context)
     {
-        var id = (int)context.MergedJobDataMap["id"];
+        var id = (long)context.MergedJobDataMap["id"];
         var name = context.MergedJobDataMap["name"].ToString();
         Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} Hello, Quartz! 参数：{id} -> {name}");
         return Task.CompletedTask;

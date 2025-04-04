@@ -1,3 +1,4 @@
+using System.Collections.Specialized;
 using System.Transactions;
 using Hangfire;
 using Hangfire.LiteDB;
@@ -9,6 +10,7 @@ using Quartz.Impl;
 using Scalar.AspNetCore;
 using Scalar.Filters;
 using Scalar.Middleware;
+using Scalar.ServiceLifetime;
 
 namespace Scalar;
 
@@ -19,6 +21,11 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
+
+        builder.Services.AddTransient<ITransientService, TransientService>();
+        builder.Services.AddTransient<IScopedService, ScopedService>();
+        builder.Services.AddTransient<ISingletonService, SingletonService>();
+
 
         builder.Services.AddControllers(options =>
         {
@@ -37,44 +44,45 @@ public class Program
             // 关闭 [ApiController] 自动返回 400 的行为
             options.SuppressModelStateInvalidFilter = true;
         });
-        
+
         var defaultConnectionString = builder.Configuration.GetConnectionString("Default");
-        builder.Services.AddHangfire(options =>
+        builder.Services.AddHangfireService();
+
+        var properties = new NameValueCollection
         {
-            options.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings();
-
-            // options.UseLiteDbStorage(hfSqliteConnectionString);
-            options.UseInMemoryStorage();
-            // options.UseStorage(new MySqlStorage(hfMySqliteConnectionString, new MySqlStorageOptions()
-            // {
-            //     TransactionIsolationLevel = IsolationLevel.ReadCommitted,
-            //     QueuePollInterval = TimeSpan.FromSeconds(15),
-            //     JobExpirationCheckInterval = TimeSpan.FromHours(1),
-            //     CountersAggregateInterval = TimeSpan.FromMinutes(5),
-            //     PrepareSchemaIfNecessary = true,
-            //     DashboardJobListLimit = 50000,
-            //     TransactionTimeout = TimeSpan.FromMinutes(1),
-            //     TablesPrefix = "Hangfire"
-            // }));
-        });
-        StdSchedulerFactory factory = new StdSchedulerFactory();
-        IScheduler scheduler = await factory.GetScheduler();
-
-        // and start it off
-        await scheduler.Start();
-        
-        builder.Services.AddHangfireServer(options =>
+            { "quartz.serializer.type", "newtonsoft" },
+            { "quartz.jobStore.driverDelegateType", "Quartz.Impl.AdoJobStore.MySQLDelegate, Quartz" },
+            { "quartz.jobStore.type", "Quartz.Impl.AdoJobStore.JobStoreTX, Quartz" },
+            { "quartz.jobStore.dataSource", "default" },
+            { "quartz.dataSource.default.provider", "MySql" },
+            {"quartz.jobStore.performSchemaValidation","false" },
+            { "quartz.dataSource.default.connectionString", defaultConnectionString },
+        };
+        ISchedulerFactory schedulerFactory = new StdSchedulerFactory(properties);
+        IScheduler scheduler = await schedulerFactory.GetScheduler();
+        await scheduler.StartDelayed(TimeSpan.FromSeconds(5));
+/*
+        builder.Services.AddQuartz(option =>
         {
-            // options.SchedulePollingInterval = TimeSpan.FromSeconds(15);
-            // options.HeartbeatInterval = TimeSpan.FromMinutes(3);//设置服务器心跳间隔，每隔多久发送一次心跳
-            // options.ServerTimeout = TimeSpan.FromMinutes(5);//设置服务器超时时间，超过这个时间，服务器会自动关闭,默认是5分钟
-            // options.ServerCheckInterval = TimeSpan.FromMinutes(5);
-            options.ServerName = "HangFireServer";
-        });
+            option.UsePersistentStore(storeOptions =>
+            {
+                storeOptions.UseProperties = true;
+                storeOptions.UseNewtonsoftJsonSerializer();
+                storeOptions.UseMySql(defaultConnectionString);
+            });
+        });*/
+        builder.Services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
 
-
+        // 注册IScheduler服务
+        builder.Services.AddSingleton(typeof(ISchedulerFactory), schedulerFactory);
+        builder.Services.AddSingleton(typeof(IScheduler), scheduler);
+        /*builder.Services.AddSingleton<IScheduler>(provider =>
+        {
+            var factory = provider.GetRequiredService<ISchedulerFactory>();
+            var scheduler = factory.GetScheduler().GetAwaiter().GetResult();
+            scheduler.Start().GetAwaiter().GetResult();
+            return scheduler;
+        });*/
         // Quartz.net 数据库表结构参考：https://github.com/quartznet/quartznet/tree/main/database/tables
         // Quartz.net并不会在程序启动时，自动生成表
         // builder.Services.AddQuartzServer(options =>
