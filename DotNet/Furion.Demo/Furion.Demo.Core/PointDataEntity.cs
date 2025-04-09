@@ -29,7 +29,8 @@ public class PointDataEntity
      * 
      */
 
-    [SugarColumn(IsPrimaryKey = true, InsertServerTime = true)]
+    //[SugarColumn(IsPrimaryKey = true, InsertServerTime = true)]
+    [SugarColumn(IsPrimaryKey = true, SqlParameterDbType = typeof(DateTime19))]
     public DateTime ts { get; set; }
 
     public string SNO { get; set; }

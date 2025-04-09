@@ -23,7 +23,7 @@ public class TdEngineAppservice : IDynamicApiController
 
     private readonly ISqlSugarClient _sqlSugarClient;
 
-    public TdEngineAppservice(ISugarRepository<PointDataEntity> repository,ISqlSugarClient sqlSugarClient /*IServiceProvider serviceProvider*/)
+    public TdEngineAppservice(ISugarRepository<PointDataEntity> repository, ISqlSugarClient sqlSugarClient /*IServiceProvider serviceProvider*/)
     {
         _sqlSugarClient = sqlSugarClient;
         //_sqlSugarClient = serviceProvider.GetKeyedService<SqlSugarClient>("Td");
@@ -40,7 +40,11 @@ public class TdEngineAppservice : IDynamicApiController
     {
 
         var data = input.Adapt<List<PointDataEntity>>();
-        data.ForEach(t => t.PointValue = Random.Shared.Next(10, 50));
+        data.ForEach(t =>
+        {
+            t.ts = DateTime.Now;
+            t.PointValue = Random.Shared.Next(10, 50);
+        });
         await _sqlSugarClient.Insertable(data)
             .SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.SNO}_{it.PointNumber}")
             .ExecuteCommandAsync();
