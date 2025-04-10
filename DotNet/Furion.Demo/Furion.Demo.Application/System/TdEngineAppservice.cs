@@ -67,6 +67,15 @@ public class TdEngineAppservice : IDynamicApiController
         return list;
     }
 
+    [HttpGet("UpdateHistoryData")]
+    public async Task UpdateHistoryDataAsync()
+    {
+        await repository.Context.Updateable<PointDataEntity>()
+                .SetColumns(t => new PointDataEntity { PointValue = Random.Shared.Next() })
+                .Where(t => t.Day == Convert.ToDateTime("2025-04-09"))
+                .ExecuteCommandAsync();
+    }
+
     [HttpGet("QueryAggregate")]
     public async Task<object> QueryAggregateAsync()
     {

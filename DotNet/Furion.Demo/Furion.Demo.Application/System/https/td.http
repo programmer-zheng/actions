@@ -45,6 +45,9 @@ Content-Type: application/json
 ### 聚合查询
 GET {{HostAddress}}/api/td/QueryAggregate
 
+### 更新历史数据
+GET {{HostAddress}}/api/td/UpdateHistoryData
+
 ### TdEngine测试查询
 POST {{HostAddress}}/api/td/QueryData
 Content-Type: application/json
