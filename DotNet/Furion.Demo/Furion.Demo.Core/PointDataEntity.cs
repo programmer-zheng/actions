@@ -19,6 +19,8 @@ namespace Furion.Demo.Core;
 [SugarTable("Point_Data")]
 [TimingDataTable]
 [STable(STableName = "Point_Data", Tag1 = nameof(SNO), Tag2 = nameof(PointNumber))]
+//[STable(STableName = "Point_Data", Tag1 = nameof(SNO), Tag2 = nameof(PointNumber), Tag3 = nameof(Day))]
+//[STable(STableName = "Point_Data", Tag1 = nameof(Day))]
 public class PointDataEntity
 {
     /*
@@ -40,6 +42,8 @@ public class PointDataEntity
     public string PointNumber { get; set; }
 
     public double PointValue { get; set; }
+
+    public DateTime Day { get; set; }
 }
 
 /// <summary>

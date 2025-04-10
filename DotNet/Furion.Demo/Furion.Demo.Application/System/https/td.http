@@ -1,22 +1,49 @@
+@HostAddress=https://localhost:5001
+
 ### TdEngine≤‚ ‘≤Â»Î
 POST {{HostAddress}}/api/td/InsertData
 Content-Type: application/json
 
 [{
+	"ts": "2025-04-08 11:42:24",
 	"sno": "152",
 	"pointNumber": "152A01",
-	"pointType": "1D"
+	"pointType": "1D",
+	"day": "2025-04-08"
 }, {
+	"ts": "2025-04-08 12:04:08",
 	"sno": "152",
 	"pointNumber": "152A02",
-	"pointType": "3F"
+	"pointType": "3F",
+	"day": "2025-04-08"
 }, {
+	"ts": "2025-04-08 12:02:08",
 	"sno": "154",
 	"pointNumber": "154B03",
-	"pointType": "2G"
+	"pointType": "2G",
+	"day": "2025-04-08"
+}, {
+	"ts": "2025-04-09 11:03:09",
+	"sno": "152",
+	"pointNumber": "152A01",
+	"pointType": "1D",
+	"day": "2025-04-09"
+}, {
+	"ts": "2025-04-09 12:03:09",
+	"sno": "152",
+	"pointNumber": "152A02",
+	"pointType": "3F",
+	"day": "2025-04-09"
+}, {
+	"ts": "2025-04-09 12:04:09",
+	"sno": "154",
+	"pointNumber": "154B03",
+	"pointType": "2G",
+	"day": "2025-04-09"
 }]
 
-
+### æ€∫œ≤È—Ø
+GET {{HostAddress}}/api/td/QueryAggregate
 
 ### TdEngine≤‚ ‘≤È—Ø
 POST {{HostAddress}}/api/td/QueryData

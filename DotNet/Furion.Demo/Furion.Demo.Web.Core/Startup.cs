@@ -24,7 +24,11 @@ public class Startup : AppStartup
         services.AddEventBus();// 添加事件总线
 
         services.AddControllers()
-                .AddInjectWithUnifyResult();
+                .AddInjectWithUnifyResult()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new DateTimeConverterUsingDateTimeParse());
+                });
 
         var monitorChannel = Channel.CreateUnbounded<string>();
         services.AddKeyedSingleton<Channel<CustomMonitorEventDto>>("Monitor", Channel.CreateUnbounded<CustomMonitorEventDto>());

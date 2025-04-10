@@ -42,11 +42,13 @@ public class TdEngineAppservice : IDynamicApiController
         var data = input.Adapt<List<PointDataEntity>>();
         data.ForEach(t =>
         {
-            t.ts = DateTime.Now;
+            //t.ts = DateTime.Now;
             t.PointValue = Random.Shared.Next(10, 50);
         });
         await _sqlSugarClient.Insertable(data)
             .SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.SNO}_{it.PointNumber}")
+            //.SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.SNO}_{it.PointNumber}_{it.Day.ToString("yyyyMMdd")}")
+            //.SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.Day.ToString("yyyyMMdd")}")
             .ExecuteCommandAsync();
     }
 
@@ -63,6 +65,24 @@ public class TdEngineAppservice : IDynamicApiController
             .WhereIF(!input.PointNumber.IsNullOrWhiteSpace(), t => t.PointNumber.Equals(input.PointNumber))
             .ToListAsync();
         return list;
+    }
+
+    [HttpGet("QueryAggregate")]
+    public async Task<object> QueryAggregateAsync()
+    {
+        var data = await repository.AsQueryable()
+            .Where(t => t.ts >= Convert.ToDateTime("2025-04-08 12:04:08") && t.ts <= Convert.ToDateTime("2025-04-09 12:03:09"))
+            .Select(t => new TdAggregateDataDto
+            {
+                Avg = SqlFunc.AggregateAvg(t.PointValue),
+                Max = SqlFunc.AggregateMax(t.PointValue),
+                Min = SqlFunc.AggregateMin(t.PointValue)
+            }).ToListAsync();
+        foreach (var item in data)
+        {
+            item.Avg = Math.Round(item.Avg, 2);
+        }
+        return data;
     }
 
     [HttpGet("BackupDatabase")]

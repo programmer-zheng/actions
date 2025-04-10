@@ -13,3 +13,13 @@ public class QueryTdDataDto
 
     public string PointNumber { get; set; }
 }
+
+
+public class TdAggregateDataDto
+{
+    public double Avg { get; set; }
+
+    public double Max { get; set; }
+
+    public double Min { get; set; }
+}

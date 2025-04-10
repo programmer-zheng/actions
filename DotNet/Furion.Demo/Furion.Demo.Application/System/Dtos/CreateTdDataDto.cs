@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Furion.Demo.Application.System.Dtos;
 
 public class CreateTdDataDto
 {
+
+    public DateTime Ts { get; set; }
+
     /// <summary>
     /// 分站号
     /// </summary>
@@ -27,4 +31,5 @@ public class CreateTdDataDto
     [DefaultValue("1D")]
     public string PointType { get; set; }
 
+    public DateTime Day { get; set; } = DateTime.Today;
 }
