@@ -2,6 +2,7 @@
 using SqlSugar.TDengine;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,6 +36,10 @@ public class PointDataEntity
     [SugarColumn(IsPrimaryKey = true, SqlParameterDbType = typeof(DateTime19))]
     public DateTime ts { get; set; }
 
+    [SugarColumn(IsPrimaryKey = true)]
+    [Key]
+    public int Id { get; set; }
+
     public string SNO { get; set; }
 
     public string PointType { get; set; }
@@ -43,7 +48,7 @@ public class PointDataEntity
 
     public double PointValue { get; set; }
 
-    public DateTime Day { get; set; }
+    public string Day { get; set; }
 }
 
 /// <summary>

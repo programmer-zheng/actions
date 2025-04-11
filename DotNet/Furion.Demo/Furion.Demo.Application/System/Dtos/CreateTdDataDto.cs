@@ -13,6 +13,8 @@ public class CreateTdDataDto
 
     public DateTime Ts { get; set; }
 
+    public int Id { get; set; }
+
     /// <summary>
     /// 分站号
     /// </summary>

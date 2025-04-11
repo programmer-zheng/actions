@@ -72,7 +72,7 @@ public class TdEngineAppservice : IDynamicApiController
     {
         await repository.Context.Updateable<PointDataEntity>()
                 .SetColumns(t => new PointDataEntity { PointValue = Random.Shared.Next() })
-                .Where(t => t.Day == Convert.ToDateTime("2025-04-09"))
+                .Where(t => t.Id == 1100)
                 .ExecuteCommandAsync();
     }
 

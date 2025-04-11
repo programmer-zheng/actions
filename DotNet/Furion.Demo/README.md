@@ -100,3 +100,27 @@ SELECT  `SNO` AS `SNO` , `PointNumber` AS `PointNumber` , `PointType` AS `PointT
 FROM `Point_Data`  
 WHERE  (`SNO` = @MethodConst0)   AND ( `IsDeleted` = @IsDeleted1 )
 ```
+
+## TdEngine
+联合主键的形式，目前只有手动语句，sqlsugar暂不支持除时间戳外的其他主键  
+即使加上了`[Key]`或`[SugarColumn(IsPrimaryKey = true)]`，生成的语句中也不会添加 `primary key`关键字
+``` sql
+CREATE STABLE IF NOT EXISTS  FURIONDEMO_TD.`point_data`(
+`ts` TIMESTAMP   ,
+`id`  INT  PRIMARY KEY ,
+`pointtype` VARCHAR(255)   ,
+`pointvalue` DOUBLE   ,
+`day` VARCHAR(255) ) TAGS(`sno`  VARCHAR(100) ,`pointnumber`  VARCHAR(100));
+```
+
+``` sql
+
+-- 可正常插入或更新
+insert into xx using point_data tags('152','152A01') (ts,id,pointvalue) values('2025-04-08T11:42:23+08:00',1100,10);
+
+-- 不管是插入还是更新，都会提示下方错误
+-- DB error: Primary timestamp column should not be null
+insert into xx using point_data tags('152','152A01') (ts,id,pointvalue) values('2025-04-08T11:42:23+08:00',1100,10);
+
+```
+
