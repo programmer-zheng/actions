@@ -1,17 +1,15 @@
 ﻿using System.Linq;
 using System.Net;
-using Furion;
+using System.Threading.Channels;
 using Furion.Demo.Application.Monitor.Dtos;
 using Furion.Demo.Core;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using SqlSugar;
-using System.Threading.Channels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
-using IPNetwork = Microsoft.AspNetCore.HttpOverrides.IPNetwork;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Furion.Demo.Web.Core;
 
@@ -36,26 +34,19 @@ public class Startup : AppStartup
 
         services.AddSqlSugar();
 
-        // services.Configure<ForwardedHeadersOptions>(options =>
-        // {
-        //     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
-        //     options.ForwardLimit = null; // 如果有多个代理层，可以设为 null 来接收所有头
-        //     options.KnownProxies.Add(IPAddress.Any);
-        // });
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        app.UseForwardedHeaders(new ForwardedHeadersOptions()
+        app.UseForwardedHeaders();
+        /*app.UseForwardedHeaders(new ForwardedHeadersOptions()
         {
             ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost,
-            ForwardLimit = null, // 如果有多个代理层，可以设为 null 来接收所有头
+            ForwardLimit = null,
             RequireHeaderSymmetry = false,
             KnownProxies = { IPAddress.Any },
+        });*/
 
-            KnownNetworks = { new IPNetwork(IPAddress.Parse("192.168.88.0"), 24)  }
-
-        });
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
@@ -63,14 +54,55 @@ public class Startup : AppStartup
 
         app.Use(async (context, next) =>
         {
-            var forwardedHost = context.Request.Headers["X-Forwarded-Host"].FirstOrDefault();
-            if (!string.IsNullOrEmpty(forwardedHost))
+            // 记录所有请求头
+            var customHost = App.GetConfig<string>("CustomHostAndPort");
+            var logger = context.RequestServices.GetRequiredService<ILogger<Startup>>();
+            logger.LogInformation("所有请求头信息：");
+            foreach (var header in context.Request.Headers)
             {
-                context.Request.Host = HostString.FromUriComponent("https://" + forwardedHost);
+                // logger.LogInformation($"{header.Key}: {header.Value}");
             }
+
+            var forwardedHost = context.Request.Headers["X-Forwarded-Host"].FirstOrDefault();
+            var forwardedProto = context.Request.Headers["X-Forwarded-Proto"].FirstOrDefault();
+            var forwardedPort = context.Request.Headers["X-Forwarded-Port"].FirstOrDefault();
+
+            logger.LogInformation("原始请求信息：");
+            logger.LogInformation($"X-Forwarded-Host: {forwardedHost}");
+            logger.LogInformation($"X-Forwarded-Proto: {forwardedProto}");
+            logger.LogInformation($"X-Forwarded-Port: {forwardedPort}");
+            logger.LogInformation($"原始Host: {context.Request.Host}");
+            logger.LogInformation($"原始Scheme: {context.Request.Scheme}");
+
+            // 如果没有转发头部，尝试从原始请求中获取信息
+            if (string.IsNullOrEmpty(forwardedHost))
+            {
+                forwardedHost = context.Request.Host.Host;
+                logger.LogInformation($"使用原始Host作为转发Host: {forwardedHost}");
+            }
+
+            if (string.IsNullOrEmpty(forwardedProto))
+            {
+                forwardedProto = context.Request.Scheme;
+                logger.LogInformation($"使用原始Scheme作为转发Scheme: {forwardedProto}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(customHost))
+            {
+                context.Request.Host = new HostString(customHost);
+            }
+
+            logger.LogInformation($"修改后的Host: {context.Request.Host}");
+
+            if (!string.IsNullOrEmpty(forwardedProto))
+            {
+                context.Request.Scheme = forwardedProto;
+                logger.LogInformation($"修改后的Scheme: {context.Request.Scheme}");
+            }
+
             await next();
         });
-        
+
         app.UseStaticFiles();
         // app.UseHttpsRedirection();
 
