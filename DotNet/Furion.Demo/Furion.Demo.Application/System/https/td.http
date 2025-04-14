@@ -1,6 +1,6 @@
 @HostAddress=https://localhost:5001
 
-### TdEngine²âÊÔ²åÈë
+### TdEngineæµ‹è¯•æ’å…¥
 POST {{HostAddress}}/api/td/InsertData
 Content-Type: application/json
 
@@ -48,13 +48,13 @@ Content-Type: application/json
 	"day": "2025-04-09"
 }]
 
-### ¾ÛºÏ²éÑ¯
+### èšåˆæŸ¥è¯¢
 GET {{HostAddress}}/api/td/QueryAggregate
 
-### ¸üĞÂÀúÊ·Êı¾İ
+### æ›´æ–°å†å²æ•°æ®
 GET {{HostAddress}}/api/td/UpdateHistoryData
 
-### TdEngine²âÊÔ²éÑ¯
+### TdEngineæµ‹è¯•æŸ¥è¯¢
 POST {{HostAddress}}/api/td/QueryData
 Content-Type: application/json
 
@@ -63,5 +63,5 @@ Content-Type: application/json
   "pointNumber": ""
 }
 
-### ±¸·İÊı¾İ¿â
+### å¤‡ä»½æ•°æ®åº“
 GET {{HostAddress}}/api/td/BackupDatabase 

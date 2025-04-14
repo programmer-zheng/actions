@@ -1,4 +1,4 @@
-### MySQL²âÊÔ²åÈë
+### MySQLæµ‹è¯•æ’å…¥
 POST {{HostAddress}}/api/mysql/InsertData
 Content-Type: application/json
 
@@ -17,7 +17,7 @@ Content-Type: application/json
 }]
 
 
-### MySQL²âÊÔ²éÑ¯
+### MySQLæµ‹è¯•æŸ¥è¯¢
 POST {{HostAddress}}/api/mysql/QueryData
 Content-Type: application/json
 
@@ -26,10 +26,10 @@ Content-Type: application/json
   "pointNumber": ""
 }
 
-### ±¸·İÊı¾İ¿â
+### å¤‡ä»½æ•°æ®åº“
 GET {{HostAddress}}/api/mysql/BackupDatabase 
 
-### ²âÊÔÉ¾³ıÊı¾İ
+### æµ‹è¯•åˆ é™¤æ•°æ®
 DELETE {{HostAddress}}/api/mysql/DeleteData
 Content-Type: application/json
 

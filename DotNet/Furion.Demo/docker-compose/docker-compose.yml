@@ -1,0 +1,12 @@
+services:
+  web:
+    image: nginx
+    container_name: web
+    restart: unless-stopped
+    volumes:
+      - "../Furion.Demo.Web.Entry/wwwroot/:/usr/share/nginx/furiondemo"
+      - "./nginx-test.conf:/etc/nginx/conf.d/nginx-test.conf"
+    ports:
+      - 18080:80
+    extra_hosts:
+      - "fd.local.host:host-gateway"
