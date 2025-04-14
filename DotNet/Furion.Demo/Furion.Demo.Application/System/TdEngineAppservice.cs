@@ -86,11 +86,12 @@ public class TdEngineAppservice : IDynamicApiController
                 Avg = SqlFunc.AggregateAvg(t.PointValue),
                 Max = SqlFunc.AggregateMax(t.PointValue),
                 Min = SqlFunc.AggregateMin(t.PointValue)
-            }).ToListAsync();
-        foreach (var item in data)
-        {
-            item.Avg = Math.Round(item.Avg, 2);
-        }
+            }).FirstAsync();
+        // 为空不会有异常
+        //foreach (var item in data)
+        //{
+        //    item.Avg = Math.Round(item.Avg, 2);
+        //}
         return data;
     }
 
