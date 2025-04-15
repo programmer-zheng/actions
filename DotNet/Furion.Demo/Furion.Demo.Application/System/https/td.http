@@ -1,4 +1,4 @@
-@HostAddress=https://localhost:5001
+@HostAddress=http://localhost:5000
 
 ### TdEngine测试插入
 POST {{HostAddress}}/api/td/InsertData
@@ -50,6 +50,10 @@ Content-Type: application/json
 
 ### 聚合查询
 GET {{HostAddress}}/api/td/QueryAggregate
+
+
+### 原生SQL聚合查询
+GET {{HostAddress}}/api/td/QueryAggregateRawSql
 
 ### 更新历史数据
 GET {{HostAddress}}/api/td/UpdateHistoryData

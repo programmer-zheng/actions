@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SqlSugar.DbConvert;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,4 +23,21 @@ public class TdAggregateDataDto
     public double Max { get; set; }
 
     public double Min { get; set; }
+}
+
+public class TdAggregateDataListDto
+{
+    public double Val { get; set; }
+
+    public DateTime Time { get; set; }
+
+    [SugarColumn(SqlParameterDbType = typeof(EnumToStringConvert))]
+    public AgggegateTypeEnum Type { get; set; }
+}
+
+public enum AgggegateTypeEnum
+{
+    Max,
+    Min,
+    Avg
 }

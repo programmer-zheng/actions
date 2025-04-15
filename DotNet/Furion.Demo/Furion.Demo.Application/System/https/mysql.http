@@ -1,3 +1,5 @@
+@HostAddress=http://localhost:5000
+
 ### MySQL测试插入
 POST {{HostAddress}}/api/mysql/InsertData
 Content-Type: application/json

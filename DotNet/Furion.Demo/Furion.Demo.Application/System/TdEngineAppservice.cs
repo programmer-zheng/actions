@@ -79,14 +79,47 @@ public class TdEngineAppservice : IDynamicApiController
     [HttpGet("QueryAggregate")]
     public async Task<object> QueryAggregateAsync()
     {
-        var data = await repository.AsQueryable()
-            .Where(t => t.ts >= Convert.ToDateTime("2025-04-08 12:04:08") && t.ts <= Convert.ToDateTime("2025-04-09 12:03:09"))
-            .Select(t => new TdAggregateDataDto
-            {
-                Avg = SqlFunc.AggregateAvg(t.PointValue),
-                Max = SqlFunc.AggregateMax(t.PointValue),
-                Min = SqlFunc.AggregateMin(t.PointValue)
-            }).FirstAsync();
+        /* var data = await repository.AsQueryable()
+             .Where(t => t.ts >= Convert.ToDateTime("2025-04-08 12:04:08") && t.ts <= Convert.ToDateTime("2025-04-09 12:03:09"))
+             .Select(t => new TdAggregateDataDto
+             {
+                 //Avg = SqlFunc.AggregateAvg(t.PointValue),
+                 Avg = SqlFunc.Round<double>(SqlFunc.AggregateAvg(t.PointValue), 2),
+                 Max = SqlFunc.AggregateMax(t.PointValue),
+                 Min = SqlFunc.AggregateMin(t.PointValue)
+             }).FirstAsync();*/
+
+        var q1 = repository.AsQueryable().Where(t => t.SNO == "152").Select(it => new TdAggregateDataListDto { Val = SqlFunc.AggregateMax(it.PointValue), Type =  AgggegateTypeEnum.Max, Time = it.ts });
+        var q2 = repository.AsQueryable().Where(t => t.SNO == "152").Select(it => new TdAggregateDataListDto { Val = SqlFunc.AggregateMin(it.PointValue), Type = AgggegateTypeEnum.Min, Time = it.ts });
+        var q3 = repository.AsQueryable().Where(t => t.SNO == "152").Select(it => new TdAggregateDataListDto { Val = SqlFunc.AggregateAvg(it.PointValue), Type = AgggegateTypeEnum.Avg, Time = DateTime.Now });
+        var data = repository.Context.UnionAll(q1, q2, q3).ToList();
+        // 为空不会有异常
+        //foreach (var item in data)
+        //{
+        //    item.Avg = Math.Round(item.Avg, 2);
+        //}
+        return data;
+    }
+
+    [HttpGet("QueryAggregateRawSql")]
+    public async Task<object> QueryAggregateRawSqlAsync()
+    {
+        var sql = """
+            SELECT * FROM ((select MAX(`pointvalue`) as `val`,`ts` as `time`,'max' as `type` from point_data where sno = @sno)
+            union all (select MIN(`pointvalue`) as `val`,`ts` as `time`,'min' as `type` from point_data where sno = @sno)
+            union all (select AVG(`pointvalue`) as val,'' as `time`,'avg' as `type` from point_data where sno = @sno)
+            )  ttt
+            """;
+        sql = """
+            SELECT * FROM  ( SELECT  MAX(`pointvalue`) AS `val` , `ts` AS `time`, 'max' AS `type`   FROM `point_data`  WHERE  `sno` = "152"    UNION ALL
+             SELECT  MIN(`pointvalue`) AS `val`, `ts` AS `time` , 'min' AS `type`   FROM `point_data`  WHERE  `sno` = "152"      UNION ALL
+             SELECT  AVG(`pointvalue`) AS `val` , '' AS `time`, 'avg' AS `type`   FROM `point_data`  WHERE  `sno` = "152"     ) unionTable
+            """;
+        var paramList = new List<SugarParameter>()
+        {
+            new SugarParameter("@sno","152")
+        };
+        var data = await repository.Context.Ado.SqlQueryAsync<TdAggregateDataListDto>(sql, paramList);
         // 为空不会有异常
         //foreach (var item in data)
         //{

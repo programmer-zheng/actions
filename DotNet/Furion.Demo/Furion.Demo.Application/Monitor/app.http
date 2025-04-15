@@ -1,4 +1,4 @@
-@HostAddress=https://localhost:5001
+@HostAddress=http://localhost:5000
 
 ### 测点数据变更
 GET {{HostAddress}}/api/monitor/point-change
