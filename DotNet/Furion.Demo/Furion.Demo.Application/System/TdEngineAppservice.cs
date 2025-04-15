@@ -110,11 +110,7 @@ public class TdEngineAppservice : IDynamicApiController
             union all (select AVG(`pointvalue`) as val,'' as `time`,'avg' as `type` from point_data where sno = @sno)
             )  ttt
             """;
-        sql = """
-            SELECT * FROM  ( SELECT  MAX(`pointvalue`) AS `val` , `ts` AS `time`, 'max' AS `type`   FROM `point_data`  WHERE  `sno` = "152"    UNION ALL
-             SELECT  MIN(`pointvalue`) AS `val`, `ts` AS `time` , 'min' AS `type`   FROM `point_data`  WHERE  `sno` = "152"      UNION ALL
-             SELECT  AVG(`pointvalue`) AS `val` , '' AS `time`, 'avg' AS `type`   FROM `point_data`  WHERE  `sno` = "152"     ) unionTable
-            """;
+        
         var paramList = new List<SugarParameter>()
         {
             new SugarParameter("@sno","152")
