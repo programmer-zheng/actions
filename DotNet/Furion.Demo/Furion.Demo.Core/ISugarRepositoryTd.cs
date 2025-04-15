@@ -24,6 +24,12 @@ public class SugarRepositoryTd<TDEntity> : SugarRepository<TDEntity>, ISugarRepo
     public async Task<AggregateDataDto<TProperty>> QueryAggregateAsync<TProperty>(Expression<Func<TDEntity, bool>> whereExpression, Expression<Func<TDEntity, TProperty>> propertySelector)
         where TProperty : struct
     {
+        
+        if (Context.CurrentConnectionConfig.DbType != DbType.TDengine)
+        {
+            throw new NotSupportedException("只支持TdEngine数据库");
+        }
+
         // 解析属性名称
         var memberExpression = (MemberExpression)propertySelector.Body;
         var propertyName = memberExpression.Member.Name;
