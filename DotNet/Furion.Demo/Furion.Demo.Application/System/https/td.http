@@ -56,6 +56,10 @@ GET {{HostAddress}}/api/td/QueryAggregate
 GET {{HostAddress}}/api/td/QueryAggregate2
 
 
+### 聚合查询3
+GET {{HostAddress}}/api/td/QueryAggregate3
+
+
 
 ### 原生SQL聚合查询
 GET {{HostAddress}}/api/td/QueryAggregateRawSql

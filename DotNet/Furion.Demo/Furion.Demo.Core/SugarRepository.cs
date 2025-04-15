@@ -1,6 +1,7 @@
 ﻿using SqlSugar;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ public class SugarRepository<T> : SimpleClient<T>, ISugarRepository<T> where T :
 {
     private const string MySqlConfigId = "MySql";
     private const string TdConfigId = "TDengine";
+
     public SugarRepository()
     {
         if (typeof(T).IsDefined(typeof(TraditionDataTableAttribute), true))
@@ -31,6 +33,7 @@ public class SugarRepository<T> : SimpleClient<T>, ISugarRepository<T> where T :
         {
             return userId;
         }
+
         return null;
     }
 
@@ -42,6 +45,7 @@ public class SugarRepository<T> : SimpleClient<T>, ISugarRepository<T> where T :
                 .IsLogic()
                 .ExecuteCommand("IsDeleted", true, "DeletionTime", "DeleterUserId", GetCurrentUserId()) > 0;
         }
+
         return base.Delete(deleteObj);
     }
 
@@ -53,6 +57,7 @@ public class SugarRepository<T> : SimpleClient<T>, ISugarRepository<T> where T :
                 .IsLogic()
                 .ExecuteCommand("IsDeleted", true, "DeletionTime", "DeleterUserId", GetCurrentUserId()) > 0;
         }
+
         return base.Delete(deleteObjs);
     }
 
@@ -64,6 +69,7 @@ public class SugarRepository<T> : SimpleClient<T>, ISugarRepository<T> where T :
                 .IsLogic()
                 .ExecuteCommand("IsDeleted", true, "DeletionTime", "DeleterUserId", GetCurrentUserId()) > 0;
         }
+
         return base.Delete(whereExpression);
     }
 
@@ -75,6 +81,7 @@ public class SugarRepository<T> : SimpleClient<T>, ISugarRepository<T> where T :
                 .IsLogic()
                 .ExecuteCommandAsync("IsDeleted", true, "DeletionTime", "DeleterUserId", GetCurrentUserId()) > 0;
         }
+
         return await base.DeleteAsync(deleteObj);
     }
 
@@ -86,6 +93,7 @@ public class SugarRepository<T> : SimpleClient<T>, ISugarRepository<T> where T :
                 .IsLogic()
                 .ExecuteCommandAsync("IsDeleted", true, "DeletionTime", "DeleterUserId", GetCurrentUserId()) > 0;
         }
+
         return await base.DeleteAsync(deleteObjs);
     }
 
@@ -98,7 +106,56 @@ public class SugarRepository<T> : SimpleClient<T>, ISugarRepository<T> where T :
                 .IsLogic()
                 .ExecuteCommandAsync("IsDeleted", true, "DeletionTime", "DeleterUserId", GetCurrentUserId()) > 0;
         }
+
         return await base.DeleteAsync(whereExpression);
     }
-}
 
+    public async Task<AggregateDataDto<TProperty>> QueryAggregateAsync<T1, TProperty>(Expression<Func<T1, bool>> whereExpression, Expression<Func<T1, TProperty>> propertySelector)
+        where T1 : ITdPrimaryKey where TProperty : struct
+    {
+        // 解析属性名称
+        var memberExpression = (MemberExpression)propertySelector.Body;
+        var propertyName = memberExpression.Member.Name;
+
+        // 构建聚合查询
+        var q1 = this.Context.Queryable<T1>()
+            .Where(whereExpression)
+            .Select(it => new AggregateDataListDto<TProperty>
+            {
+                Val = SqlFunc.AggregateMax(SqlFunc.MappingColumn<TProperty>(propertyName)),
+                Type = AgggegateTypeEnum.Max,
+                Time = it.ts
+            });
+
+        var q2 = this.Context.Queryable<T1>()
+            .Where(whereExpression)
+            .Select(it => new AggregateDataListDto<TProperty>
+            {
+                Val = SqlFunc.AggregateMin(SqlFunc.MappingColumn<TProperty>(propertyName)),
+                Type = AgggegateTypeEnum.Min,
+                Time = it.ts
+            });
+
+        var q3 = this.Context.Queryable<T1>()
+            .Where(whereExpression)
+            .Select(it => new AggregateDataListDto<TProperty>
+            {
+                Val = SqlFunc.AggregateAvg(SqlFunc.MappingColumn<TProperty>(propertyName)),
+                Type = AgggegateTypeEnum.Avg,
+                Time = DateTime.Now
+            });
+
+        var data = await this.Context.UnionAll(q1, q2, q3).ToListAsync();
+
+        return data.Count > 0
+            ? new AggregateDataDto<TProperty>
+            {
+                Avg = data.First(t => t.Type == AgggegateTypeEnum.Avg).Val,
+                Max = data.First(t => t.Type == AgggegateTypeEnum.Max).Val,
+                Min = data.First(t => t.Type == AgggegateTypeEnum.Min).Val,
+                MaxTime = data.First(t => t.Type == AgggegateTypeEnum.Max).Time,
+                MinTime = data.First(t => t.Type == AgggegateTypeEnum.Min).Time
+            }
+            : null;
+    }
+}

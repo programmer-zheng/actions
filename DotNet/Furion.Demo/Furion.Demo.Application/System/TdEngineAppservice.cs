@@ -117,6 +117,13 @@ public class TdEngineAppservice : IDynamicApiController
         return data;
     }
 
+    [HttpGet("QueryAggregate3")]
+    public async Task<object> QueryAggregate3Async()
+    {
+        var data = await _repository.QueryAggregateAsync<PointDataEntity, double>(t => t.Id > 1102, t => t.PointValue);
+        return data;
+    }
+
     /// <summary>
     /// 原生sql查询聚合数据
     /// </summary>
