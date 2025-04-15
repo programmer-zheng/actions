@@ -52,6 +52,11 @@ Content-Type: application/json
 GET {{HostAddress}}/api/td/QueryAggregate
 
 
+### 聚合查询2
+GET {{HostAddress}}/api/td/QueryAggregate2
+
+
+
 ### 原生SQL聚合查询
 GET {{HostAddress}}/api/td/QueryAggregateRawSql
 

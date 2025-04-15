@@ -57,7 +57,7 @@ public class Startup : AppStartup
             // 记录所有请求头
             var customHost = App.GetConfig<string>("CustomHostAndPort");
             var logger = context.RequestServices.GetRequiredService<ILogger<Startup>>();
-            logger.LogInformation("所有请求头信息：");
+            logger.LogDebug("所有请求头信息：");
             foreach (var header in context.Request.Headers)
             {
                 // logger.LogInformation($"{header.Key}: {header.Value}");
@@ -67,24 +67,24 @@ public class Startup : AppStartup
             var forwardedProto = context.Request.Headers["X-Forwarded-Proto"].FirstOrDefault();
             var forwardedPort = context.Request.Headers["X-Forwarded-Port"].FirstOrDefault();
 
-            logger.LogInformation("原始请求信息：");
-            logger.LogInformation($"X-Forwarded-Host: {forwardedHost}");
-            logger.LogInformation($"X-Forwarded-Proto: {forwardedProto}");
-            logger.LogInformation($"X-Forwarded-Port: {forwardedPort}");
-            logger.LogInformation($"原始Host: {context.Request.Host}");
-            logger.LogInformation($"原始Scheme: {context.Request.Scheme}");
+            logger.LogDebug("原始请求信息：");
+            logger.LogDebug($"X-Forwarded-Host: {forwardedHost}");
+            logger.LogDebug($"X-Forwarded-Proto: {forwardedProto}");
+            logger.LogDebug($"X-Forwarded-Port: {forwardedPort}");
+            logger.LogDebug($"原始Host: {context.Request.Host}");
+            logger.LogDebug($"原始Scheme: {context.Request.Scheme}");
 
             // 如果没有转发头部，尝试从原始请求中获取信息
             if (string.IsNullOrEmpty(forwardedHost))
             {
                 forwardedHost = context.Request.Host.Host;
-                logger.LogInformation($"使用原始Host作为转发Host: {forwardedHost}");
+                logger.LogDebug($"使用原始Host作为转发Host: {forwardedHost}");
             }
 
             if (string.IsNullOrEmpty(forwardedProto))
             {
                 forwardedProto = context.Request.Scheme;
-                logger.LogInformation($"使用原始Scheme作为转发Scheme: {forwardedProto}");
+                logger.LogDebug($"使用原始Scheme作为转发Scheme: {forwardedProto}");
             }
 
             if (!string.IsNullOrWhiteSpace(customHost))
@@ -92,12 +92,12 @@ public class Startup : AppStartup
                 context.Request.Host = new HostString(customHost);
             }
 
-            logger.LogInformation($"修改后的Host: {context.Request.Host}");
+            logger.LogDebug($"修改后的Host: {context.Request.Host}");
 
             if (!string.IsNullOrEmpty(forwardedProto))
             {
                 context.Request.Scheme = forwardedProto;
-                logger.LogInformation($"修改后的Scheme: {context.Request.Scheme}");
+                logger.LogDebug($"修改后的Scheme: {context.Request.Scheme}");
             }
 
             await next();

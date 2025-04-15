@@ -14,7 +14,7 @@ namespace Furion.Demo.Core;
  * SugarTable中也不能使用TableDescription
  * 否则会生成
  * comment on table `point_data` is 'xxx'
- * 
+ *
  * STable中指定的表名需要与SugarTable中的一致，否则查询时会提示表不存在（表名与实体不一致情况下）
  */
 [SugarTable("Point_Data")]
@@ -22,14 +22,14 @@ namespace Furion.Demo.Core;
 [STable(STableName = "Point_Data", Tag1 = nameof(SNO), Tag2 = nameof(PointNumber))]
 //[STable(STableName = "Point_Data", Tag1 = nameof(SNO), Tag2 = nameof(PointNumber), Tag3 = nameof(Day))]
 //[STable(STableName = "Point_Data", Tag1 = nameof(Day))]
-public class PointDataEntity
+public class PointDataEntity : ITdPrimaryKey
 {
     /*
      * [SugarColumn(IsPrimaryKey = true, InsertServerTime = true)]
      * 毫秒 默认
      * 纳秒：SqlParameterDbType =typeof(DateTime19)，TsType=config_ns
      * 微秒：SqlParameterDbType =typeof(DateTime16)，TsType=config_us
-     * 
+     *
      */
 
     //[SugarColumn(IsPrimaryKey = true, InsertServerTime = true)]
@@ -58,7 +58,6 @@ public class PointDataEntity
 [TraditionDataTable]
 public class PointEntity : BaseEntity
 {
-
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public long Id { get; set; }
 

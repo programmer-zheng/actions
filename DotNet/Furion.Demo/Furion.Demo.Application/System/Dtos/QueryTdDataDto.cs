@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Furion.Demo.Core;
 
 namespace Furion.Demo.Application.System.Dtos;
 
@@ -37,11 +38,4 @@ public class TdAggregateDataListDto
 
     [SugarColumn(SqlParameterDbType = typeof(EnumToStringConvert))]
     public AgggegateTypeEnum Type { get; set; }
-}
-
-public enum AgggegateTypeEnum
-{
-    Max,
-    Min,
-    Avg
 }

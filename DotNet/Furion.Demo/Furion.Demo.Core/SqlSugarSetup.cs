@@ -33,6 +33,7 @@ public static class SqlSugarSetup
         SugarScope = sugarClient;
         services.AddSingleton<ISqlSugarClient>(sugarClient);
         services.AddScoped(typeof(ISugarRepository<>), typeof(SugarRepository<>));
+        services.AddScoped(typeof(ISugarRepositoryTd<>), typeof(SugarRepositoryTd<>));
         try
         {
             foreach (var item in connectionConfigs)

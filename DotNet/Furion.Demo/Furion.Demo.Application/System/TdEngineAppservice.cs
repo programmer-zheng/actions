@@ -1,14 +1,7 @@
 ﻿using Furion.Demo.Application.System.Dtos;
 using Furion.Demo.Core;
-using Furion.HttpRemote;
-using Microsoft.Extensions.DependencyInjection;
 using SqlSugar.TDengine;
 using StackExchange.Profiling.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Furion.Demo.Application.System;
 
@@ -19,15 +12,18 @@ public class TdEngineAppservice : IDynamicApiController
 
     // https://www.donet5.com/Home/Doc?typeId=2566
 
-    private readonly ISugarRepository<PointDataEntity> repository;
+    private readonly ISugarRepository<PointDataEntity> _repository;
+
+    private readonly ISugarRepositoryTd<PointDataEntity> _tdPrpository;
 
     private readonly ISqlSugarClient _sqlSugarClient;
 
-    public TdEngineAppservice(ISugarRepository<PointDataEntity> repository, ISqlSugarClient sqlSugarClient /*IServiceProvider serviceProvider*/)
+    public TdEngineAppservice(ISugarRepository<PointDataEntity> repository, ISqlSugarClient sqlSugarClient, ISugarRepositoryTd<PointDataEntity> tdPrpository /*IServiceProvider serviceProvider*/)
     {
         _sqlSugarClient = sqlSugarClient;
+        _tdPrpository = tdPrpository;
         //_sqlSugarClient = serviceProvider.GetKeyedService<SqlSugarClient>("Td");
-        this.repository = repository;
+        this._repository = repository;
     }
 
     /// <summary>
@@ -59,7 +55,7 @@ public class TdEngineAppservice : IDynamicApiController
     [HttpPost("QueryData")]
     public async Task<object> QueryDataAsync(QueryTdDataDto input)
     {
-        var list = await repository.AsQueryable()
+        var list = await _repository.AsQueryable()
             .WhereIF(!input.Sno.IsNullOrWhiteSpace(), t => t.SNO.Equals(input.Sno))
             .WhereIF(!input.PointNumber.IsNullOrWhiteSpace(), t => t.PointNumber.Equals(input.PointNumber))
             .ToListAsync();
@@ -69,7 +65,7 @@ public class TdEngineAppservice : IDynamicApiController
     [HttpGet("UpdateHistoryData")]
     public async Task UpdateHistoryDataAsync()
     {
-        await repository.Context.Updateable<PointDataEntity>()
+        await _repository.Context.Updateable<PointDataEntity>()
             .SetColumns(t => new PointDataEntity { PointValue = Random.Shared.Next() })
             .Where(t => t.Id == 1100)
             .ExecuteCommandAsync();
@@ -92,11 +88,13 @@ public class TdEngineAppservice : IDynamicApiController
                  Min = SqlFunc.AggregateMin(t.PointValue)
              }).FirstAsync();*/
 
-        var q1 = repository.AsQueryable().Where(t => t.SNO == "152").Select(it => new TdAggregateDataListDto { Val = SqlFunc.AggregateMax(it.PointValue), Type = AgggegateTypeEnum.Max, Time = it.ts });
-        var q2 = repository.AsQueryable().Where(t => t.SNO == "152").Select(it => new TdAggregateDataListDto { Val = SqlFunc.AggregateMin(it.PointValue), Type = AgggegateTypeEnum.Min, Time = it.ts });
-        var q3 = repository.AsQueryable().Where(t => t.SNO == "152")
+        var q1 = _repository.AsQueryable().Where(t => t.SNO == "152")
+            .Select(it => new TdAggregateDataListDto { Val = SqlFunc.AggregateMax(it.PointValue), Type = AgggegateTypeEnum.Max, Time = it.ts });
+        var q2 = _repository.AsQueryable().Where(t => t.SNO == "152")
+            .Select(it => new TdAggregateDataListDto { Val = SqlFunc.AggregateMin(it.PointValue), Type = AgggegateTypeEnum.Min, Time = it.ts });
+        var q3 = _repository.AsQueryable().Where(t => t.SNO == "152")
             .Select(it => new TdAggregateDataListDto { Val = SqlFunc.AggregateAvg(it.PointValue), Type = AgggegateTypeEnum.Avg, Time = DateTime.Now });
-        var data = await repository.Context.UnionAll(q1, q2, q3).ToListAsync();
+        var data = await _repository.Context.UnionAll(q1, q2, q3).ToListAsync();
         if (data.Count > 0)
         {
             return new TdAggregateDataDto()
@@ -110,6 +108,13 @@ public class TdEngineAppservice : IDynamicApiController
         }
 
         return null;
+    }
+
+    [HttpGet("QueryAggregate2")]
+    public async Task<object> QueryAggregate2Async()
+    {
+        var data = await _tdPrpository.QueryAggregateAsync<double>(t => t.SNO == "152" && t.PointNumber == "152A02", t => t.PointValue);
+        return data;
     }
 
     /// <summary>
@@ -130,7 +135,7 @@ public class TdEngineAppservice : IDynamicApiController
         {
             new SugarParameter("@sno", "152")
         };
-        var data = await repository.Context.Ado.SqlQueryAsync<TdAggregateDataListDto>(sql, paramList);
+        var data = await _repository.Context.Ado.SqlQueryAsync<TdAggregateDataListDto>(sql, paramList);
         if (data.Count > 0)
         {
             return new TdAggregateDataDto()
@@ -151,7 +156,7 @@ public class TdEngineAppservice : IDynamicApiController
     {
         try
         {
-            var client = repository.Context;
+            var client = _repository.Context;
             var path = Path.Combine(AppContext.BaseDirectory, "td.sql");
             client.DbMaintenance.BackupDataBase(client.Ado.Connection.Database, path);
             return "success";
