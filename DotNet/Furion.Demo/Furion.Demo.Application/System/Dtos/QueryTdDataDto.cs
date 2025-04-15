@@ -21,8 +21,12 @@ public class TdAggregateDataDto
     public double Avg { get; set; }
 
     public double Max { get; set; }
+    
+    public DateTime MaxTime { get; set; }
 
     public double Min { get; set; }
+    
+    public DateTime MinTime { get; set; }
 }
 
 public class TdAggregateDataListDto
