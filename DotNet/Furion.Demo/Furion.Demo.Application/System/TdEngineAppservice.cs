@@ -73,10 +73,14 @@ public class TdEngineAppservice : IDynamicApiController
              .SetColumns(t => new PointDataEntity { PointValue = Random.Shared.Next() })
              .Where(t => t.Id == 1100)
              .ExecuteCommandAsync();*/
+        // TdEngine中不支持直接update语句，如果需要更新历史数据，需要先知道历史数据的ts值，然后对其进行insert插入更新
+
 
         var old = await _repository.AsQueryable().Where(t => t.Id == 1100).FirstAsync();
         old.PointValue = Random.Shared.Next();
         await _repository.Context.Insertable(old)
+            // https://www.donet5.com/home/doc?masterId=1&typeId=1193
+            //.InsertColumns(t => new { t.ts, t.PointValue })//指定列插入功能在TdEngine中不生效
             .SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.SNO}_{it.PointNumber}").ExecuteCommandAsync();
     }
 

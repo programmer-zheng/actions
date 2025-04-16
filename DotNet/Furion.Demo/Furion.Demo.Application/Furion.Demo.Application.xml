@@ -120,6 +120,12 @@
             <param name="input"></param>
             <returns></returns>
         </member>
+        <member name="M:Furion.Demo.Application.System.TdEngineAppservice.UpdateHistoryDataAsync">
+            <summary>
+            覆盖更新历史数据
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Furion.Demo.Application.System.TdEngineAppservice.QueryAggregateAsync">
             <summary>
             查询聚合数据
