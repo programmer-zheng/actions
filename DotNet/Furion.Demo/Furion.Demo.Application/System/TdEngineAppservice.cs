@@ -62,13 +62,22 @@ public class TdEngineAppservice : IDynamicApiController
         return list;
     }
 
+    /// <summary>
+    /// 覆盖更新历史数据
+    /// </summary>
+    /// <returns></returns>
     [HttpGet("UpdateHistoryData")]
     public async Task UpdateHistoryDataAsync()
     {
-        await _repository.Context.Updateable<PointDataEntity>()
-            .SetColumns(t => new PointDataEntity { PointValue = Random.Shared.Next() })
-            .Where(t => t.Id == 1100)
-            .ExecuteCommandAsync();
+        /* await _repository.Context.Updateable<PointDataEntity>()
+             .SetColumns(t => new PointDataEntity { PointValue = Random.Shared.Next() })
+             .Where(t => t.Id == 1100)
+             .ExecuteCommandAsync();*/
+
+        var old = await _repository.AsQueryable().Where(t => t.Id == 1100).FirstAsync();
+        old.PointValue = Random.Shared.Next();
+        await _repository.Context.Insertable(old)
+            .SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.SNO}_{it.PointNumber}").ExecuteCommandAsync();
     }
 
     /// <summary>
