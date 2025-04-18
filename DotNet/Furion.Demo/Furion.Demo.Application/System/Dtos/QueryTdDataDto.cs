@@ -11,7 +11,7 @@ namespace Furion.Demo.Application.System.Dtos;
 public class QueryTdDataDto
 {
 
-    public string Sno { get; set; }
+    public long Sno { get; set; }
 
     public string PointNumber { get; set; }
 }

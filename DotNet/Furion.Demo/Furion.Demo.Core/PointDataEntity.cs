@@ -40,6 +40,7 @@ public class PointDataEntity : ITdPrimaryKey
     [Key]
     public int Id { get; set; }
 
+    [SugarColumn(IsOnlyIgnoreInsert = true, IsOnlyIgnoreUpdate = true)]//Tags字段禁止插入
     public string SNO { get; set; }
 
     public string PointType { get; set; }
@@ -49,6 +50,8 @@ public class PointDataEntity : ITdPrimaryKey
     public double PointValue { get; set; }
 
     public string Day { get; set; }
+
+    public DateTime? DateTime { get; set; }
 }
 
 /// <summary>

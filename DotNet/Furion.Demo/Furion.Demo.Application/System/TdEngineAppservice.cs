@@ -55,8 +55,9 @@ public class TdEngineAppservice : IDynamicApiController
     [HttpPost("QueryData")]
     public async Task<object> QueryDataAsync(QueryTdDataDto input)
     {
-        var list = await _repository.AsQueryable()
-            .WhereIF(!input.Sno.IsNullOrWhiteSpace(), t => t.SNO.Equals(input.Sno))
+        var list = await _repository.Context.Queryable<PointDataEntity>()//.AsQueryable()
+            .Where(t=>t.DateTime == null)
+            .WhereIF(input.Sno > 0, t => t.SNO == (input.Sno.ToString()))
             .WhereIF(!input.PointNumber.IsNullOrWhiteSpace(), t => t.PointNumber.Equals(input.PointNumber))
             .ToListAsync();
         return list;
@@ -76,8 +77,8 @@ public class TdEngineAppservice : IDynamicApiController
         // TdEngine中不支持直接update语句，如果需要更新历史数据，需要先知道历史数据的ts值，然后对其进行insert插入更新
 
 
-        var old = await _repository.AsQueryable().Where(t => t.Id == 1100).FirstAsync();
-        old.PointValue = Random.Shared.Next();
+        var old = await _repository.AsQueryable().Where(t => t.SNO == "152" && t.PointNumber == "152A01").FirstAsync();
+        old.PointValue = Random.Shared.Next(100, 200);
         await _repository.Context.Insertable(old)
             // https://www.donet5.com/home/doc?masterId=1&typeId=1193
             //.InsertColumns(t => new { t.ts, t.PointValue })//指定列插入功能在TdEngine中不生效

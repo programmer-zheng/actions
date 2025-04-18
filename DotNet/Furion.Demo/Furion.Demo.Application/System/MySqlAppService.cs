@@ -43,7 +43,7 @@ public class MySqlAppService : IDynamicApiController
     public async Task<object> QueryDataAsync(QueryTdDataDto input)
     {
         var list = await repository.AsQueryable()
-            .WhereIF(!input.Sno.IsNullOrWhiteSpace(), t => t.SNO.Equals(input.Sno))
+            .WhereIF(input.Sno>0, t => t.SNO.Equals(input.Sno.ToString()))
             .WhereIF(!input.PointNumber.IsNullOrWhiteSpace(), t => t.PointNumber.Equals(input.PointNumber))
             .ToListAsync();
         return list;
