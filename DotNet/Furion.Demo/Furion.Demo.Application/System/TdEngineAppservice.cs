@@ -85,7 +85,7 @@ INSERT INTO
             {
                 stringBuilder.AppendLine();
                 stringBuilder.Append($"`point_data_{tagGroup.Key.SNO}_{tagGroup.Key.PointNumber}` ");//指定子表名称
-                stringBuilder.Append($" USING `point_data` tags('{tagGroup.Key.SNO}','{ tagGroup.Key.PointNumber}') ");//tags值
+                stringBuilder.Append($" USING `point_data` tags('{tagGroup.Key.SNO}','{tagGroup.Key.PointNumber}') ");//tags值
                 stringBuilder.AppendLine(" (`ts`,`id`,`pointtype`,`pointvalue`,`day`,`datetime`) ");//指定插入的字段
                 stringBuilder.Append($" VALUES ");
                 foreach (var item in tagGroup)
@@ -107,7 +107,7 @@ INSERT INTO
     [HttpPost("QueryData")]
     public async Task<object> QueryDataAsync(QueryTdDataDto input)
     {
-        var list = await _repository.Context.Queryable<PointDataEntity>()//.AsQueryable()
+        var list = await _repository.Context.Queryable<PointDataEntity>().AsTDengineSTable()//.AsQueryable()
             .Where(t => t.DateTime == null)
             .WhereIF(input.Sno > 0, t => t.SNO == (input.Sno.ToString()))
             .WhereIF(!input.PointNumber.IsNullOrWhiteSpace(), t => t.PointNumber.Equals(input.PointNumber))
@@ -156,10 +156,13 @@ INSERT INTO
 
         var q1 = _repository.AsQueryable().Where(t => t.SNO == "152")
             .Select(it => new TdAggregateDataListDto { Val = SqlFunc.AggregateMax(it.PointValue), Type = AgggegateTypeEnum.Max, Time = it.ts });
+
         var q2 = _repository.AsQueryable().Where(t => t.SNO == "152")
             .Select(it => new TdAggregateDataListDto { Val = SqlFunc.AggregateMin(it.PointValue), Type = AgggegateTypeEnum.Min, Time = it.ts });
+
         var q3 = _repository.AsQueryable().Where(t => t.SNO == "152")
             .Select(it => new TdAggregateDataListDto { Val = SqlFunc.AggregateAvg(it.PointValue), Type = AgggegateTypeEnum.Avg, Time = DateTime.Now });
+
         var data = await _repository.Context.UnionAll(q1, q2, q3).ToListAsync();
         if (data.Count > 0)
         {
