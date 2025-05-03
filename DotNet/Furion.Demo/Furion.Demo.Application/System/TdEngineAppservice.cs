@@ -2,6 +2,7 @@
 using Furion.Demo.Core;
 using SqlSugar.TDengine;
 using StackExchange.Profiling.Internal;
+using System.Text;
 
 namespace Furion.Demo.Application.System;
 
@@ -48,6 +49,57 @@ public class TdEngineAppservice : IDynamicApiController
     }
 
     /// <summary>
+    /// 往TdEngine中插入数据
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    [HttpPost("InsertDataWithSql")]
+    public async Task CreateRawSqlAsync(List<CreateTdDataDto> input)
+    {
+        var data = input.Adapt<List<PointDataEntity>>();
+        data.ForEach(t =>
+        {
+            //t.ts = DateTime.Now;
+            t.PointValue = Random.Shared.Next(10, 50);
+        });
+        if (data.Count > 0)
+        {
+            /*
+
+INSERT INTO
+
+`point_data_152_152A01`  USING `point_data` tags('152','152A01')  (`ts`,`id`,`pointtype`,`pointvalue`,`day`,`datetime`)
+ VALUES  ('2025-04-08 11:42:24',1100,'1D',46,'2025/4/8 0:00:00',null) ('2025-04-09 11:03:09',1103,'1D',22,'2025/4/9 0:00:00',null)
+
+`point_data_152_152A02`  USING `point_data` tags('152','152A02')  (`ts`,`id`,`pointtype`,`pointvalue`,`day`,`datetime`)
+ VALUES  ('2025-04-08 12:04:08',1101,'3F',15,'2025/4/8 0:00:00',null) ('2025-04-09 12:03:09',1104,'3F',21,'2025/4/9 0:00:00',null)
+
+`point_data_154_154B03`  USING `point_data` tags('154','154B03')  (`ts`,`id`,`pointtype`,`pointvalue`,`day`,`datetime`)
+ VALUES  ('2025-04-08 12:02:08',1102,'2G',21,'2025/4/8 0:00:00',null) ('2025-04-09 12:04:09',1105,'2G',47,'2025/4/9 0:00:00',null)
+
+            */
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine("INSERT INTO");
+            var groups = data.GroupBy(t => new { t.SNO, t.PointNumber }).ToList();
+            foreach (var tagGroup in groups)
+            {
+                stringBuilder.AppendLine();
+                stringBuilder.Append($"`point_data_{tagGroup.Key.SNO}_{tagGroup.Key.PointNumber}` ");//指定子表名称
+                stringBuilder.Append($" USING `point_data` tags('{tagGroup.Key.SNO}','{ tagGroup.Key.PointNumber}') ");//tags值
+                stringBuilder.AppendLine(" (`ts`,`id`,`pointtype`,`pointvalue`,`day`,`datetime`) ");//指定插入的字段
+                stringBuilder.Append($" VALUES ");
+                foreach (var item in tagGroup)
+                {
+                    stringBuilder.Append($" ('{item.ts:yyyy-MM-dd HH:mm:ss}',{item.Id},'{item.PointType}',{item.PointValue},'{item.Day}',null)");
+                }
+                stringBuilder.AppendLine();
+            }
+            Console.WriteLine(stringBuilder.ToString());
+            await _sqlSugarClient.Ado.ExecuteCommandAsync(stringBuilder.ToString());
+        }
+    }
+
+    /// <summary>
     /// 查询TdEngine中的数据
     /// </summary>
     /// <param name="input"></param>
@@ -56,7 +108,7 @@ public class TdEngineAppservice : IDynamicApiController
     public async Task<object> QueryDataAsync(QueryTdDataDto input)
     {
         var list = await _repository.Context.Queryable<PointDataEntity>()//.AsQueryable()
-            .Where(t=>t.DateTime == null)
+            .Where(t => t.DateTime == null)
             .WhereIF(input.Sno > 0, t => t.SNO == (input.Sno.ToString()))
             .WhereIF(!input.PointNumber.IsNullOrWhiteSpace(), t => t.PointNumber.Equals(input.PointNumber))
             .ToListAsync();
