@@ -61,7 +61,10 @@ public class TdEngineAppservice : IDynamicApiController
         {
             //t.ts = DateTime.Now;
             t.PointValue = Random.Shared.Next(10, 50);
+            t.AlarmId = 1234;
         });
+        data.Last().AlarmId = null;
+        data.Last().DateTime = DateTime.Now;
         if (data.Count > 0)
         {
             /*
@@ -86,14 +89,17 @@ INSERT INTO
                 stringBuilder.AppendLine();
                 stringBuilder.Append($"`point_data_{tagGroup.Key.SNO}_{tagGroup.Key.PointNumber}` ");//指定子表名称
                 stringBuilder.Append($" USING `point_data` tags('{tagGroup.Key.SNO}','{tagGroup.Key.PointNumber}') ");//tags值
-                stringBuilder.AppendLine(" (`ts`,`id`,`pointtype`,`pointvalue`,`day`,`datetime`) ");//指定插入的字段
+                stringBuilder.AppendLine(" (`ts`,`id`,`pointtype`,`pointvalue`,`day`,`alarm_id`,`datetime`) ");//指定插入的字段
                 stringBuilder.Append($" VALUES ");
                 foreach (var item in tagGroup)
                 {
-                    stringBuilder.Append($" ('{item.ts:yyyy-MM-dd HH:mm:ss}',{item.Id},'{item.PointType}',{item.PointValue},'{item.Day}',null)");
+                    // stringBuilder.Append($" (now,{item.Id},'{item.PointType}',{item.PointValue},'{item.Day}',");
+                    stringBuilder.Append($" ('{item.ts:yyyy-MM-dd HH:mm:ss.fffffff}',{item.Id},'{item.PointType}',{item.PointValue},'{item.Day}',");
+                    stringBuilder.Append($"{(item.AlarmId.HasValue?item.AlarmId.Value:"null")},{(item.DateTime.HasValue?"'"+item.DateTime.Value.ToString("yyyy-MM-dd HH:mm:ss.fffffff")+"'":"null")})");
                 }
                 stringBuilder.AppendLine();
             }
+            
             Console.WriteLine(stringBuilder.ToString());
             await _sqlSugarClient.Ado.ExecuteCommandAsync(stringBuilder.ToString());
         }

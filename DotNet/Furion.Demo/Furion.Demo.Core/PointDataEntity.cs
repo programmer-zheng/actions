@@ -50,6 +50,9 @@ public class PointDataEntity : ITdPrimaryKey
     public double PointValue { get; set; }
 
     public string Day { get; set; }
+    
+    [SugarColumn(ColumnName = "alarm_id")]
+    public long? AlarmId { get; set; }
 
     public DateTime? DateTime { get; set; }
 }
