@@ -19,12 +19,11 @@ public class TdEngineAppservice : IDynamicApiController
 
     private readonly ISqlSugarClient _sqlSugarClient;
 
-    public TdEngineAppservice(ISugarRepository<PointDataEntity> repository, ISqlSugarClient sqlSugarClient, ISugarRepositoryTd<PointDataEntity> tdPrpository /*IServiceProvider serviceProvider*/)
+    public TdEngineAppservice(ISugarRepository<PointDataEntity> repository, ISqlSugarClient sqlSugarClient, ISugarRepositoryTd<PointDataEntity> tdPrpository)
     {
         _sqlSugarClient = sqlSugarClient;
         _tdPrpository = tdPrpository;
-        //_sqlSugarClient = serviceProvider.GetKeyedService<SqlSugarClient>("Td");
-        this._repository = repository;
+        _repository = repository;
     }
 
     /// <summary>
@@ -87,19 +86,21 @@ INSERT INTO
             foreach (var tagGroup in groups)
             {
                 stringBuilder.AppendLine();
-                stringBuilder.Append($"`point_data_{tagGroup.Key.SNO}_{tagGroup.Key.PointNumber}` ");//指定子表名称
-                stringBuilder.Append($" USING `point_data` tags('{tagGroup.Key.SNO}','{tagGroup.Key.PointNumber}') ");//tags值
-                stringBuilder.AppendLine(" (`ts`,`id`,`pointtype`,`pointvalue`,`day`,`alarm_id`,`datetime`) ");//指定插入的字段
+                stringBuilder.Append($"`point_data_{tagGroup.Key.SNO}_{tagGroup.Key.PointNumber}` "); //指定子表名称
+                stringBuilder.Append($" USING `point_data` tags('{tagGroup.Key.SNO}','{tagGroup.Key.PointNumber}') "); //tags值
+                stringBuilder.AppendLine(" (`ts`,`id`,`pointtype`,`pointvalue`,`day`,`alarm_id`,`datetime`) "); //指定插入的字段
                 stringBuilder.Append($" VALUES ");
                 foreach (var item in tagGroup)
                 {
                     // stringBuilder.Append($" (now,{item.Id},'{item.PointType}',{item.PointValue},'{item.Day}',");
                     stringBuilder.Append($" ('{item.ts:yyyy-MM-dd HH:mm:ss.fffffff}',{item.Id},'{item.PointType}',{item.PointValue},'{item.Day}',");
-                    stringBuilder.Append($"{(item.AlarmId.HasValue?item.AlarmId.Value:"null")},{(item.DateTime.HasValue?"'"+item.DateTime.Value.ToString("yyyy-MM-dd HH:mm:ss.fffffff")+"'":"null")})");
+                    stringBuilder.Append(
+                        $"{(item.AlarmId.HasValue ? item.AlarmId.Value : "null")},{(item.DateTime.HasValue ? "'" + item.DateTime.Value.ToString("yyyy-MM-dd HH:mm:ss.fffffff") + "'" : "null")})");
                 }
+
                 stringBuilder.AppendLine();
             }
-            
+
             Console.WriteLine(stringBuilder.ToString());
             await _sqlSugarClient.Ado.ExecuteCommandAsync(stringBuilder.ToString());
         }
@@ -113,7 +114,7 @@ INSERT INTO
     [HttpPost("QueryData")]
     public async Task<object> QueryDataAsync(QueryTdDataDto input)
     {
-        var list = await _repository.Context.Queryable<PointDataEntity>().AsTDengineSTable()//.AsQueryable()
+        var list = await _repository.Context.Queryable<PointDataEntity>().AsTDengineSTable() //.AsQueryable()
             .Where(t => t.DateTime == null)
             .WhereIF(input.Sno > 0, t => t.SNO == (input.Sno.ToString()))
             .WhereIF(!input.PointNumber.IsNullOrWhiteSpace(), t => t.PointNumber.Equals(input.PointNumber))

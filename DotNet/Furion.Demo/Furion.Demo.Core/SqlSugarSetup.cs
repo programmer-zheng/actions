@@ -76,7 +76,7 @@ public static class SqlSugarSetup
         db.Aop.OnLogExecuting = (sql, paras) =>
         {
             var rawSql = UtilMethods.GetNativeSql(sql, paras);
-            var log = $"【{DateTime.Now} Execute SQL】【{db.CurrentConnectionConfig.DbType}】\r\n{sql}\r\n";
+            var log = $"【{DateTime.Now} Execute SQL】【{db.CurrentConnectionConfig.DbType}】\r\n{rawSql}\r\n";
             var originColor = Console.ForegroundColor;
             if (sql.StartsWith("SELECT", StringComparison.OrdinalIgnoreCase))
                 Console.ForegroundColor = ConsoleColor.Green;
