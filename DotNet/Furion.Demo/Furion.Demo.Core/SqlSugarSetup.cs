@@ -24,6 +24,10 @@ public static class SqlSugarSetup
         {
             foreach (var item in connectionConfigs)
             {
+                item.MoreSettings = new ConnMoreSettings()
+                {
+                    IsNoReadXmlDescription = true, // 禁止读取XML中备注,true是禁用
+                };
                 var dbProvider = db.GetConnection(item.ConfigId);
                 SetupSugarAop(dbProvider);
                 // 之所以不在此初始化数据库，是因为默认启动时，不会立即创建数据库
@@ -57,10 +61,10 @@ public static class SqlSugarSetup
     private static void InitDatabase(SqlSugarProvider db, DbType dbType)
     {
         var entityTypes = App.EffectiveTypes
-                       .Where(u => !u.IsInterface && !u.IsAbstract && u.IsClass && u.IsDefined(typeof(SugarTable), false))
-                       .WhereIF(dbType == DbType.TDengine, u => u.IsDefined(typeof(TimingDataTableAttribute), true))
-                       .WhereIF(dbType == DbType.MySql, u => u.IsDefined(typeof(TraditionDataTableAttribute), true))
-                       .ToArray();
+            .Where(u => !u.IsInterface && !u.IsAbstract && u.IsClass && u.IsDefined(typeof(SugarTable), false))
+            .WhereIF(dbType == DbType.TDengine, u => u.IsDefined(typeof(TimingDataTableAttribute), true))
+            .WhereIF(dbType == DbType.MySql, u => u.IsDefined(typeof(TraditionDataTableAttribute), true))
+            .ToArray();
         var databaseName = db.Ado.Connection.Database;
         db.DbMaintenance.CreateDatabase(databaseName);
         db.CodeFirst.InitTables(entityTypes);
