@@ -31,6 +31,7 @@ public class Startup : AppStartup
 
         var monitorChannel = Channel.CreateUnbounded<string>();
         services.AddKeyedSingleton<Channel<CustomMonitorEventDto>>("Monitor", Channel.CreateUnbounded<CustomMonitorEventDto>());
+        services.AddEventBus();
 
         services.AddSqlSugar();
 

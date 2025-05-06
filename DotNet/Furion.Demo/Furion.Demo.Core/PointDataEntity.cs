@@ -56,6 +56,12 @@ public class PointDataEntity : ITdPrimaryKey
     public long? AlarmId { get; set; }
 
     public DateTime? DateTime { get; set; }
+    
+    public double? AvgValue { get; set; }
+    
+    public double? MaxValue { get; set; }
+    
+    public double? MinValue { get; set; }
 }
 
 /// <summary>

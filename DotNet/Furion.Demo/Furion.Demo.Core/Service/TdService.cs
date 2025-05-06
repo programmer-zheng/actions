@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Furion.Demo.Core.Dtos;
@@ -18,10 +19,35 @@ public class TdService : ISingleton
         _tenant = tenant;
     }
 
+    public async Task InsertAndUpdate(PointDataEntity data)
+    {
+        var oldData = await _tenant.QueryableWithAttr<PointDataEntity>().Where(t => t.SNO == data.SNO && t.ts < data.ts).OrderByDescending(t => t.ts).FirstAsync();
+        if (oldData != null)
+        {
+            var aggregateData = await QueryAggregateAsync(data.SNO, data.PointNumber);
+            if (aggregateData.Count > 0)
+            {
+                oldData.AvgValue = aggregateData.First(t => t.Type == AgggegateTypeEnum.Avg).Val;
+                oldData.MaxValue = aggregateData.First(t => t.Type == AgggegateTypeEnum.Max).Val;
+                oldData.MinValue = aggregateData.First(t => t.Type == AgggegateTypeEnum.Min).Val;
+            }
+
+            oldData.DateTime = DateTime.Now;
+            await _tenant.InsertableWithAttr(oldData)
+                .SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.SNO}_{it.PointNumber}")
+                .ExecuteCommandAsync();
+        }
+
+        await _tenant.InsertableWithAttr(data)
+            .SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.SNO}_{it.PointNumber}")
+            .ExecuteCommandAsync();
+    }
+
+
     public async Task BatchInsert(List<PointDataEntity> data)
     {
         // var db = _tenant.GetConnectionScope(Consts.MySqlConfigId);
-        
+
         await _tenant.InsertableWithAttr(data)
             .SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.SNO}_{it.PointNumber}")
             //.SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.SNO}_{it.PointNumber}_{it.Day.ToString("yyyyMMdd")}")
@@ -34,8 +60,8 @@ public class TdService : ISingleton
         var db = _tenant.GetConnectionScope(Consts.TdConfigId);
         await db.Ado.ExecuteCommandAsync(sql);
     }
-    
-    public async Task<List<TdAggregateDataListDto>> QueryAggregateAsync()
+
+    public async Task<List<TdAggregateDataListDto>> QueryAggregateAsync(string sno = "152", string pointNumber = null)
     {
         /* var data = await repository.AsQueryable()
             .Where(t => t.ts >= Convert.ToDateTime("2025-04-08 12:04:08") && t.ts <= Convert.ToDateTime("2025-04-09 12:03:09"))
@@ -46,7 +72,11 @@ public class TdService : ISingleton
                 Max = SqlFunc.AggregateMax(t.PointValue),
                 Min = SqlFunc.AggregateMin(t.PointValue)
             }).FirstAsync();*/
-        Expression<Func<PointDataEntity, bool>> expression = t => t.SNO == "152";
+        Expression<Func<PointDataEntity, bool>> expression = Expressionable.Create<PointDataEntity>() //创建表达式
+            .And(it => it.SNO == sno)
+            .AndIF(!string.IsNullOrWhiteSpace(pointNumber), it => it.PointNumber == pointNumber)
+            .ToExpression(); //注意 这一句 不能少
+
         var q1 = _tenant.QueryableWithAttr<PointDataEntity>().Where(expression)
             .Select(it => new TdAggregateDataListDto { Val = SqlFunc.AggregateMax(it.PointValue), Type = AgggegateTypeEnum.Max, Time = it.ts });
 
@@ -60,7 +90,7 @@ public class TdService : ISingleton
         var data = await db.UnionAll(q1, q2, q3).ToListAsync();
         return data;
     }
-    
+
     public async Task<object> QueryDataAsync(QueryDataDto input)
     {
         var list = await _tenant.QueryableWithAttr<PointDataEntity>().AsTDengineSTable() //.AsQueryable()
@@ -73,7 +103,6 @@ public class TdService : ISingleton
 
     public async Task UpdateHistoryDataAsync()
     {
-        
         var old = await _tenant.QueryableWithAttr<PointDataEntity>().Where(t => t.SNO == "152" && t.PointNumber == "152A01").FirstAsync();
         old.PointValue = Random.Shared.Next(100, 200);
         await _tenant.InsertableWithAttr<PointDataEntity>(old)

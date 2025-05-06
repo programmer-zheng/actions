@@ -78,7 +78,7 @@ public static class SqlSugarSetup
     private static void SetupSugarAop(SqlSugarProvider db)
     {
         db.QueryFilter.AddTableFilter<ISoftDelete>(t => t.IsDeleted == false);
-        db.Aop.OnLogExecuting = (sql, paras) =>
+        /*db.Aop.OnLogExecuting = (sql, paras) =>
         {
             var rawSql = UtilMethods.GetNativeSql(sql, paras);
             var log = $"【{DateTime.Now} Execute SQL】【{db.CurrentConnectionConfig.DbType}】\r\n{rawSql}\r\n";
@@ -91,7 +91,7 @@ public static class SqlSugarSetup
                 Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(log);
             Console.ForegroundColor = originColor;
-        };
+        };*/
 
         db.Aop.OnError = (sugarException) =>
         {
