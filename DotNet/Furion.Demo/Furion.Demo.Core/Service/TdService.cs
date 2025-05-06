@@ -21,7 +21,7 @@ public class TdService : ISingleton
 
     public async Task InsertAndUpdate(PointDataEntity data)
     {
-        var oldData = await _tenant.QueryableWithAttr<PointDataEntity>().Where(t => t.SNO == data.SNO && t.ts < data.ts).OrderByDescending(t => t.ts).FirstAsync();
+        var oldData = await _tenant.QueryableWithAttr<PointDataEntity>().Where(t => t.SNO == data.SNO && t.PointNumber == data.PointNumber && t.ts < data.ts).OrderByDescending(t => t.ts).FirstAsync();
         if (oldData != null)
         {
             var aggregateData = await QueryAggregateAsync(data.SNO, data.PointNumber);
