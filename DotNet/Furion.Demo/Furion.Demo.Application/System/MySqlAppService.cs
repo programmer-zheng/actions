@@ -70,7 +70,7 @@ public class MySqlAppService : IDynamicApiController
     {
         try
         {
-            var path = Path.Combine(AppContext.BaseDirectory, "mysql.sql");
+            var path = Path.Combine(AppContext.BaseDirectory, "backup", "mysql.sql");
             _mySqlService.Backup(path);
             return "success";
         }

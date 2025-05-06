@@ -120,7 +120,7 @@
             <param name="input"></param>
             <returns></returns>
         </member>
-        <member name="M:Furion.Demo.Application.System.TdEngineAppservice.QueryDataAsync(Furion.Demo.Application.System.Dtos.QueryTdDataDto)">
+        <member name="M:Furion.Demo.Application.System.TdEngineAppservice.QueryDataAsync(Furion.Demo.Core.Dtos.QueryDataDto)">
             <summary>
             查询TdEngine中的数据
             </summary>

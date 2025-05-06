@@ -3,6 +3,8 @@ using Furion.Demo.Core;
 using SqlSugar.TDengine;
 using StackExchange.Profiling.Internal;
 using System.Text;
+using Furion.Demo.Core.Dtos;
+using Furion.Demo.Core.Service;
 
 namespace Furion.Demo.Application.System;
 
@@ -17,12 +19,12 @@ public class TdEngineAppservice : IDynamicApiController
 
     private readonly ISugarRepositoryTd<PointDataEntity> _tdPrpository;
 
-    private readonly ISqlSugarClient _sqlSugarClient;
+    private readonly TdService _tdService;
 
-    public TdEngineAppservice(ISugarRepository<PointDataEntity> repository, ISqlSugarClient sqlSugarClient, ISugarRepositoryTd<PointDataEntity> tdPrpository)
+    public TdEngineAppservice(ISugarRepository<PointDataEntity> repository, ISugarRepositoryTd<PointDataEntity> tdPrpository, TdService tdService)
     {
-        _sqlSugarClient = sqlSugarClient;
         _tdPrpository = tdPrpository;
+        _tdService = tdService;
         _repository = repository;
     }
 
@@ -40,11 +42,7 @@ public class TdEngineAppservice : IDynamicApiController
             //t.ts = DateTime.Now;
             t.PointValue = Random.Shared.Next(10, 50);
         });
-        await _sqlSugarClient.Insertable(data)
-            .SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.SNO}_{it.PointNumber}")
-            //.SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.SNO}_{it.PointNumber}_{it.Day.ToString("yyyyMMdd")}")
-            //.SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.Day.ToString("yyyyMMdd")}")
-            .ExecuteCommandAsync();
+        await _tdService.BatchInsert(data);
     }
 
     /// <summary>
@@ -102,7 +100,7 @@ INSERT INTO
             }
 
             Console.WriteLine(stringBuilder.ToString());
-            await _sqlSugarClient.Ado.ExecuteCommandAsync(stringBuilder.ToString());
+            await _tdService.ExecuteSqlAsync(stringBuilder.ToString());
         }
     }
 
@@ -112,14 +110,9 @@ INSERT INTO
     /// <param name="input"></param>
     /// <returns></returns>
     [HttpPost("QueryData")]
-    public async Task<object> QueryDataAsync(QueryTdDataDto input)
+    public Task<object> QueryDataAsync(QueryDataDto input)
     {
-        var list = await _repository.Context.Queryable<PointDataEntity>().AsTDengineSTable() //.AsQueryable()
-            .Where(t => t.DateTime == null)
-            .WhereIF(input.Sno > 0, t => t.SNO == (input.Sno.ToString()))
-            .WhereIF(!input.PointNumber.IsNullOrWhiteSpace(), t => t.PointNumber.Equals(input.PointNumber))
-            .ToListAsync();
-        return list;
+        return _tdService.QueryDataAsync(input);
     }
 
     /// <summary>
@@ -135,13 +128,7 @@ INSERT INTO
              .ExecuteCommandAsync();*/
         // TdEngine中不支持直接update语句，如果需要更新历史数据，需要先知道历史数据的ts值，然后对其进行insert插入更新
 
-
-        var old = await _repository.AsQueryable().Where(t => t.SNO == "152" && t.PointNumber == "152A01").FirstAsync();
-        old.PointValue = Random.Shared.Next(100, 200);
-        await _repository.Context.Insertable(old)
-            // https://www.donet5.com/home/doc?masterId=1&typeId=1193
-            //.InsertColumns(t => new { t.ts, t.PointValue })//指定列插入功能在TdEngine中不生效
-            .SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.SNO}_{it.PointNumber}").ExecuteCommandAsync();
+        await _tdService.UpdateHistoryDataAsync();
     }
 
     /// <summary>
@@ -151,26 +138,7 @@ INSERT INTO
     [HttpGet("QueryAggregate")]
     public async Task<object> QueryAggregateAsync()
     {
-        /* var data = await repository.AsQueryable()
-             .Where(t => t.ts >= Convert.ToDateTime("2025-04-08 12:04:08") && t.ts <= Convert.ToDateTime("2025-04-09 12:03:09"))
-             .Select(t => new TdAggregateDataDto
-             {
-                 //Avg = SqlFunc.AggregateAvg(t.PointValue),
-                 Avg = SqlFunc.Round<double>(SqlFunc.AggregateAvg(t.PointValue), 2),
-                 Max = SqlFunc.AggregateMax(t.PointValue),
-                 Min = SqlFunc.AggregateMin(t.PointValue)
-             }).FirstAsync();*/
-
-        var q1 = _repository.AsQueryable().Where(t => t.SNO == "152")
-            .Select(it => new TdAggregateDataListDto { Val = SqlFunc.AggregateMax(it.PointValue), Type = AgggegateTypeEnum.Max, Time = it.ts });
-
-        var q2 = _repository.AsQueryable().Where(t => t.SNO == "152")
-            .Select(it => new TdAggregateDataListDto { Val = SqlFunc.AggregateMin(it.PointValue), Type = AgggegateTypeEnum.Min, Time = it.ts });
-
-        var q3 = _repository.AsQueryable().Where(t => t.SNO == "152")
-            .Select(it => new TdAggregateDataListDto { Val = SqlFunc.AggregateAvg(it.PointValue), Type = AgggegateTypeEnum.Avg, Time = DateTime.Now });
-
-        var data = await _repository.Context.UnionAll(q1, q2, q3).ToListAsync();
+        var data = await _tdService.QueryAggregateAsync();
         if (data.Count > 0)
         {
             return new TdAggregateDataDto()
@@ -207,18 +175,7 @@ INSERT INTO
     [HttpGet("QueryAggregateRawSql")]
     public async Task<object> QueryAggregateRawSqlAsync()
     {
-        var sql = """
-                  SELECT * FROM ((select MAX(`pointvalue`) as `val`,`ts` as `time`,'Max' as `type` from point_data where sno = @sno)
-                  union all (select MIN(`pointvalue`) as `val`,`ts` as `time`,'Min' as `type` from point_data where sno = @sno)
-                  union all (select ROUND(AVG(`pointvalue`),2) as val,'' as `time`,'Avg' as `type` from point_data where sno = @sno)
-                  )  ttt
-                  """;
-
-        var paramList = new List<SugarParameter>()
-        {
-            new SugarParameter("@sno", "152")
-        };
-        var data = await _repository.Context.Ado.SqlQueryAsync<TdAggregateDataListDto>(sql, paramList);
+        var data = await _tdService.QueryAggregateWithSqlAsync();
         if (data.Count > 0)
         {
             return new TdAggregateDataDto()
@@ -239,9 +196,11 @@ INSERT INTO
     {
         try
         {
-            var client = _repository.Context;
-            var path = Path.Combine(AppContext.BaseDirectory, "td.sql");
-            client.DbMaintenance.BackupDataBase(client.Ado.Connection.Database, path);
+            var path = Path.Combine(AppContext.BaseDirectory, "backup", "td.sql");
+            // var client = _repository.Context;
+            //
+            // client.DbMaintenance.BackupDataBase(client.Ado.Connection.Database, path);
+            _tdService.Backup(path);
             return "success";
         }
         catch (Exception ex)

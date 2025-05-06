@@ -45,13 +45,3 @@ public class MySqlService : ISingleton
         return Task.CompletedTask;
     }
 }
-
-public class TdService : ISingleton
-{
-    private readonly ITenant _tenant;
-
-    public TdService(ITenant tenant)
-    {
-        _tenant = tenant;
-    }
-}
