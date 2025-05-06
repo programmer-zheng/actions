@@ -1,0 +1,4 @@
+@HostAddress=http://localhost:5000
+
+### 生成Mock数据
+GET {{HostAddress}}/api/mock/Generate

@@ -7,9 +7,8 @@ namespace Furion.Demo.Application.SqlSugar;
 public class MockAppService:IDynamicApiController
 {
     /// <summary>
-    /// 往MySql中插入数据
+    /// 批量生成数据，使用事件总线发布
     /// </summary>
-    /// <param name="input"></param>
     /// <returns></returns>
     [HttpGet("Generate")]
     public async Task CreateAsync()
