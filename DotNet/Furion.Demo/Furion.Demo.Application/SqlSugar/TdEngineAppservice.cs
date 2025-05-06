@@ -1,12 +1,10 @@
-﻿using Furion.Demo.Application.System.Dtos;
+﻿using System.Text;
+using Furion.Demo.Application.System.Dtos;
 using Furion.Demo.Core;
-using SqlSugar.TDengine;
-using StackExchange.Profiling.Internal;
-using System.Text;
 using Furion.Demo.Core.Dtos;
 using Furion.Demo.Core.Service;
 
-namespace Furion.Demo.Application.System;
+namespace Furion.Demo.Application.SqlSugar;
 
 [Route("api/Td")]
 public class TdEngineAppservice : IDynamicApiController

@@ -2,10 +2,9 @@
 using Furion.Demo.Core;
 using Furion.Demo.Core.Dtos;
 using Furion.Demo.Core.Service;
-using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Profiling.Internal;
 
-namespace Furion.Demo.Application.System;
+namespace Furion.Demo.Application.SqlSugar;
 
 [Route("api/MySQL")]
 public class MySqlAppService : IDynamicApiController
