@@ -19,6 +19,7 @@ namespace Furion.Demo.Core;
  */
 [SugarTable("Point_Data")]
 [TimingDataTable]
+[Tenant(Consts.TdConfigId)]
 [STable(STableName = "Point_Data", Tag1 = nameof(SNO), Tag2 = nameof(PointNumber))]
 //[STable(STableName = "Point_Data", Tag1 = nameof(SNO), Tag2 = nameof(PointNumber), Tag3 = nameof(Day))]
 //[STable(STableName = "Point_Data", Tag1 = nameof(Day))]
@@ -62,6 +63,7 @@ public class PointDataEntity : ITdPrimaryKey
 /// </summary>
 [SugarTable("Point_Data")]
 [TraditionDataTable]
+[Tenant(Consts.MySqlConfigId)]
 public class PointEntity : BaseEntity
 {
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]

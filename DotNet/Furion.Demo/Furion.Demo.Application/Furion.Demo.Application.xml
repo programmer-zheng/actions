@@ -92,7 +92,7 @@
             <param name="input"></param>
             <returns></returns>
         </member>
-        <member name="M:Furion.Demo.Application.System.MySqlAppService.QueryDataAsync(Furion.Demo.Application.System.Dtos.QueryTdDataDto)">
+        <member name="M:Furion.Demo.Application.System.MySqlAppService.QueryDataAsync(Furion.Demo.Core.Dtos.QueryDataDto)">
             <summary>
             查询MySql中的数据
             </summary>

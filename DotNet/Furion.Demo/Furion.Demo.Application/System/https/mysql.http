@@ -36,5 +36,5 @@ DELETE {{HostAddress}}/api/mysql/DeleteData
 Content-Type: application/json
 
 [
-	1
+	1,2,3,4
 ]

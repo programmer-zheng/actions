@@ -1,5 +1,7 @@
 ﻿using Furion.Demo.Application.System.Dtos;
 using Furion.Demo.Core;
+using Furion.Demo.Core.Dtos;
+using Furion.Demo.Core.Service;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Profiling.Internal;
 
@@ -8,15 +10,14 @@ namespace Furion.Demo.Application.System;
 [Route("api/MySQL")]
 public class MySqlAppService : IDynamicApiController
 {
+    private readonly ISugarRepository<PointEntity> _repository;
 
-    private readonly ISugarRepository<PointEntity> repository;
+    private readonly MySqlService _mySqlService;
 
-    private readonly ISqlSugarClient _sqlSugarClient;
-
-    public MySqlAppService(ISugarRepository<PointEntity> repository, ISqlSugarClient sqlSugarClient /*IServiceProvider serviceProvider*/)
+    public MySqlAppService(ISugarRepository<PointEntity> repository, MySqlService mySqlService /*IServiceProvider serviceProvider*/)
     {
-        this.repository = repository;
-        _sqlSugarClient = sqlSugarClient;
+        _repository = repository;
+        _mySqlService = mySqlService;
         //_sqlSugarClient = serviceProvider.GetKeyedService<SqlSugarClient>("MySQL");
     }
 
@@ -31,7 +32,8 @@ public class MySqlAppService : IDynamicApiController
     {
         var data = input.Adapt<List<PointEntity>>();
         data.ForEach(t => t.PointValue = Random.Shared.Next(10, 50));
-        await repository.InsertRangeAsync(data);
+        // await repository.InsertRangeAsync(data);
+        await _mySqlService.BatchInsert(data);
     }
 
     /// <summary>
@@ -40,20 +42,16 @@ public class MySqlAppService : IDynamicApiController
     /// <param name="input"></param>
     /// <returns></returns>
     [HttpPost("QueryData")]
-    public async Task<object> QueryDataAsync(QueryTdDataDto input)
+    public async Task<object> QueryDataAsync(QueryDataDto input)
     {
-        var list = await repository.AsQueryable()
-            .WhereIF(input.Sno>0, t => t.SNO.Equals(input.Sno.ToString()))
+        // return await _mySqlService.QueryDataAsync(input);
+
+        var list = await _repository.Context.Queryable<PointEntity>()
+            .WhereIF(input.Sno > 0, t => t.SNO.Equals(input.Sno))
             .WhereIF(!input.PointNumber.IsNullOrWhiteSpace(), t => t.PointNumber.Equals(input.PointNumber))
+            .Select(t => new { t.SNO, t.PointNumber, t.PointType, t.PointValue })
             .ToListAsync();
         return list;
-
-        /*        var list = await repository.Context.Queryable<PointEntity>()
-                    .WhereIF(!input.Sno.IsNullOrWhiteSpace(), t => t.SNO.Equals(input.Sno))
-                    .WhereIF(!input.PointNumber.IsNullOrWhiteSpace(), t => t.PointNumber.Equals(input.PointNumber))
-                    .Select(t => new { t.SNO, t.PointNumber, t.PointType, t.PointValue })
-                    .ToListAsync();
-                return list;*/
     }
 
     /// <summary>
@@ -64,8 +62,7 @@ public class MySqlAppService : IDynamicApiController
     [ActionName("DeleteData")]
     public async Task<bool> DeleteAsync(List<long> ids)
     {
-        var result = await repository.DeleteAsync(t => ids.Contains(t.Id));
-        return result;
+        return await _mySqlService.DeleteAsync(ids);
     }
 
     [HttpGet("BackupDatabase")]
@@ -73,9 +70,8 @@ public class MySqlAppService : IDynamicApiController
     {
         try
         {
-            var client = repository.Context;
             var path = Path.Combine(AppContext.BaseDirectory, "mysql.sql");
-            client.DbMaintenance.BackupDataBase(client.Ado.Connection.Database, path);
+            _mySqlService.Backup(path);
             return "success";
         }
         catch (Exception ex)
