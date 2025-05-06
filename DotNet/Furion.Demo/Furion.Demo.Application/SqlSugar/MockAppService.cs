@@ -18,15 +18,14 @@ public class MockAppService:IDynamicApiController
         {
             var data = new PointDataEntity()
             {
-                ts = DateTime.Now,
-                SNO = Random.Shared.Next(1, 254).ToString(),
-                PointNumber = Random.Shared.Next(1, 40).ToString(),
+                ts = DateTime.Today.AddSeconds(i),
+                SNO = Random.Shared.Next(1000, 1005).ToString(),
+                PointNumber = Random.Shared.Next(2000, 2005).ToString(),
                 Id = Random.Shared.Next(1, 100),
                 PointValue = Random.Shared.Next(1, 40),
                 Day = DateOnly.FromDateTime(DateTime.Today).ToString(),
             };
             await MessageCenter.PublishAsync("PointValueChanged", data);
-            await Task.Delay(100);
         }
     }
 }
