@@ -20,7 +20,7 @@ public class MockAppService:IDynamicApiController
                 ts = DateTime.Today.AddSeconds(i),
                 SNO = Random.Shared.Next(1000, 1005).ToString(),
                 PointNumber = Random.Shared.Next(2000, 2005).ToString(),
-                Id = Random.Shared.Next(1, 100),
+                Id = i,
                 PointValue = Random.Shared.Next(1, 40),
                 Day = DateOnly.FromDateTime(DateTime.Today).ToString(),
             };

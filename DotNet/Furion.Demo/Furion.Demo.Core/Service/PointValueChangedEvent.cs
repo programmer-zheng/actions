@@ -23,12 +23,7 @@ public class PointValueChangedEvent : IEventSubscriber, ISingleton
     {
         var eto = context.GetPayload<PointDataEntity>();
         var sno = eto.SNO;
-        Channel<PointDataEntity> channel;
-        if (_channels.TryGetValue(sno, out var _channel))
-        {
-            channel = _channel;
-        }
-        else
+        if (!_channels.TryGetValue(sno, out var channel))
         {
             channel = Channel.CreateUnbounded<PointDataEntity>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = true });
             _channels.TryAdd(sno, channel);
