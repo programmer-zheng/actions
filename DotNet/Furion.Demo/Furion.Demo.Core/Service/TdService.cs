@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Furion.Demo.Core.Dtos;
 using Furion.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using SqlSugar;
 using SqlSugar.TDengine;
 
@@ -13,34 +14,44 @@ namespace Furion.Demo.Core.Service;
 public class TdService : ISingleton
 {
     private readonly ITenant _tenant;
+    private readonly ILogger<TdService> _logger;
 
-    public TdService(ITenant tenant)
+    public TdService(ITenant tenant, ILogger<TdService> logger)
     {
         _tenant = tenant;
+        _logger = logger;
     }
 
     public async Task InsertAndUpdate(PointDataEntity data)
     {
-        var oldData = await _tenant.QueryableWithAttr<PointDataEntity>().Where(t => t.SNO == data.SNO && t.PointNumber == data.PointNumber && t.ts < data.ts).OrderByDescending(t => t.ts).FirstAsync();
-        if (oldData != null)
+        try
         {
-            var aggregateData = await QueryAggregateAsync(data.SNO, data.PointNumber);
-            if (aggregateData.Count > 0)
+            var db = ((ISqlSugarClient)_tenant).CopyNew().GetConnection(Consts.TdConfigId);
+            var oldData = await db.Queryable<PointDataEntity>().Where(t => t.SNO == data.SNO && t.PointNumber == data.PointNumber && t.ts < data.ts).OrderByDescending(t => t.ts).FirstAsync();
+            if (oldData != null)
             {
-                oldData.AvgValue = aggregateData.First(t => t.Type == AgggegateTypeEnum.Avg).Val;
-                oldData.MaxValue = aggregateData.First(t => t.Type == AgggegateTypeEnum.Max).Val;
-                oldData.MinValue = aggregateData.First(t => t.Type == AgggegateTypeEnum.Min).Val;
+                var aggregateData = await QueryAggregateAsync(data.SNO, data.PointNumber);
+                if (aggregateData.Count > 0)
+                {
+                    oldData.AvgValue = aggregateData.First(t => t.Type == AgggegateTypeEnum.Avg).Val;
+                    oldData.MaxValue = aggregateData.First(t => t.Type == AgggegateTypeEnum.Max).Val;
+                    oldData.MinValue = aggregateData.First(t => t.Type == AgggegateTypeEnum.Min).Val;
+                }
+
+                oldData.DateTime = DateTime.Now;
+                await db.Insertable(oldData)
+                    .SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.SNO}_{it.PointNumber}")
+                    .ExecuteCommandAsync();
             }
 
-            oldData.DateTime = DateTime.Now;
-            await _tenant.InsertableWithAttr(oldData)
+            await db.Insertable(data)
                 .SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.SNO}_{it.PointNumber}")
                 .ExecuteCommandAsync();
         }
-
-        await _tenant.InsertableWithAttr(data)
-            .SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.SNO}_{it.PointNumber}")
-            .ExecuteCommandAsync();
+        catch (Exception e)
+        {
+            _logger.LogError(e, "保存出错");
+        }
     }
 
 
@@ -86,7 +97,8 @@ public class TdService : ISingleton
         var q3 = _tenant.QueryableWithAttr<PointDataEntity>().Where(expression)
             .Select(it => new TdAggregateDataListDto { Val = SqlFunc.AggregateAvg(it.PointValue), Type = AgggegateTypeEnum.Avg, Time = DateTime.Now });
 
-        var db = _tenant.GetConnectionScope(Consts.TdConfigId);
+        //var db = _tenant.GetConnectionScope(Consts.TdConfigId);
+        var db = ((ISqlSugarClient)_tenant).CopyNew().GetConnection(Consts.TdConfigId);
         var data = await db.UnionAll(q1, q2, q3).ToListAsync();
         return data;
     }

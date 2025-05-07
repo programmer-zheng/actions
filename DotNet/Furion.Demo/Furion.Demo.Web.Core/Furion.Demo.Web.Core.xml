@@ -4,5 +4,143 @@
         <name>Furion.Demo.Web.Core</name>
     </assembly>
     <members>
+        <member name="T:TouchSocket.Core.GeneratorContainerAttribute">
+            <summary>
+            源生成容器特性
+            </summary>
+        </member>
+        <member name="P:TouchSocket.Core.BaseInjectAttribute.FromType">
+            <summary>
+            注册类型
+            </summary>
+        </member>
+        <member name="P:TouchSocket.Core.BaseInjectAttribute.ToType">
+            <summary>
+            实例类型
+            </summary>
+        </member>
+        <member name="P:TouchSocket.Core.BaseInjectAttribute.Key">
+            <summary>
+            注册额外键
+            </summary>
+        </member>
+        <member name="T:TouchSocket.Core.AutoInjectForSingletonAttribute">
+            <summary>
+            自动注入为单例。
+            </summary>
+        </member>
+        <member name="T:TouchSocket.Core.AutoInjectForTransientAttribute">
+            <summary>
+            自动注入为瞬时。
+            </summary>
+        </member>
+        <member name="T:TouchSocket.Core.AddSingletonInjectAttribute">
+            <summary>
+            添加单例注入。
+            <para>
+            该标签仅添加在继承<see cref="T:TouchSocket.Core.ManualContainer"/>的容器上时有用。
+            </para>
+            </summary>
+        </member>
+        <member name="M:TouchSocket.Core.AddSingletonInjectAttribute.#ctor(System.Type,System.Type,System.String)">
+            <summary>
+            添加单例注入。
+            <para>
+            该标签仅添加在继承<see cref="T:TouchSocket.Core.ManualContainer"/>的容器上时有用。
+            </para>
+            </summary>
+            <param name="fromType">注册类型</param>
+            <param name="toType">实例类型</param>
+            <param name="key">注册额外键</param>
+        </member>
+        <member name="M:TouchSocket.Core.AddSingletonInjectAttribute.#ctor(System.Type)">
+            <summary>
+            添加单例注入。
+            <para>
+            该标签仅添加在继承<see cref="T:TouchSocket.Core.ManualContainer"/>的容器上时有用。
+            </para>
+            </summary>
+            <param name="type">注册类型与实例类型一致</param>
+        </member>
+        <member name="M:TouchSocket.Core.AddSingletonInjectAttribute.#ctor(System.Type,System.Type)">
+            <summary>
+            添加单例注入。
+            <para>
+            该标签仅添加在继承<see cref="T:TouchSocket.Core.ManualContainer"/>的容器上时有用。
+            </para>
+            </summary>
+            <param name="fromType">注册类型</param>
+            <param name="toType">实例类型</param>
+        </member>
+        <member name="T:TouchSocket.Core.AddTransientInjectAttribute">
+            <summary>
+            添加瞬态注入。
+            <para>
+            该标签仅添加在继承<see cref="T:TouchSocket.Core.ManualContainer"/>的容器上时有用。
+            </para>
+            </summary>
+        </member>
+        <member name="M:TouchSocket.Core.AddTransientInjectAttribute.#ctor(System.Type,System.Type,System.String)">
+            <summary>
+            添加瞬态注入。
+            <para>
+            该标签仅添加在继承<see cref="T:TouchSocket.Core.ManualContainer"/>的容器上时有用。
+            </para>
+            </summary>
+            <param name="fromType">注册类型</param>
+            <param name="toType">实例类型</param>
+            <param name="key">注册额外键</param>
+        </member>
+        <member name="M:TouchSocket.Core.AddTransientInjectAttribute.#ctor(System.Type)">
+            <summary>
+            添加瞬态注入。
+            <para>
+            该标签仅添加在继承<see cref="T:TouchSocket.Core.ManualContainer"/>的容器上时有用。
+            </para>
+            </summary>
+            <param name="type">注册类型与实例类型一致</param>
+        </member>
+        <member name="M:TouchSocket.Core.AddTransientInjectAttribute.#ctor(System.Type,System.Type)">
+            <summary>
+            添加瞬态注入。
+            <para>
+            该标签仅添加在继承<see cref="T:TouchSocket.Core.ManualContainer"/>的容器上时有用。
+            </para>
+            </summary>
+            <param name="fromType">注册类型</param>
+            <param name="toType">实例类型</param>
+        </member>
+        <member name="T:TouchSocket.Core.FastSerializableAttribute">
+            <summary>
+            标识源生成Fast序列化相关的实现。
+            </summary>
+        </member>
+        <member name="T:TouchSocket.Core.GeneratorPackageAttribute">
+            <summary>
+            标识源生成<see cref="T:TouchSocket.Core.IPackage"/>的实现。
+            </summary>
+        </member>
+        <member name="T:TouchSocket.Core.PackageMemberAttribute">
+            <summary>
+            标识源生成<see cref="T:TouchSocket.Core.IPackage"/>成员的特性。
+            </summary>
+        </member>
+        <member name="P:TouchSocket.Core.PackageMemberAttribute.Behavior">
+            <summary>
+            生成行为。一般来说，对于非只读、非重写、且同时拥有get，set（可以私有）访问器的属性，会自动生成。
+            对于字段，均不会自动生成。所以可以使用该设置，来指示生成器的生成行为。
+            </summary>
+        </member>
+        <member name="T:TouchSocket.Core.GeneratorPluginAttribute">
+            <summary>
+            使用源生成插件的调用。
+            </summary>
+        </member>
+        <member name="M:TouchSocket.Core.GeneratorPluginAttribute.#ctor(System.Type)">
+            <summary>
+            使用源生成插件的调用。
+            </summary>
+            <param name="pluginType">插件名称，一般建议使用<see langword="typeof"/>解决。</param>
+        </member>
     </members>
 </doc>

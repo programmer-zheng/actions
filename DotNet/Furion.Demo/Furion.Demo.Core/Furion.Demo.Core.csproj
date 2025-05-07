@@ -19,6 +19,7 @@
 		<PackageReference Include="SqlSugar.TDengineCore" />
 		<PackageReference Include="SqlSugarCore" />
 		<PackageReference Include="TDengine.Ado.Data" />
+		<PackageReference Include="TouchSocket.Core" />
 	</ItemGroup>
 
 </Project>

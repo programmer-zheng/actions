@@ -11,5 +11,6 @@
     <PackageVersion Include="SqlSugar.TDengineCore" Version="4.18.9" />
     <PackageVersion Include="SqlSugarCore" Version="5.1.4.188" />
     <PackageVersion Include="TDengine.Ado.Data" Version="3.1.7" />
+    <PackageVersion Include="TouchSocket.Core" Version="3.0.16" />
   </ItemGroup>
 </Project>
