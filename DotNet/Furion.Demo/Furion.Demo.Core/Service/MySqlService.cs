@@ -23,7 +23,7 @@ public class MySqlService : ISingleton
 
     public async Task<object> QueryDataAsync(QueryDataDto input)
     {
-        var db = _tenant.GetConnectionScope(Consts.MySqlConfigId);
+        var db = _tenant.GetConnectionScope(Consts.MainConfigId);
         var list = await db.Queryable<PointEntity>()
             .WhereIF(input.Sno > 0, t => t.SNO.Equals(input.Sno.ToString()))
             .WhereIF(!string.IsNullOrWhiteSpace(input.PointNumber), t => t.PointNumber.Equals(input.PointNumber))
@@ -33,14 +33,14 @@ public class MySqlService : ISingleton
 
     public async Task<bool> DeleteAsync(List<long> ids)
     {
-        var db = _tenant.GetConnectionScope(Consts.MySqlConfigId);
+        var db = _tenant.GetConnectionScope(Consts.MainConfigId);
         var count = await db.Deleteable<PointEntity>(t => ids.Contains(t.Id)).ExecuteCommandAsync();
         return count > 0;
     }
 
     public Task Backup(string filePath)
     {
-        var db = _tenant.GetConnectionScope(Consts.MySqlConfigId);
+        var db = _tenant.GetConnectionScope(Consts.MainConfigId);
         db.DbMaintenance.BackupDataBase(db.Ado.Connection.Database, filePath);
         return Task.CompletedTask;
     }

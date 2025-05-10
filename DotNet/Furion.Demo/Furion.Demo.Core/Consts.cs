@@ -2,6 +2,6 @@
 
 public class Consts
 {
-    public const string MySqlConfigId = "MySql";
+    public const string MainConfigId = "Main";
     public const string TdConfigId = "TDengine";
 }

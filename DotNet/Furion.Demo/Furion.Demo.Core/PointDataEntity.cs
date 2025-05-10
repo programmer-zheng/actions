@@ -69,10 +69,10 @@ public class PointDataEntity : ITdPrimaryKey
 /// </summary>
 [SugarTable("Point_Data")]
 [TraditionDataTable]
-[Tenant(Consts.MySqlConfigId)]
+[Tenant(Consts.MainConfigId)]
 public class PointEntity : BaseEntity
 {
-    [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
+    [SugarColumn(IsPrimaryKey = true)]
     public long Id { get; set; }
 
     public string SNO { get; set; }

@@ -7,7 +7,7 @@ using StackExchange.Profiling.Internal;
 namespace Furion.Demo.Application.SqlSugar;
 
 [Route("api/MySQL")]
-public class MySqlAppService : IDynamicApiController
+public class MySqlAppService : IDynamicApiController, ITransient
 {
     private readonly ISugarRepository<PointEntity> _repository;
 
@@ -30,7 +30,11 @@ public class MySqlAppService : IDynamicApiController
     public async Task CreateAsync(List<CreateTdDataDto> input)
     {
         var data = input.Adapt<List<PointEntity>>();
-        data.ForEach(t => t.PointValue = Random.Shared.Next(10, 50));
+        data.ForEach(t =>
+        {
+            t.PointValue = Random.Shared.Next(10, 50);
+            t.Id = SnowFlakeSingle.instance.NextId();
+        });
         // await repository.InsertRangeAsync(data);
         await _mySqlService.BatchInsert(data);
     }

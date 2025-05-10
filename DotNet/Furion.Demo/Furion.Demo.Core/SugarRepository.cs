@@ -15,7 +15,7 @@ public class SugarRepository<T> : SimpleClient<T>, ISugarRepository<T> where T :
     {
         if (typeof(T).IsDefined(typeof(TraditionDataTableAttribute), true))
         {
-            base.Context = SqlSugarSetup.SugarScope.GetConnectionScope(Consts.MySqlConfigId);
+            base.Context = SqlSugarSetup.SugarScope.GetConnectionScope(Consts.MainConfigId);
         }
         else if (typeof(T).IsDefined(typeof(TimingDataTableAttribute), true))
         {

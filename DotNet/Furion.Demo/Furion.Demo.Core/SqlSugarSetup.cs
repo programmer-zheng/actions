@@ -1,4 +1,5 @@
 ﻿using Furion.Demo.Core;
+using Furion.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using SqlSugar;
 using SqlSugar.DbConvert;
@@ -65,6 +66,7 @@ public static class SqlSugarSetup
             .Where(u => !u.IsInterface && !u.IsAbstract && u.IsClass && u.IsDefined(typeof(SugarTable), false))
             .WhereIF(dbType == DbType.TDengine, u => u.IsDefined(typeof(TimingDataTableAttribute), true))
             .WhereIF(dbType == DbType.MySql, u => u.IsDefined(typeof(TraditionDataTableAttribute), true))
+            .WhereIF(dbType == DbType.Sqlite, u => u.IsDefined(typeof(TraditionDataTableAttribute), true))
             .ToArray();
         var databaseName = db.Ado.Connection.Database;
         db.DbMaintenance.CreateDatabase(databaseName);
@@ -78,7 +80,7 @@ public static class SqlSugarSetup
     private static void SetupSugarAop(SqlSugarProvider db)
     {
         db.QueryFilter.AddTableFilter<ISoftDelete>(t => t.IsDeleted == false);
-        /*db.Aop.OnLogExecuting = (sql, paras) =>
+        db.Aop.OnLogExecuting = (sql, paras) =>
         {
             var rawSql = UtilMethods.GetNativeSql(sql, paras);
             var log = $"【{DateTime.Now} Execute SQL】【{db.CurrentConnectionConfig.DbType}】\r\n{rawSql}\r\n";
@@ -90,8 +92,9 @@ public static class SqlSugarSetup
             if (sql.StartsWith("DELETE", StringComparison.OrdinalIgnoreCase))
                 Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(log);
+            Log.Information(log);
             Console.ForegroundColor = originColor;
-        };*/
+        };
 
         db.Aop.OnError = (sugarException) =>
         {
@@ -101,6 +104,7 @@ public static class SqlSugarSetup
             var originColor = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine(log);
+            Log.Information(log);
             Console.ForegroundColor = originColor;
         };
     }
