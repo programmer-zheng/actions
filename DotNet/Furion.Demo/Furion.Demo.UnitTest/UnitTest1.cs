@@ -5,6 +5,7 @@ using Furion.Demo.Application.System.Dtos;
 using Furion.Demo.Core;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Shouldly;
 using SqlSugar;
 using StackExchange.Profiling.Internal;
 using Xunit.Abstractions;
@@ -34,7 +35,7 @@ namespace Furion.Demo.UnitTest
         {
             var connectionConfigs = App.GetConfig<List<ConnectionConfig>>("ConnectionConfigs");
             var str = JsonConvert.SerializeObject(connectionConfigs, formatting: Formatting.Indented);
-            Assert.True(connectionConfigs.Any(t => t.ConfigId.ToString() == Consts.MainConfigId));
+            connectionConfigs.Any(t => t.ConfigId.ToString() == Consts.MainConfigId).ShouldBeTrue();
             _outputHelper.WriteLine(str);
 
         }
@@ -43,7 +44,7 @@ namespace Furion.Demo.UnitTest
         public async Task TestDemoApi()
         {
             var result = demoAppService.SayHello();
-            Assert.Equal("Hello Furion", result);
+            result.ShouldBeEquivalentTo("Hello Furion");
 
         }
 
@@ -52,7 +53,7 @@ namespace Furion.Demo.UnitTest
         {
             var result = systemService.GetDescription();
             _outputHelper.WriteLine(result);
-            Assert.NotEqual(string.Empty, result);
+            result.ShouldNotBeNullOrEmpty();
 
         }
 
@@ -65,7 +66,7 @@ namespace Furion.Demo.UnitTest
 
             var queryResult = await mySqlAppService.QueryDataAsync(new Core.Dtos.QueryDataDto());
             _outputHelper.WriteLine(JsonConvert.SerializeObject(queryResult, formatting: Formatting.Indented));
-            Assert.NotNull(queryResult);
+            queryResult.ShouldNotBeNull();
         }
     }
 }

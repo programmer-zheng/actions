@@ -8,6 +8,7 @@
     <PackageVersion Include="Furion.Extras.ObjectMapper.Mapster" Version="4.9.7.34" />
 	  <PackageVersion Include="Furion.Pure" Version="4.9.7.34" />
     <PackageVersion Include="MySqlBackup.NET.MySqlConnector" Version="2.3.9" />
+    <PackageVersion Include="Shouldly" Version="4.3.0" />
     <PackageVersion Include="SqlSugar.TDengineCore" Version="4.18.9" />
     <PackageVersion Include="SqlSugarCore" Version="5.1.4.188" />
     <PackageVersion Include="TDengine.Ado.Data" Version="3.1.7" />
