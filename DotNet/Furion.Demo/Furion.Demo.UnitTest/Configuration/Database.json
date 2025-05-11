@@ -11,7 +11,9 @@
     {
       "ConfigId": "Main",
       "DbType": "Sqlite",
-      "ConnectionString": "DataSource=a_unittest.db"
+      //"ConnectionString": "DataSource=a_unittest.db",
+      "ConnectionString": "Data Source=:memory:",
+      "IsAutoCloseConnection": false
     }
   ]
 }
