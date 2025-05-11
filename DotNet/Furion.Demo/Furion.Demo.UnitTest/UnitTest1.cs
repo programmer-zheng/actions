@@ -41,7 +41,7 @@ namespace Furion.Demo.UnitTest
         }
 
         [Fact]
-        public async Task TestDemoApi()
+        public void TestDemoApi()
         {
             var result = demoAppService.SayHello();
             result.ShouldBeEquivalentTo("Hello Furion");
@@ -49,7 +49,7 @@ namespace Furion.Demo.UnitTest
         }
 
         [Fact]
-        public async Task TestDemoService()
+        public void TestDemoService()
         {
             var result = systemService.GetDescription();
             _outputHelper.WriteLine(result);
