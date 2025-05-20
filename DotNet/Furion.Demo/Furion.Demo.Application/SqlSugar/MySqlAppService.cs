@@ -2,7 +2,10 @@
 using Furion.Demo.Core;
 using Furion.Demo.Core.Dtos;
 using Furion.Demo.Core.Service;
+using SqlSugar.DbConvert;
 using StackExchange.Profiling.Internal;
+using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace Furion.Demo.Application.SqlSugar;
 
@@ -20,6 +23,18 @@ public class MySqlAppService : IDynamicApiController, ITransient
         //_sqlSugarClient = serviceProvider.GetKeyedService<SqlSugarClient>("MySQL");
     }
 
+    /// <summary>
+    /// 测试枚举转换
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    [HttpPost("TestEnumConvert")]
+    public Task<string> TestEnumConvert(CreatePointDto input)
+    {
+        var xx = Newtonsoft.Json.JsonConvert.SerializeObject(input,new Newtonsoft.Json.Converters.StringEnumConverter());
+
+        return Task.FromResult<string>(xx);
+    }
 
     /// <summary>
     /// 往MySql中插入数据
@@ -45,6 +60,7 @@ public class MySqlAppService : IDynamicApiController, ITransient
     /// <param name="input"></param>
     /// <returns></returns>
     [HttpPost("QueryData")]
+    [FormatFilter]
     public async Task<object> QueryDataAsync(QueryDataDto input)
     {
         // return await _mySqlService.QueryDataAsync(input);
@@ -52,9 +68,9 @@ public class MySqlAppService : IDynamicApiController, ITransient
         var list = await _repository.Context.Queryable<PointEntity>()
             .WhereIF(input.Sno > 0, t => t.SNO.Equals(input.Sno))
             .WhereIF(!input.PointNumber.IsNullOrWhiteSpace(), t => t.PointNumber.Equals(input.PointNumber))
-            .Select(t => new { t.SNO, t.PointNumber, t.PointType, t.PointValue })
             .ToListAsync();
-        return list;
+
+        return list.Adapt<List<PointListDto>>();
     }
 
     /// <summary>
@@ -82,4 +98,31 @@ public class MySqlAppService : IDynamicApiController, ITransient
             return ex.Message;
         }
     }
+}
+
+public class PointListDto
+{
+    public long Id { get; set; }
+
+    public string SNO { get; set; }
+
+    public string PointType { get; set; }
+
+    public string PointNumber { get; set; }
+
+    public double PointValue { get; set; }
+
+    public SensorType SensorType { get; set; }
+
+    public string SensorName => SensorType.ToString();
+
+    public string SensorDescription => EnumHelper.GetEnumDescription(SensorType);
+}
+
+public class CreatePointDto
+{
+    public string PointNumber { get; set; }
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public SensorType SensorType { get; set; }
 }

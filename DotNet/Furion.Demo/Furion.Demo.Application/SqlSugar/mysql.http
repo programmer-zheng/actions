@@ -1,4 +1,6 @@
-@HostAddress=http://localhost:5000
+﻿@HostAddress=http://localhost:5000
+
+
 
 ### MySQL测试插入
 POST {{HostAddress}}/api/mysql/InsertData
@@ -18,6 +20,14 @@ Content-Type: application/json
 	"pointType": "2G"
 }]
 
+### 测试枚举值转换
+POST {{HostAddress}}/api/mysql/TestEnumConvert
+Content-Type: application/json
+
+{
+	"PointNumber": "152A01",
+	"SensorType": "control"
+}
 
 ### MySQL测试查询
 POST {{HostAddress}}/api/mysql/QueryData

@@ -29,6 +29,15 @@
             MySQL数据库中的表
             </summary>
         </member>
+        <member name="M:Furion.Demo.Core.EnumHelper.SplitStringAndParseToEnums``1(System.String,System.Char)">
+            <summary>
+            将字符串分割成枚举值列表
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="source"></param>
+            <param name="separator"></param>
+            <returns></returns>
+        </member>
         <member name="M:Furion.Demo.Core.SqlSugarSetup.InitDatabase(SqlSugar.SqlSugarProvider,SqlSugar.DbType)">
             <summary>
             初始化数据库
