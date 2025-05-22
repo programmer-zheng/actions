@@ -124,5 +124,5 @@ public class CreatePointDto
     public string PointNumber { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public SensorType SensorType { get; set; }
+    public SensorType? SensorType { get; set; }
 }
