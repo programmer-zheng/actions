@@ -11,7 +11,7 @@ using SqlSugar.TDengine;
 
 namespace Furion.Demo.Core.Service;
 
-public class TdService : ISingleton
+public class TdService : IScoped
 {
     private readonly ITenant _tenant;
     private readonly ISqlSugarClient _client;

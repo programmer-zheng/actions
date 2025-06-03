@@ -36,8 +36,8 @@ public static class SqlSugarSetup
             }
         });
         SugarScope = sugarClient;
-        services.AddSingleton<ISqlSugarClient>(sugarClient);
-        services.AddSingleton<ITenant>(sugarClient);
+        services.AddScoped<ISqlSugarClient>(t => sugarClient);
+        services.AddScoped<ITenant>(t => sugarClient);
         services.AddScoped(typeof(ISugarRepository<>), typeof(SugarRepository<>));
         services.AddScoped(typeof(ISugarRepositoryTd<>), typeof(SugarRepositoryTd<>));
         try

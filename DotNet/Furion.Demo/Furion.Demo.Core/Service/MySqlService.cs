@@ -6,7 +6,7 @@ using SqlSugar;
 
 namespace Furion.Demo.Core.Service;
 
-public class MySqlService : ISingleton
+public class MySqlService : IScoped
 {
     private readonly ITenant _tenant;
 

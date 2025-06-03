@@ -10,7 +10,7 @@ using System.Text.Json.Serialization;
 namespace Furion.Demo.Application.SqlSugar;
 
 [Route("api/MySQL")]
-public class MySqlAppService : IDynamicApiController, ITransient
+public class MySqlAppService : IDynamicApiController, IScoped
 {
     private readonly ISugarRepository<PointEntity> _repository;
 

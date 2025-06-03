@@ -3,18 +3,19 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using Furion.DependencyInjection;
 using Furion.EventBus;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Furion.Demo.Core.Service;
 
 public class PointValueChangedEvent : IEventSubscriber, ISingleton
 {
-    private readonly TdService _tdService;
+    private readonly IServiceScopeFactory _scopeFactory;
 
     private ConcurrentDictionary<string, Channel<PointDataEntity>> _channels = new();
 
-    public PointValueChangedEvent(TdService tdService)
+    public PointValueChangedEvent(IServiceScopeFactory scopeFactory)
     {
-        _tdService = tdService;
+        _scopeFactory = scopeFactory;
     }
 
 
@@ -35,6 +36,9 @@ public class PointValueChangedEvent : IEventSubscriber, ISingleton
 
     void xxx(ChannelReader<PointDataEntity> reader)
     {
+        using var serviceScope = _scopeFactory.CreateScope();
+
+        var _tdService = serviceScope.ServiceProvider.GetService<TdService>();
         _ = Task.Run(async () =>
         {
             await foreach (var item in reader.ReadAllAsync())
@@ -47,13 +51,13 @@ public class PointValueChangedEvent : IEventSubscriber, ISingleton
 
 public class PointValueChangedEvent2 : IEventSubscriber, ISingleton
 {
-    private readonly TdService _tdService;
+    private readonly IServiceScopeFactory _scopeFactory;
 
     private ConcurrentDictionary<string, Channel<PointDataEntity>> _channels = new();
 
-    public PointValueChangedEvent2(TdService tdService)
+    public PointValueChangedEvent2(IServiceScopeFactory scopeFactory)
     {
-        _tdService = tdService;
+        _scopeFactory = scopeFactory;
     }
 
 
@@ -74,6 +78,9 @@ public class PointValueChangedEvent2 : IEventSubscriber, ISingleton
 
     void xxx(ChannelReader<PointDataEntity> reader)
     {
+        using var serviceScope = _scopeFactory.CreateScope();
+
+        var _tdService = serviceScope.ServiceProvider.GetService<TdService>();
         _ = Task.Run(async () =>
         {
             await foreach (var item in reader.ReadAllAsync())
@@ -86,13 +93,13 @@ public class PointValueChangedEvent2 : IEventSubscriber, ISingleton
 
 public class PointValueChangedEvent3 : IEventSubscriber, ISingleton
 {
-    private readonly TdService _tdService;
+    private readonly IServiceScopeFactory _scopeFactory;
 
     private ConcurrentDictionary<string, Channel<PointDataEntity>> _channels = new();
 
-    public PointValueChangedEvent3(TdService tdService)
+    public PointValueChangedEvent3(IServiceScopeFactory scopeFactory)
     {
-        _tdService = tdService;
+        _scopeFactory = scopeFactory;
     }
 
 
@@ -113,6 +120,9 @@ public class PointValueChangedEvent3 : IEventSubscriber, ISingleton
 
     void xxx(ChannelReader<PointDataEntity> reader)
     {
+        using var serviceScope = _scopeFactory.CreateScope();
+
+        var _tdService = serviceScope.ServiceProvider.GetService<TdService>();
         _ = Task.Run(async () =>
         {
             await foreach (var item in reader.ReadAllAsync())
@@ -125,13 +135,13 @@ public class PointValueChangedEvent3 : IEventSubscriber, ISingleton
 
 public class PointValueChangedEvent4 : IEventSubscriber, ISingleton
 {
-    private readonly TdService _tdService;
+    private readonly IServiceScopeFactory _scopeFactory;
 
     private ConcurrentDictionary<string, Channel<PointDataEntity>> _channels = new();
 
-    public PointValueChangedEvent4(TdService tdService)
+    public PointValueChangedEvent4(IServiceScopeFactory scopeFactory)
     {
-        _tdService = tdService;
+        _scopeFactory = scopeFactory;
     }
 
 
@@ -152,6 +162,9 @@ public class PointValueChangedEvent4 : IEventSubscriber, ISingleton
 
     void xxx(ChannelReader<PointDataEntity> reader)
     {
+        using var serviceScope = _scopeFactory.CreateScope();
+
+        var _tdService = serviceScope.ServiceProvider.GetService<TdService>();
         _ = Task.Run(async () =>
         {
             await foreach (var item in reader.ReadAllAsync())
