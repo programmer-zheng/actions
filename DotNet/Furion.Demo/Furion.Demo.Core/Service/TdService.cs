@@ -14,12 +14,14 @@ namespace Furion.Demo.Core.Service;
 public class TdService : ISingleton
 {
     private readonly ITenant _tenant;
+    private readonly ISqlSugarClient _client;
     private readonly ILogger<TdService> _logger;
 
-    public TdService(ITenant tenant, ILogger<TdService> logger)
+    public TdService(ITenant tenant, ILogger<TdService> logger, ISqlSugarClient client)
     {
         _tenant = tenant;
         _logger = logger;
+        _client = client;
     }
 
     public async Task InsertAndUpdate(PointDataEntity data)
@@ -64,6 +66,12 @@ public class TdService : ISingleton
             //.SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.SNO}_{it.PointNumber}_{it.Day.ToString("yyyyMMdd")}")
             //.SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.Day.ToString("yyyyMMdd")}")
             .ExecuteCommandAsync();
+    }
+
+    public void BatchInsertBulkCopy(List<PointDataEntity> data)
+    {
+        TDengineFastBuilder.SetTags(_client, (tag,stable) => $"{stable}_{tag}", "SNO", "PointNumber");
+        _client.Fastest<PointDataEntity>().BulkCopy(data);
     }
 
     public async Task ExecuteSqlAsync(string sql)

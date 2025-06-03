@@ -1,4 +1,13 @@
-@HostAddress=http://localhost:5000
+﻿@HostAddress=http://localhost:5000
+
+### 测试TD批量插入(Insertable)
+GET {{HostAddress}}/api/td/batchInsertToTd?type=1
+
+### 测试TD批量插入(sql)
+GET {{HostAddress}}/api/td/batchInsertToTd?type=2
+
+### 测试TD批量插入(bulkcopy)
+GET {{HostAddress}}/api/td/batchInsertToTd?type=3
 
 ### TdEngine测试插入
 POST {{HostAddress}}/api/td/InsertData
