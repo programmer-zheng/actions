@@ -33,7 +33,7 @@ public class TcpReceived : PluginBase, ITcpReceivedPlugin
             Buffer.BlockCopy(e.ByteBlock.ToArray(), 0, data, 0, e.ByteBlock.CanReadLength);
             // 处理46命令
             // 这里可以添加具体的处理逻辑
-            Console.WriteLine("Received command 46 from client.");
+            Console.WriteLine($"{DateTime.Now:yyyy-MM-dd  HH:mm:ss} Received command 46 from {sno} client.");
         }
         else
         {
@@ -43,7 +43,6 @@ public class TcpReceived : PluginBase, ITcpReceivedPlugin
         /*var mes = e.ByteBlock.Span.ToString(Encoding.UTF8);
         client.Logger.Info($"已从{client.IP}接收到信息：{mes}");*/
 
-        Console.WriteLine("----------收到TCP数据----------");
         await e.InvokeNext();
     }
 }

@@ -11,6 +11,13 @@ public class StationSeedData : ISqlSugarEntitySeedData<StationEntity>
 {
     public IEnumerable<StationEntity> HasData()
     {
-        return [new StationEntity { Id = 1, ip = "127.0.0.1", port = 11001, sno = "001", }];
+        var list = Enumerable.Range(1, 254).Select(t => new StationEntity()
+        {
+            Id = t,
+            ip = "127.0.0.1",
+            port = 11000 + t,
+            sno = t.ToString("D3"),
+        }).ToList();
+        return list;
     }
 }
