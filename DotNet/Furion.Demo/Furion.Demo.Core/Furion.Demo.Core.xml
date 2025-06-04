@@ -29,6 +29,31 @@
             MySQL数据库中的表
             </summary>
         </member>
+        <member name="P:Furion.Demo.Core.Entity.StationEntity.sno">
+            <summary>
+            分站号(通讯用)
+            </summary>
+        </member>
+        <member name="P:Furion.Demo.Core.Entity.StationEntity.mode">
+            <summary>
+            通讯分类
+            </summary>
+        </member>
+        <member name="P:Furion.Demo.Core.Entity.StationEntity.model">
+            <summary>
+            分站类型(8口、16口、24口)
+            </summary>
+        </member>
+        <member name="P:Furion.Demo.Core.Entity.StationEntity.ip">
+            <summary>
+            IP地址
+            </summary>
+        </member>
+        <member name="P:Furion.Demo.Core.Entity.StationEntity.port">
+            <summary>
+            端口号
+            </summary>
+        </member>
         <member name="M:Furion.Demo.Core.EnumHelper.SplitStringAndParseToEnums``1(System.String,System.Char)">
             <summary>
             将字符串分割成枚举值列表
@@ -36,6 +61,12 @@
             <typeparam name="T"></typeparam>
             <param name="source"></param>
             <param name="separator"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Furion.Demo.Core.ISqlSugarEntitySeedData`1.HasData">
+            <summary>
+            种子数据
+            </summary>
             <returns></returns>
         </member>
         <member name="M:Furion.Demo.Core.SqlSugarSetup.InitDatabase(SqlSugar.SqlSugarProvider,SqlSugar.DbType)">

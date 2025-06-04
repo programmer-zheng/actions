@@ -2,8 +2,8 @@
 using Furion.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using SqlSugar;
-using SqlSugar.DbConvert;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -70,7 +70,51 @@ public static class SqlSugarSetup
             .ToArray();
         var databaseName = db.Ado.Connection.Database;
         db.DbMaintenance.CreateDatabase(databaseName);
+        //db.DbMaintenance.DropTable(entityTypes);
         db.CodeFirst.InitTables(entityTypes);
+
+        var seedDataTypes = App.EffectiveTypes
+                   .Where(u => !u.IsInterface && !u.IsAbstract && u.IsClass
+                               && u.GetInterfaces().Any(i => i.HasImplementedRawGeneric(typeof(ISqlSugarEntitySeedData<>))))
+                   .ToList();
+        foreach (var seedType in seedDataTypes)
+        {
+
+            var entityType = seedType.GetInterfaces().First().GetGenericArguments().First();
+            if (dbType == DbType.MySql) // 默认库（有系统表特性、没有日志表和租户表特性）
+            {
+                if (entityType.GetCustomAttribute<TraditionDataTableAttribute>() == null &&
+                    (entityType.GetCustomAttribute<TenantAttribute>() != null))
+                    continue;
+            }
+            else
+            {
+                continue;
+            }
+            var instance = Activator.CreateInstance(seedType);
+            var hasDataMethod = seedType.GetMethod("HasData");
+            var seedData = ((IEnumerable)hasDataMethod?.Invoke(instance, null))?.Cast<object>();
+            if (seedData == null)
+                continue;
+
+            var entityInfo = db.EntityMaintenance.GetEntityInfo(entityType);
+            if (entityInfo.Columns.Any(u => u.IsPrimarykey))
+            {
+                // 按主键进行批量增加和更新
+                var storage = db.StorageableByObject(seedData.ToList()).ToStorage();
+                storage.AsInsertable.ExecuteCommand();
+                //if (seedType.GetCustomAttribute<IgnoreUpdateSeedAttribute>() == null) // 有忽略更新种子特性时则不更新
+                //    storage.AsUpdateable
+                //        .IgnoreColumns(entityInfo.Columns.Where(c => c.PropertyInfo.GetCustomAttribute<IgnoreUpdateSeedColumnAttribute>() != null).Select(c => c.PropertyName).ToArray())
+                //        .ExecuteCommand();
+            }
+            else
+            {
+                // 无主键则只进行插入
+                if (!db.Queryable(entityInfo.DbTableName, entityInfo.DbTableName).Any())
+                    db.InsertableByObject(seedData.ToList()).ExecuteCommand();
+            }
+        }
     }
 
     /// <summary>
