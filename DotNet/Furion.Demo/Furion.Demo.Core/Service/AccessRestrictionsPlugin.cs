@@ -50,7 +50,7 @@ public class AccessRestrictionsPlugin : PluginBase, ITcpConnectingPlugin
 
     private byte[] CreateDataRequestCommand(byte stationAddress, string value = "")
     {
-        List<byte> command = new List<byte>
+        var command = new List<byte>(6)
             {
                 LEAD_BYTE,
                 stationAddress,

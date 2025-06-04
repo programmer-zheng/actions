@@ -10,6 +10,7 @@ using TouchSocket.Core;
 using TouchSocket.Sockets;
 
 namespace Furion.Demo.Core;
+
 public class TcpReceived : PluginBase, ITcpReceivedPlugin
 {
     public TcpReceived(StationAttribute stationAttribule)
@@ -21,16 +22,15 @@ public class TcpReceived : PluginBase, ITcpReceivedPlugin
 
     public async Task OnTcpReceived(ITcpSession client, ReceivedDataEventArgs e)
     {
-        System.Buffers.ArrayPool<byte> s_arrayPool = System.Buffers.ArrayPool<byte>.Shared;
-        //var data = s_arrayPool.Rent(e.ByteBlock.CanReadLength);
-        var data = new Byte[e.ByteBlock.CanReadLength];
-        var cmdStr = e.ByteBlock[2].ToString("X");//命令
-        var sno = e.ByteBlock[1].ToString("D3");//分站号
+        var receivedData = new Byte[e.ByteBlock.CanReadLength];
+        Buffer.BlockCopy(e.ByteBlock.ToArray(), 0, receivedData, 0, e.ByteBlock.CanReadLength);
+
+        var cmdStr = receivedData[2].ToString("X"); //命令
+        var sno = receivedData[1].ToString("D3"); //分站号
         if (cmdStr == "46")
         {
-
-            //globalCollectionService.StationAttribuleList.FirstOrDefault(t => t.StationName == sno);
-            Buffer.BlockCopy(e.ByteBlock.ToArray(), 0, data, 0, e.ByteBlock.CanReadLength);
+            // 从分站响应中获取数据
+            Console.WriteLine(string.Concat(receivedData.Select(x => x.ToString("X2"))) + "  " + sno + "end-----");
             // 处理46命令
             // 这里可以添加具体的处理逻辑
             Console.WriteLine($"{DateTime.Now:yyyy-MM-dd  HH:mm:ss} Received command 46 from {sno} client.");
