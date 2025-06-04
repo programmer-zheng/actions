@@ -13,3 +13,4 @@ node_modules/
 **.user
 # 忽略ef core迁移目录
 Migrations/
+DotNet/**/*.xml
