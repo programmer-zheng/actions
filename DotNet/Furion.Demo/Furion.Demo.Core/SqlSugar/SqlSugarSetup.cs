@@ -70,7 +70,14 @@ public static class SqlSugarSetup
             .ToArray();
         var databaseName = db.Ado.Connection.Database;
         db.DbMaintenance.CreateDatabase(databaseName);
-        //db.DbMaintenance.DropTable(entityTypes);
+        foreach (var entityType in entityTypes)
+        {
+            var tableName = db.EntityMaintenance.GetEntityInfo(entityType).DbTableName;
+            if (db.DbMaintenance.IsAnyTable(tableName))
+            {
+                db.DbMaintenance.DropTable(tableName);
+            }
+        }
         db.CodeFirst.InitTables(entityTypes);
 
         var seedDataTypes = App.EffectiveTypes
