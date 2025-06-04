@@ -1,0 +1,11 @@
+# top-most EditorConfig file
+root = true
+
+# 针对所有文件
+[*]
+charset = utf-8
+# C# files
+[*.cs]
+
+# 使用文件范围的命名空间（C# 10+）
+csharp_style_namespace_declarations = file_scoped:suggestion

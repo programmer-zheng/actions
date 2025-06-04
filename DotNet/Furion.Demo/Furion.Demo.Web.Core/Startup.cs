@@ -1,8 +1,9 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Net;
 using System.Threading.Channels;
 using Furion.Demo.Application.Monitor.Dtos;
 using Furion.Demo.Core;
+using Furion.Demo.Core.Service;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using TouchSocket.Core;
 
 namespace Furion.Demo.Web.Core;
 
@@ -34,6 +36,7 @@ public class Startup : AppStartup
         services.AddEventBus();
 
         services.AddSqlSugar();
+        services.AddHostedService<CustomHostedService>();
 
     }
 

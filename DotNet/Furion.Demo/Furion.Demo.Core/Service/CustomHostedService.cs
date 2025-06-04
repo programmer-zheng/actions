@@ -1,26 +1,36 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Furion.EventBus;
 using Microsoft.Extensions.Hosting;
 
 namespace Furion.Demo.Core.Service;
 
-public class CustomHostedService : IHostedService
+public class CustomHostedService(GlobalCollectionService globalCollectionService) : IHostedService
 {
-    private readonly MySqlService _mySqlService;
+    private CancellationTokenSource _cancellationTokenSource;
 
-    public CustomHostedService(MySqlService mySqlService)
+    public Task StartAsync(CancellationToken cancellationToken)
     {
-        _mySqlService = mySqlService;
+        _cancellationTokenSource = new CancellationTokenSource();
+        // 确保后台任务在启动后异步执行
+        _ = Task.Run(async () =>
+        {
+            await RunAllAsyncInBackground(_cancellationTokenSource.Token);
+        }, cancellationToken);
+        return Task.CompletedTask;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    private async Task RunAllAsyncInBackground(CancellationToken token)
     {
-        // MessageCenter.PublishAsync("XXX",)
+        await globalCollectionService.InitializeAsync();
+        await globalCollectionService.RunAllAsync();
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
+        _cancellationTokenSource.Cancel();
+        Environment.Exit(0);
         return Task.CompletedTask;
     }
 }
