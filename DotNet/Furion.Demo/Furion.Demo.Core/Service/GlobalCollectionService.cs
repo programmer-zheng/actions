@@ -1,5 +1,6 @@
 ﻿using Furion.Demo.Core.Entity;
 using Furion.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SqlSugar;
@@ -17,12 +18,15 @@ public class GlobalCollectionService : ISingleton
 {
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<GlobalCollectionService> _logger;
+    private readonly IConfiguration _configuration;
     public GlobalCollectionService(IServiceScopeFactory scopeFactory,
-        ILogger<GlobalCollectionService> logger)
+        ILogger<GlobalCollectionService> logger,
+        IConfiguration configuration)
     {
         _scopeFactory = scopeFactory;
         StationAttribuleList = new List<StationAttribute>();
         _logger = logger;
+        _configuration = configuration;
     }
     public IList<StationAttribute> StationAttribuleList { get; set; }
 
@@ -55,6 +59,7 @@ public class GlobalCollectionService : ISingleton
 
     public async Task RunAllAsync()
     {
+
         try
         {
             var tasks = StationAttribuleList.Where(s => s.StationId != 8888888888888).Select(async station =>
@@ -88,12 +93,12 @@ public class GlobalCollectionService : ISingleton
             var config = new TouchSocketConfig()
                 .SetServerName(stationAttribule.StationName)
                 .SetRemoteIPHost($"{stationAttribule.StationIp}:{stationAttribule.StationPort}")
-                                          //.ConfigureContainer(
-                                          //    a =>
-                                          //    {
-                                          //        a.AddConsoleLogger();
-                                          //    }
-                                          //)
+                //.ConfigureContainer(
+                //    a =>
+                //    {
+                //        a.AddConsoleLogger();
+                //    }
+                //)
                 .ConfigurePlugins(a =>
                 {
                     a.Add(new TcpReceived(stationAttribule));
@@ -104,8 +109,11 @@ public class GlobalCollectionService : ISingleton
                 });
 
             await stationAttribule.Client.socketClient.SetupAsync(config).ConfigureAwait(false);
+            if (_configuration.GetValue<bool>("Collect"))
+            {
+                await stationAttribule.Client.socketClient.ConnectAsync().ConfigureAwait(false);
+            }
 
-            await stationAttribule.Client.socketClient.ConnectAsync().ConfigureAwait(false);
             return true; // 成功连接
         }
         catch (Exception ex)

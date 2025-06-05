@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Text;
 using Dm;
 using Furion.Demo.Application.System.Dtos;
@@ -208,7 +208,7 @@ INSERT INTO
     [HttpGet("QueryAggregate")]
     public async Task<object> QueryAggregateAsync()
     {
-        var data = await _tdService.QueryAggregateAsync();
+        var data = await _tdService.QueryAggregateAsync("152", "152A01");
         if (data.Count > 0)
         {
             return new TdAggregateDataDto()
