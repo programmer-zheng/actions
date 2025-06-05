@@ -4,6 +4,7 @@ using System.Threading.Channels;
 using Furion.Demo.Application.Monitor.Dtos;
 using Furion.Demo.Core;
 using Furion.Demo.Core.Service;
+using Furion.Schedule;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -11,6 +12,8 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Identity.Client;
+using StackExchange.Redis;
 using TouchSocket.Core;
 
 namespace Furion.Demo.Web.Core;
@@ -37,6 +40,29 @@ public class Startup : AppStartup
 
         services.AddSqlSugar();
         services.AddHostedService<CustomHostedService>();
+
+        services.AddSchedule(options =>
+        {
+            //批量扫描定时任务,自动添加
+            options.AddJob(App.EffectiveTypes.ScanToBuilders());
+        });
+
+        var configurationOptions = new StackExchange.Redis.ConfigurationOptions
+        {
+            EndPoints = { $"127.0.0.1:6379" },
+            Password = "123456",
+            DefaultDatabase = 0,
+            AbortOnConnectFail = false,
+            ConnectRetry = 5,
+            SyncTimeout = 5000,
+            AsyncTimeout = 5000,
+            ConnectTimeout = 5000,
+
+
+            // 添加其他配置项
+        };
+        // redis
+        services.AddSingleton<IDatabase>(ConnectionMultiplexer.Connect(configurationOptions).GetDatabase());
 
     }
 

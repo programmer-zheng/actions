@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -154,5 +154,19 @@ public class TdService : IScoped
         var db = _tenant.GetConnectionScope(Consts.TdConfigId);
         db.DbMaintenance.BackupDataBase(db.Ado.Connection.Database, filePath);
         return Task.CompletedTask;
+    }
+
+    public async Task BatchInsertPointAlarmData(List<PointAlarmData> data)
+    {
+        var db = _tenant.GetConnection(Consts.TdConfigId);
+        TDengineFastBuilder.SetTags(db, (tag, stable) => $"{stable}_{tag}",
+                   nameof(PointAlarmData.SubStationId), nameof(PointAlarmData.PointId), nameof(PointAlarmData.SensorType));
+
+        await db.Fastest<PointAlarmData>().BulkCopyAsync(data);
+    }
+
+    public async Task<int> GetAlarmCount()
+    {
+        return await _tenant.QueryableWithAttr<PointAlarmData>().CountAsync();
     }
 }

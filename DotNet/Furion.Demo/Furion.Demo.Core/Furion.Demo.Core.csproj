@@ -18,11 +18,13 @@
 		<PackageReference Include="MySqlBackup.NET.MySqlConnector" />
 		<PackageReference Include="SqlSugar.TDengineCore" />
 		<PackageReference Include="SqlSugarCore" />
+		<PackageReference Include="StackExchange.Redis" />
 		<PackageReference Include="TDengine.Ado.Data" />
 		<PackageReference Include="TouchSocket" />
 		<PackageReference Include="TouchSocket.AspNetCore" />
 		<PackageReference Include="TouchSocket.Core" />
 		<PackageReference Include="TouchSocket.Core.DependencyInjection" />
+		<PackageReference Include="Yitter.IdGenerator" />
 	</ItemGroup>
 
 </Project>
