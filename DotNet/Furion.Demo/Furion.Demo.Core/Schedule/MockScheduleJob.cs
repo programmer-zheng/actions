@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -14,9 +15,10 @@ using TouchSocket.Sockets;
 using Yitter.IdGenerator;
 
 namespace Furion.Demo.Core.Schedule;
+
 [JobDetail(nameof(MockScheduleJob), "模拟报警生成测试")]
-//[Secondly]
-[Cron("0/2 * * * * ?", CronStringFormat.WithSeconds)]
+[Secondly]
+//[Cron("0/2 * * * * ?", CronStringFormat.WithSeconds)]
 //[Minutely]
 public class MockScheduleJob : IJob
 {
@@ -30,7 +32,6 @@ public class MockScheduleJob : IJob
     public async Task ExecuteAsync(JobExecutingContext context, CancellationToken stoppingToken)
     {
         await InsertToCache();
-
     }
 
 
@@ -39,7 +40,7 @@ public class MockScheduleJob : IJob
         try
         {
             const int rangeStart = 100000;
-            int pointCount = 5000;
+            int pointCount = 10200;
             var start = DateTime.Now.AddSeconds(-5);
             var now = DateTime.Now;
             List<StationPointBaseDto> pointData = new List<StationPointBaseDto>();
@@ -54,6 +55,7 @@ public class MockScheduleJob : IJob
                     })
                     .ToList());
             }
+
             var tempList = pointData.GroupBy(t => t.Id)
                 .Select(t => new
                 {
@@ -76,7 +78,7 @@ public class MockScheduleJob : IJob
                 SubStationId = 1000,
                 StationNumber = "001000",
                 PointDateTime = start,
-                EndDateTime = now,//Random.Shared.Next(1, 20) > 5 ? now : null,
+                EndDateTime = now, //Random.Shared.Next(1, 20) > 5 ? now : null,
                 PointStatus = PointDataStatusEnum.UpPowerOutageAlarm,
                 TypeId = "93",
                 RealValue = 1,
@@ -94,15 +96,13 @@ public class MockScheduleJob : IJob
         {
             Console.WriteLine("----------定时Mock出错----------");
             Console.WriteLine(e);
-
         }
     }
 }
 
-
 [JobDetail(nameof(ScheduleSavePointAlarmDataFromCacheJob), "定时从缓存中获取报警数据保存到Td")]
-//[Secondly]
-[Cron("0/2 * * * * ?", CronStringFormat.WithSeconds)]
+[Secondly]
+//[Cron("0/2 * * * * ?", CronStringFormat.WithSeconds)]
 //[Minutely]
 public class ScheduleSavePointAlarmDataFromCacheJob : IJob
 {
@@ -178,18 +178,21 @@ public class ScheduleSavePointAlarmDataFromCacheJob : IJob
                         SetAggregatedData(alarmData, pointData);
                         hashKeys.Add(item.AlarmId!.Value.ToString());
                     }
+
                     data.Add(alarmData);
                 }
 
                 var hashFields = hashKeys.Select(t => (RedisValue)t).ToArray();
                 await _cache.HashDeleteAsync(Consts.PointAlarmHashTableKey, hashFields).ConfigureAwait(false);
-                await tdService.BatchInsertPointAlarmData(data);
-
+                //await tdService.BatchInsertPointAlarmData(data);
+                var sw = Stopwatch.StartNew();
+                await tdService.BatchInsertPointAlarmDataWithSql(data, 500);
+                sw.Stop();
+                Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} 插入 {data.Count} 条数据,用时:{sw.Elapsed.TotalSeconds} s");
                 // 删除有报警结束时间的报警缓存
                 /*_ = Task.Run(async () =>
                 {
                 });*/
-
             }
 
             var currentCount = await tdService.GetAlarmCount();
@@ -221,7 +224,7 @@ public class ScheduleSavePointAlarmDataFromCacheJob : IJob
         var pointDataList = pointData[alarmData.PointId];
         foreach (var item in pointDataList)
         {
-            if ( /*item.Id.ToString() == alarmData.PointId &&*/ item.Ts >= alarmData.StartTime && item.Ts <= alarmData.EndTime)
+            if (item.Ts >= alarmData.StartTime && item.Ts <= alarmData.EndTime)
             {
                 if (item.Value > max)
                 {

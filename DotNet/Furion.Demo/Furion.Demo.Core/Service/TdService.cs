@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading.Tasks;
 using Furion.Demo.Core.Dtos;
 using Furion.DependencyInjection;
@@ -70,7 +71,7 @@ public class TdService : IScoped
 
     public void BatchInsertBulkCopy(List<PointDataEntity> data)
     {
-        TDengineFastBuilder.SetTags(_client, (tag,stable) => $"{stable}_{tag}", "SNO", "PointNumber");
+        TDengineFastBuilder.SetTags(_client, (tag, stable) => $"{stable}_{tag}", "SNO", "PointNumber");
         _client.Fastest<PointDataEntity>().BulkCopy(data);
     }
 
@@ -160,9 +161,100 @@ public class TdService : IScoped
     {
         var db = _tenant.GetConnection(Consts.TdConfigId);
         TDengineFastBuilder.SetTags(db, (tag, stable) => $"{stable}_{tag}",
-                   nameof(PointAlarmData.SubStationId), nameof(PointAlarmData.PointId), nameof(PointAlarmData.SensorType));
+            nameof(PointAlarmData.SubStationId), nameof(PointAlarmData.PointId), nameof(PointAlarmData.SensorType));
 
         await db.Fastest<PointAlarmData>().BulkCopyAsync(data);
+    }
+
+    public async Task BatchInsertPointAlarmDataWithSql(List<PointAlarmData> data, int pageSize = 0)
+    {
+        try
+        {
+            if (data == null || data.Count == 0)
+                return;
+            var db = _tenant.GetConnection(Consts.TdConfigId);
+            if (pageSize > 0 && data.Count > pageSize)
+            {
+                var totalCount = data.Count;
+                var totalPage = (int)Math.Ceiling((double)totalCount / pageSize);
+                for (int i = 0; i < totalPage; i++)
+                {
+                    var temp = data.Skip(i * pageSize).Take(pageSize);
+                    var sql = GetRawSql(temp);
+                    await db.Ado.ExecuteCommandAsync(sql);
+                }
+            }
+            else
+            {
+                var sql = GetRawSql(data);
+                await db.Ado.ExecuteCommandAsync(sql);
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }
+
+    private string GetRawSql(IEnumerable<PointAlarmData> data)
+    {
+        var groups = data.GroupBy(t => new { t.SubStationId, t.PointId, t.SensorType }).ToList();
+
+        var stringBuilder = new StringBuilder();
+        stringBuilder.AppendLine("INSERT INTO");
+        foreach (var tagGroup in groups)
+        {
+            stringBuilder.Append($"`point_alarm_data_{tagGroup.Key.SubStationId}_{tagGroup.Key.PointId}_{tagGroup.Key.SensorType}` "); //指定子表名称
+            stringBuilder.Append($" USING `point_alarm_data` tags('{tagGroup.Key.SubStationId}','{tagGroup.Key.PointId}','{tagGroup.Key.SensorType}') "); //tags值
+            stringBuilder.AppendLine(
+                " (`ts`,`start_time`,`end_time`,`max_value_time`,`min_value_time`,`station_number`,`sensor_name`,`area_id`,`alarm_value`,`max_value`,`min_value`,`avg_value`,`point_data_status`,`point_origin_status`,`alarm_id`) "); //指定插入的字段
+            stringBuilder.Append($" VALUES ");
+            foreach (var item in tagGroup)
+            {
+                stringBuilder.Append($" ('{item.ts:yyyy-MM-dd HH:mm:ss.fffffff}',");
+                stringBuilder.Append($"'{item.StartTime:yyyy-MM-dd HH:mm:ss.fffffff}',");
+                if (item.EndTime.HasValue)
+                {
+                    stringBuilder.Append($"'{item.EndTime:yyyy-MM-dd HH:mm:ss.fffffff}',");
+                }
+                else
+                {
+                    stringBuilder.Append("null,");
+                }
+
+                if (item.MaxValueTime.HasValue)
+                {
+                    stringBuilder.Append($"'{item.MaxValueTime:yyyy-MM-dd HH:mm:ss.fffffff}',");
+                }
+                else
+                {
+                    stringBuilder.Append("null,");
+                }
+
+                if (item.MinValueTime.HasValue)
+                {
+                    stringBuilder.Append($"'{item.MinValueTime:yyyy-MM-dd HH:mm:ss.fffffff}',");
+                }
+                else
+                {
+                    stringBuilder.Append("null,");
+                }
+
+                stringBuilder.Append($"'{item.StationNumber}','{item.SensorName}',{item.AreaId},{item.AlarmValue},");
+                stringBuilder.Append($"{(item.MaxValue.HasValue ? item.MaxValue.Value : "null")},");
+                stringBuilder.Append($"{(item.MinValue.HasValue ? item.MinValue.Value : "null")},");
+                stringBuilder.Append($"{(item.AvgValue.HasValue ? item.AvgValue.Value : "null")},");
+                stringBuilder.Append($"'{item.PointDataStatus.ToString()}',");
+                stringBuilder.Append($"'{item.PointOriginStatus.ToString()}',");
+                stringBuilder.Append($"{item.AlarmId}");
+                stringBuilder.Append(")");
+            }
+        }
+
+        return stringBuilder.ToString();
+        //var str = stringBuilder.ToString();
+        //Console.WriteLine(str);
+        //return str;
     }
 
     public async Task<int> GetAlarmCount()
