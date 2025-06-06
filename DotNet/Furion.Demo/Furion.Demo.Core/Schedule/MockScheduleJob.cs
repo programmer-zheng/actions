@@ -218,36 +218,20 @@ public class ScheduleSavePointAlarmDataFromCacheJob : IJob
             return;
         }
 
-        double max = 0, min = 0, sum = 0;
-        DateTime? maxTime = null, minTime = null;
-        int count = 0;
         var pointDataList = pointData[alarmData.PointId];
-        foreach (var item in pointDataList)
+        if (pointDataList == null || pointDataList.Count == 0)
         {
-            if (item.Ts >= alarmData.StartTime && item.Ts <= alarmData.EndTime)
-            {
-                if (item.Value > max)
-                {
-                    max = item.Value;
-                    maxTime = item.Ts;
-                }
-
-                if (item.Value < min)
-                {
-                    min = item.Value;
-                    minTime = item.Ts;
-                }
-
-                sum += item.Value;
-                count++;
-            }
+            return;
         }
-
-        var avg = count > 0 ? sum / count : 0;
-        alarmData.MaxValue = max;
-        alarmData.MinValue = min;
-        alarmData.AvgValue = avg;
-        alarmData.MaxValueTime = maxTime;
-        alarmData.MinValueTime = minTime;
+        var matchList = pointDataList.Where(item => item.Ts >= alarmData.StartTime && item.Ts <= alarmData.EndTime).ToList();
+        if (matchList.Count == 0)
+        {
+            return;
+        }
+        alarmData.MaxValue = matchList.Max(item => item.Value);
+        alarmData.MinValue = matchList.Min(item => item.Value);
+        alarmData.AvgValue = Math.Round(matchList.Average(item => item.Value), 2);
+        alarmData.MaxValueTime = matchList.First(item => item.Value == alarmData.MaxValue).Ts;
+        alarmData.MinValueTime = matchList.First(item => item.Value == alarmData.MinValue).Ts;
     }
 }
