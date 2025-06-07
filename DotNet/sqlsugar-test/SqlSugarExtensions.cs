@@ -25,6 +25,63 @@ public class STagInsertChildTable<T> where T : class, new()
 
     internal SqlSugarProvider Context;
 
+
+    public List<string> GetExecuteSql(int pageSize = 500)
+    {
+        var reuslt = new List<string>();
+        var provider = (InsertableProvider<T>)thisValue;
+        var inserObjects = provider.InsertObjs;
+        var attr = GetCommonSTableAttribute(typeof(T).GetCustomAttribute<STableAttribute>());
+        Check.ExceptionEasy(attr == null || attr?.Tag1 == null, $"", $"{nameof(T)}缺少特性STableAttribute和Tag1");
+        // 根据所有非空的 Tag 进行分组
+        var ignoreColumns = GetTagNames(inserObjects.First(), attr).ToArray();
+        StringBuilder sb;
+        var sTableName = provider.SqlBuilder.GetTranslationColumnName(attr.STableName);
+        var entityInfo = this.Context.EntityMaintenance.GetEntityInfo<T>();
+        var columnInfos = entityInfo.Columns.Where(t => !ignoreColumns.Contains(t.DbColumnName)).ToList();
+        var columnNames = string.Join(",", columnInfos.Select(t => $"'{t.DbColumnName.ToLower()}'").ToList());
+
+        this.Context.Utilities.PageEach(inserObjects, pageSize, pageItems =>
+        {
+            var sw = Stopwatch.StartNew();
+            var groups = GetGroupInfos(pageItems.ToArray(), attr);
+            sb = new StringBuilder();
+            sb.Append("INSERT INTO");
+            foreach (var group in groups)
+            {
+                var groupList = group.ToList();
+                var childTableName = getChildTableNamefunc(attr.STableName, groupList.First());
+                sb.AppendLine();
+                List<string> tagValues = GetTagValues(groupList, attr);
+                string.Join("_", tagValues.Select(v => v.ToSqlFilter()));
+                var tagString = string.Join(",", tagValues.Select(v => $"'{v.ToSqlFilter()}'"));
+                sb.Append($"`{childTableName}` "); //指定子表名称
+                sb.Append($" USING {sTableName} tags({tagString}) "); //tags值
+                sb.AppendLine($"({columnNames})"); //列名
+                sb.Append("VALUES (");
+                foreach (var item in groupList)
+                {
+                    var columnValues = GetColumnValues(item, columnInfos);
+                    sb.Append(columnValues);
+                }
+
+                // await this.Context.Ado.ExecuteCommandAsync($"CREATE TABLE IF NOT EXISTS {childTableName} USING {sTableName} TAGS ({tagString})");
+                // await this.Context.Insertable(pageItems).IgnoreColumns(ignoreColumns).AS(childTableName).ExecuteCommandAsync();
+                sb.Append(")");
+            }
+
+            reuslt.Add(sb.ToString());
+            sw.Stop();
+            Console.WriteLine($"前奏用时 {sw.Elapsed.TotalSeconds} s");
+            sw.Restart();
+            // await provider.Ado.ExecuteCommandAsync(sb.ToString());
+            sw.Stop();
+            Console.WriteLine($"插入{pageItems.Count}用时 {sw.Elapsed.TotalMilliseconds} ms");
+        });
+
+        return reuslt;
+    }
+
     public async Task<int> ExecuteInsertAsync(int pageSize = 500)
     {
         var provider = (InsertableProvider<T>)thisValue;
@@ -71,9 +128,9 @@ public class STagInsertChildTable<T> where T : class, new()
             sw.Stop();
             Console.WriteLine($"前奏用时 {sw.Elapsed.TotalSeconds} s");
             sw.Restart();
-            await provider.Ado.ExecuteCommandAsync(sb.ToString());
+            // await provider.Ado.ExecuteCommandAsync(sb.ToString());
             sw.Stop();
-            Console.WriteLine($"插入{pageItems.Count}用时 {sw.Elapsed.TotalSeconds} s");
+            Console.WriteLine($"插入{pageItems.Count}用时 {sw.Elapsed.TotalMilliseconds} ms");
         });
 
         return inserObjects.Count();
