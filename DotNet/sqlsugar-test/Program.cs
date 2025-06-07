@@ -20,6 +20,13 @@ public class BulkDemo2
     public bool Boolean { get; set; }
     public string Sno { get; set; }
     public string PointNumber { get; set; }
+    
+    [SugarColumn(ColumnName = "double_value")]
+    public double Double { get; set; } 
+
+    
+    [SugarColumn(ColumnName = "null_double")]
+    public double? NullableDouble { get; set; }
 
     public DateTime? Dt { get; set; }
 }
@@ -89,6 +96,7 @@ internal class Program
                     Ts = now, // now.AddMicroseconds(i * x * y),
                     Sno = x.ToString("D3"),
                     PointNumber = y.ToString("D5"),
+                    Double = Random.Shared.NextDouble()
                 });
             }
         }
@@ -109,9 +117,9 @@ internal class Program
             sw.Stop();
             Console.WriteLine($"{list.Count}条 数据准备完毕，用时  {sw.Elapsed.TotalSeconds} s");
             sw.Restart();
-            var result = await db.Insertable<BulkDemo2>(list).ToSTableChild((stable, it) => $"{stable}_{it.Sno}_{it.PointNumber}").ExecuteInsertAsync(7000);
+            var result = await db.Insertable<BulkDemo2>(list).ToSTableChild((stable, it) => $"{stable}_{it.Sno}_{it.PointNumber}").ExecuteInsertAsync(5000);
             sw.Stop();
-            Console.WriteLine($"获取插入 插入{result}条 用时 {sw.Elapsed.TotalSeconds} s");
+            Console.WriteLine($"插入 {result}条 用时 {sw.Elapsed.TotalSeconds} s");
 
             var count = await db.Queryable<BulkDemo2>().CountAsync();
             Console.WriteLine($"当前库中有{count}条数据");

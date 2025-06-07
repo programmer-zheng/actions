@@ -126,7 +126,15 @@ public class STagInsertChildTable<T> where T : class, new()
             sw.Stop();
             Console.WriteLine($"扩展中分页生成sql用时 {sw.Elapsed.TotalSeconds} s");
             sw.Restart();
-            await provider.Ado.ExecuteCommandAsync(sb.ToString());
+            try
+            {
+                await provider.Ado.ExecuteCommandAsync(sb.ToString());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
             sw.Stop();
             Console.WriteLine($"扩展中分页插入{pageItems.Count}用时 {sw.Elapsed.TotalMilliseconds} ms");
         });
@@ -167,7 +175,11 @@ public class STagInsertChildTable<T> where T : class, new()
             }
             else if (type == typeof(string))
             {
-                list.Add($"'{obj.ObjToString()}'");
+                list.Add($"'{objValue.ObjToString()}'");
+            }
+            else
+            {
+                list.Add($"{objValue.ObjToString()}");
             }
             // else if(entityColumnInfo)
             // {
