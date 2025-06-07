@@ -5,20 +5,36 @@ using SqlSugar.TDengine;
 using System;
 using System.Diagnostics;
 using System.Text;
+
 //using TDengine.TMQ;
 
 namespace sqlsugar_test;
 
+[STableAttribute(STableName = "BulkDemo2", Tag1 = nameof(Sno), Tag2 = nameof(PointNumber))]
+//[STableAttribute(STableName = "BulkDemo2", Tag1 = nameof(Sno))]
+public class BulkDemo2
+{
+    [SugarColumn(IsPrimaryKey = true, SqlParameterDbType = typeof(DateTime19))]
+    public DateTime Ts { get; set; }
+
+    public bool Boolean { get; set; }
+    public string Sno { get; set; }
+    public string PointNumber { get; set; }
+    
+    public DateTime? Dt { get; set; }
+}
 internal class Program
 {
     static async Task Main(string[] args)
     {
+        var tdEngineServerIp = "127.0.0.1";
+        tdEngineServerIp = "192.168.110.128";
         var services = new ServiceCollection();
         var db = new SqlSugarClient(new ConnectionConfig()
         {
             ConfigId = "tdengine",
             DbType = SqlSugar.DbType.TDengine,
-            ConnectionString = "Host=127.0.0.1;Port=6030;Username=root;Password=taosdata;Database=test;TsType=config_ns",
+            ConnectionString = $"Host={tdEngineServerIp};Port=6030;Username=root;Password=taosdata;Database=sqlsugartest;TsType=config_ns",
             IsAutoCloseConnection = true,
         });
 
@@ -29,7 +45,7 @@ internal class Program
             {
                 ConfigId = "tdengine",
                 DbType = SqlSugar.DbType.TDengine,
-                ConnectionString = "Host=127.0.0.1;Port=6030;Username=root;Password=taosdata;Database=test;TsType=config_ns",
+                ConnectionString = $"Host={tdEngineServerIp};Port=6030;Username=root;Password=taosdata;Database=sqlsugartest;TsType=config_ns",
                 IsAutoCloseConnection = true,
             });
             return db;
@@ -40,18 +56,45 @@ internal class Program
         {
             db.DbMaintenance.DropTable<BulkDemo2>();
         }
-        db.CodeFirst.InitTables(typeof(BulkDemo2));
-        var serviceProvider = services.BuildServiceProvider();
 
-        int i = 0;
-        while (true)
+        db.CodeFirst.InitTables(typeof(BulkDemo2));
+
+        var list = GetData();
+        var sw = Stopwatch.StartNew();
+        await db.Insertable<BulkDemo2>(list).ToSTableChild((stable, it) => $"{stable}_{it.Sno}_{it.PointNumber}").ExecuteInsertAsync(5000);
+        sw.Stop();
+        Console.WriteLine($"tdengine 插入{list.Count}条 用时 {sw.Elapsed.TotalSeconds} s");
+        // var serviceProvider = services.BuildServiceProvider();
+        //
+        // int i = 0;
+        // while (true)
+        // {
+        //     i++;
+        //     //await Insertable(serviceProvider, i);
+        //     //await BulkCopyAsync(serviceProvider, i);
+        //     await RawSqlAsync(serviceProvider, i);
+        //     await Task.Delay(TimeSpan.FromSeconds(1));
+        // }
+    }
+
+    static List<BulkDemo2> GetData()
+    {
+        var now = DateTime.Now;
+        var list = new List<BulkDemo2>();
+        for (int x = 1; x <= 254; x++)
         {
-            i++;
-            //await Insertable(serviceProvider, i);
-            //await BulkCopyAsync(serviceProvider, i);
-            await RawSqlAsync(serviceProvider, i);
-            await Task.Delay(TimeSpan.FromSeconds(1));
+            for (int y = 1; y <= 30; y++)
+            {
+                list.Add(new BulkDemo2()
+                {
+                    Ts = now, // now.AddMicroseconds(i * x * y),
+                    Sno = x.ToString("D3"),
+                    PointNumber = y.ToString("D5"),
+                });
+            }
         }
+
+        return list;
     }
 
     static async Task RawSqlAsync(IServiceProvider serviceProvider, int i)
@@ -60,21 +103,8 @@ internal class Program
         {
             var _db = serviceProvider.GetRequiredService<ISqlSugarClient>();
             // 准备数据
-            var now = Convert.ToDateTime("2025-01-01");
-            now = DateTime.Now;
-            var list = new List<BulkDemo2>();
-            for (int x = 1; x <= 254; x++)
-            {
-                for (int y = 1; y <= 30; y++)
-                {
-                    list.Add(new BulkDemo2()
-                    {
-                        Ts = now,// now.AddMicroseconds(i * x * y),
-                        Sno = x.ToString("D3"),
-                        PointNumber = y.ToString("D5"),
-                    });
-                }
-            }
+            var list = GetData();
+
             Console.WriteLine($"{i} 数据准备完毕");
 
             var stringBuilder = new StringBuilder();
@@ -93,7 +123,6 @@ internal class Program
                     // stringBuilder.Append($" (now,{item.Id},'{item.PointType}',{item.PointValue},'{item.Day}',");
                     stringBuilder.Append($" ('{item.Ts:yyyy-MM-dd HH:mm:ss.fffffff}',0)");
                 }
-
             }
 
             //Console.WriteLine(stringBuilder.ToString());
@@ -114,21 +143,8 @@ internal class Program
         {
             var _db = serviceProvider.GetRequiredService<ISqlSugarClient>();
             // 准备数据
-            var now = Convert.ToDateTime("2025-01-01");
-            now = DateTime.Now;
-            var list = new List<BulkDemo2>();
-            for (int x = 1; x <= 254; x++)
-            {
-                for (int y = 1; y <= 2; y++)
-                {
-                    list.Add(new BulkDemo2()
-                    {
-                        Ts = now,// now.AddMicroseconds(i * x * y),
-                        Sno = x.ToString("D3"),
-                        PointNumber = y.ToString("D5"),
-                    });
-                }
-            }
+            var list = GetData();
+
             Console.WriteLine($"{i} 数据准备完毕");
             var sw = Stopwatch.StartNew();
             await _db.Insertable<BulkDemo2>(list)
@@ -150,21 +166,8 @@ internal class Program
             var _db = serviceProvider.GetRequiredService<ISqlSugarClient>();
             TDengineFastBuilder.SetTags(_db, (tag, stable) => $"{stable}_{tag}", nameof(BulkDemo2.Sno), nameof(BulkDemo2.PointNumber));
             // 准备数据
-            var now = Convert.ToDateTime("2025-01-01");
-            now = DateTime.Now;
-            var list = new List<BulkDemo2>();
-            for (int x = 1; x <= 254; x++)
-            {
-                for (int y = 1; y <= 20; y++)
-                {
-                    list.Add(new BulkDemo2()
-                    {
-                        Ts = now,// now.AddMicroseconds(i * x * y),
-                        Sno = x.ToString("D3"),
-                        PointNumber = y.ToString("D5"),
-                    });
-                }
-            }
+            var list = GetData();
+
             Console.WriteLine($"{i} 数据准备完毕");
             var sw = Stopwatch.StartNew();
             await _db.Fastest<BulkDemo2>().BulkCopyAsync(list);
@@ -178,15 +181,3 @@ internal class Program
     }
 }
 
-
-
-[STableAttribute(STableName = "BulkDemo2", Tag1 = nameof(Sno), Tag2 = nameof(PointNumber))]
-//[STableAttribute(STableName = "BulkDemo2", Tag1 = nameof(Sno))]
-public class BulkDemo2
-{
-    [SugarColumn(IsPrimaryKey = true, SqlParameterDbType = typeof(DateTime19))]
-    public DateTime Ts { get; set; }
-    public bool Boolean { get; set; }
-    public string Sno { get; set; }
-    public string PointNumber { get; set; }
-}
