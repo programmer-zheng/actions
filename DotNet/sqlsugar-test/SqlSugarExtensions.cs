@@ -120,17 +120,15 @@ public class STagInsertChildTable<T> where T : class, new()
                     sb.Append(columnValues);
                 }
 
-                // await this.Context.Ado.ExecuteCommandAsync($"CREATE TABLE IF NOT EXISTS {childTableName} USING {sTableName} TAGS ({tagString})");
-                // await this.Context.Insertable(pageItems).IgnoreColumns(ignoreColumns).AS(childTableName).ExecuteCommandAsync();
                 sb.Append(")");
             }
 
             sw.Stop();
-            Console.WriteLine($"前奏用时 {sw.Elapsed.TotalSeconds} s");
+            Console.WriteLine($"扩展中分页生成sql用时 {sw.Elapsed.TotalSeconds} s");
             sw.Restart();
-            // await provider.Ado.ExecuteCommandAsync(sb.ToString());
+            await provider.Ado.ExecuteCommandAsync(sb.ToString());
             sw.Stop();
-            Console.WriteLine($"插入{pageItems.Count}用时 {sw.Elapsed.TotalMilliseconds} ms");
+            Console.WriteLine($"扩展中分页插入{pageItems.Count}用时 {sw.Elapsed.TotalMilliseconds} ms");
         });
 
         return inserObjects.Count();

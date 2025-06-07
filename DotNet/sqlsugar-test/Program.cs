@@ -29,7 +29,7 @@ internal class Program
     static async Task Main(string[] args)
     {
         var tdEngineServerIp = "127.0.0.1";
-        tdEngineServerIp = "192.168.110.128";
+        // tdEngineServerIp = "192.168.110.128";
         var services = new ServiceCollection();
         var db = new SqlSugarClient(new ConnectionConfig()
         {
@@ -62,15 +62,16 @@ internal class Program
 
 
         var serviceProvider = services.BuildServiceProvider();
-        
+
         int i = 0;
         while (true)
         {
             i++;
             //await Insertable(serviceProvider, i);
             //await BulkCopyAsync(serviceProvider, i);
-            await RawSqlAsync(serviceProvider, i);
+            // await RawSqlAsync(serviceProvider, i);
             // await GenSqlAndExecuteAsync(serviceProvider, i);
+            await ExecuteSqlAsync(serviceProvider, i);
             await Task.Delay(TimeSpan.FromSeconds(1));
         }
     }
@@ -81,7 +82,7 @@ internal class Program
         var list = new List<BulkDemo2>();
         for (int x = 1; x <= 254; x++)
         {
-            for (int y = 1; y <= 30; y++)
+            for (int y = 1; y <= 40; y++)
             {
                 list.Add(new BulkDemo2()
                 {
@@ -93,6 +94,30 @@ internal class Program
         }
 
         return list;
+    }
+
+    static async Task ExecuteSqlAsync(IServiceProvider serviceProvider, int i)
+    {
+        using (var scope = serviceProvider.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<ISqlSugarClient>();
+            Console.WriteLine($"第{i}次：");
+            // 准备数据
+            var sw = Stopwatch.StartNew();
+
+            var list = GetData();
+            sw.Stop();
+            Console.WriteLine($"{list.Count}条 数据准备完毕，用时  {sw.Elapsed.TotalSeconds} s");
+            sw.Restart();
+            var result = await db.Insertable<BulkDemo2>(list).ToSTableChild((stable, it) => $"{stable}_{it.Sno}_{it.PointNumber}").ExecuteInsertAsync(7000);
+            sw.Stop();
+            Console.WriteLine($"获取插入 插入{result}条 用时 {sw.Elapsed.TotalSeconds} s");
+
+            var count = await db.Queryable<BulkDemo2>().CountAsync();
+            Console.WriteLine($"当前库中有{count}条数据");
+
+            Console.WriteLine();
+        }
     }
 
     static async Task GenSqlAndExecuteAsync(IServiceProvider serviceProvider, int i)
@@ -107,7 +132,7 @@ internal class Program
             sw.Stop();
             Console.WriteLine($"数据准备完毕，用时  {sw.Elapsed.TotalSeconds} s");
             sw.Restart();
-            var result = db.Insertable<BulkDemo2>(list).ToSTableChild((stable, it) => $"{stable}_{it.Sno}_{it.PointNumber}").GetExecuteSql(500);
+            var result = db.Insertable<BulkDemo2>(list).ToSTableChild((stable, it) => $"{stable}_{it.Sno}_{it.PointNumber}").GetExecuteSql(5000);
             sw.Stop();
             Console.WriteLine($"获取插入 插入{list.Count}条 用时 {sw.Elapsed.TotalSeconds} s");
             foreach (var item in result)
@@ -118,10 +143,11 @@ internal class Program
                 sw.Stop();
                 Console.WriteLine($"执行sql用时 {sw.Elapsed.TotalSeconds} s");
             }
+
             Console.WriteLine($"{i} 数据准备完毕");
         }
     }
-    
+
     static async Task RawSqlAsync(IServiceProvider serviceProvider, int i)
     {
         using (var scope = serviceProvider.CreateScope())
@@ -136,6 +162,7 @@ internal class Program
             stringBuilder.AppendLine("INSERT INTO");
             var groups = list.GroupBy(t => new { t.Sno, t.PointNumber }).ToList();
             Console.WriteLine($"分组数量:{groups.Count}");
+            var sw = Stopwatch.StartNew();
             foreach (var tagGroup in groups)
             {
                 stringBuilder.AppendLine();
@@ -150,8 +177,10 @@ internal class Program
                 }
             }
 
+            sw.Stop();
+            Console.WriteLine($"第{i}次 rawsql 生成sql {sw.Elapsed.TotalSeconds} s");
+            sw.Restart();
             //Console.WriteLine(stringBuilder.ToString());
-            var sw = Stopwatch.StartNew();
             await _db.Ado.ExecuteCommandAsync(stringBuilder.ToString());
 
             sw.Stop();
@@ -160,6 +189,8 @@ internal class Program
             var count = _db.Queryable<BulkDemo2>().Count();
             Console.WriteLine($"查询到{count}条数据");
         }
+
+        Console.WriteLine();
     }
 
     static async Task Insertable(IServiceProvider serviceProvider, int i)
